@@ -51,7 +51,8 @@ class X<[DefaultGenericArgument(typeof(C))] T> where T : C
 #### Aliases defining partial type arguments
 
 > Source:
-> [csharplang/issues#1239](https://github.com/dotnet/csharplang/issues/1239)
+> [csharplang/issues#1239](https://github.com/dotnet/csharplang/issues/1239),
+> [csharplang/issue#4284](https://github.com/dotnet/csharplang/issues/4284)
 
 **Idea**
 
@@ -157,7 +158,8 @@ IEnumerable<KeyValuePair<string, string>> Headers = new[]
 > [csharplang/discussions#2845](https://github.com/dotnet/csharplang/discussions/2845),
 > [csharplang/discussions#1103](https://github.com/dotnet/csharplang/discussions/1103),
 > [csharplang/discussions#5430](https://github.com/dotnet/csharplang/discussions/5430),
-> [csharplang/discussions#5173](https://github.com/dotnet/csharplang/discussions/5173)
+> [csharplang/discussions#5173](https://github.com/dotnet/csharplang/discussions/5173),
+> [csharplang/issues#1324](https://github.com/dotnet/csharplang/issues/1324)
 
 **Idea**
 
@@ -213,6 +215,7 @@ var add(int a, int b) => a+b;
 
 > Source:
 > [csharplang/issues#1328](https://github.com/dotnet/csharplang/issues/1328)
+> [csharplang/issues#5556](https://github.com/dotnet/csharplang/issues/5556)
 
 **Idea**
 

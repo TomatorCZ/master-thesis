@@ -68,7 +68,7 @@ using StringDictionary<TValue> = System.Collections.Generic.Dictionary<String, T
 #### Named typed arguments
 
 > Source:
-> [csharplang/discussions#280](https://github.com/dotnet/csharplang/discussions/280)),
+> [csharplang/discussions#280](https://github.com/dotnet/csharplang/discussions/280),
 > [csharplang/discussions#279](https://github.com/dotnet/csharplang/discussions/279)
 
 **Idea**

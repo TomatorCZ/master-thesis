@@ -5,7 +5,6 @@ This intro lists features regarding partial type inference, which will be target
 ## Probably will be accepted by LDM
 
 - (0.0) Using char to determine inferred type argument
-- (0.1) Type argument wildcards
 - (0.2) Inference based on target
 - (0.3) Constructor type inference
 - (0.4) Type inference using implicit operators

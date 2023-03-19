@@ -3,7 +3,7 @@
 ## My notes
 
 > Source:
-> [csharplang/discussion#6930](https://github.com/dotnet/csharplang/discussions/6930,
+> [csharplang/discussion#6930](https://github.com/dotnet/csharplang/discussions/6930),
 > [comment](https://github.com/dotnet/roslyn/pull/7850#issuecomment-170154270),
 > [csharplang/discussions#478](https://github.com/dotnet/csharplang/discussions/478),
 > [csharplang/discussions#741](https://github.com/dotnet/csharplang/discussions/741),

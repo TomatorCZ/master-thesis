@@ -288,6 +288,7 @@ A.Foo<int;string>();
 > [csharplang/discussions#2935](https://github.com/dotnet/csharplang/discussions/2935),
 > [csharplang/discussions#427](https://github.com/dotnet/csharplang/discussions/427),
 > [roslyn/issues#2319](https://github.com/dotnet/roslyn/issues/2319)
+> https://github.com/dotnet/csharplang/issues/151
 
 **Idea**
 

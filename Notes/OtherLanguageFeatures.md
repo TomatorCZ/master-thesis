@@ -66,6 +66,8 @@ let printSequence (sequence1: Collections.seq<_>) =
 
 # Kotlin type inference
 
+> Kotlin infrence https://kotlinlang.org/spec/type-inference.html
+
 ## Inference based on call arguments
 
 > Source: [kotlinlang.org](https://kotlinlang.org/docs/generics.html)

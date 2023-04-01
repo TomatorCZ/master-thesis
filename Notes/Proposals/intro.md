@@ -4,13 +4,15 @@ This intro lists features regarding partial type inference, which will be target
 
 ## Probably will be accepted by LDM
 
-- (0.0) Using char to determine inferred type argument
-- (0.2) Inference based on target
+- Explicit partial type inference
+- Type inference based on target
 - (0.3) Constructor type inference
+  - ParameterLess constructor
+  - target-types new[] initializers
+  - object and collection initilizers
 - (0.4) Type inference using implicit operators
 - (0.5) Type Inference of ref/out params in lambdas
 - (0.6) Improve type inference when inhereting multible single generic interface
-- (0.7) Target-typed inference for switch expression and deconstruction
 - (0.8) Improve infrence of type deconstruction
 
 ## I like to pick it up
@@ -23,3 +25,7 @@ This intro lists features regarding partial type inference, which will be target
 - (1.5) Named typed arguments
 - (1.6) Aliases defining partial type arguments
 - (1.7) Existential types
+- Inference of type signatures for single expression or void...
+  - https://learn.microsoft.com/en-gb/archive/blogs/ericlippert/why-no-var-on-fields
+  - Why kotlin is able to do that ?
+  - 

@@ -8,7 +8,7 @@ This intro lists features regarding partial type inference, which will be target
 - Type inference based on target
 - Type inference of constructor
 - Type inference using implicit operators
-- (0.5) Type Inference of ref/out params in lambdas
+- Type inference of ref/out params in lambdas
 - (0.6) Improve type inference when inhereting multible single generic interface
 - (0.8) Improve infrence of type deconstruction
 

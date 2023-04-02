@@ -2,7 +2,7 @@
 
 ## Summary
 
-Allow compiler to use operators for implicit casting during inference.
+Allow the compiler to use operators for implicit casting during inference.
 
 # Motivation
 

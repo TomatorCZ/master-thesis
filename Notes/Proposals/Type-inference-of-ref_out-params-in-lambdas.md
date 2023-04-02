@@ -1,4 +1,4 @@
-# Type Inference of ref/out params in lambdas
+# Type inference of ref/out params in lambdas
 
 ## Summary
 

@@ -6,10 +6,7 @@ This intro lists features regarding partial type inference, which will be target
 
 - Explicit partial type inference
 - Type inference based on target
-- (0.3) Constructor type inference
-  - ParameterLess constructor
-  - target-types new[] initializers
-  - object and collection initilizers
+- Type inference of constructor
 - (0.4) Type inference using implicit operators
 - (0.5) Type Inference of ref/out params in lambdas
 - (0.6) Improve type inference when inhereting multible single generic interface

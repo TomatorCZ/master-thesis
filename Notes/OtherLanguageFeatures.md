@@ -183,3 +183,29 @@ fun main() {
 # Rust type inference
 
 https://doc.rust-lang.org/rust-by-example/types/inference.html
+
+```rust
+use std::ptr::NonNull;
+struct A<T,U> {
+    ptr1: NonNull<T>,
+    ptr2: NonNull<U>
+}
+
+impl<T,U> A<T,U> {
+    fn new() -> Self {
+        A{
+            ptr1: NonNull::dangling(),
+            ptr2: NonNull::dangling()
+        }
+    }
+    fn foo(&self, p : T) {}
+    fn bar(&self, p : U) {}
+}
+
+fn main() {
+    println!("Hello, world!");
+    let temp = A::<i32, i32>::new();
+    temp.foo(1);
+    temp.bar(2);
+}
+```

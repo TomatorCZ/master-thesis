@@ -66,7 +66,7 @@ let printSequence (sequence1: Collections.seq<_>) =
 
 # Kotlin type inference
 
-> Kotlin infrence https://kotlinlang.org/spec/type-inference.html
+> Kotlin type inference https://kotlinlang.org/spec/type-inference.html
 
 ## Inference based on call arguments
 
@@ -182,7 +182,7 @@ fun main() {
 
 # Rust type inference
 
-https://doc.rust-lang.org/rust-by-example/types/inference.html
+> [rust-type-inference](https://doc.rust-lang.org/rust-by-example/types/inference.html)
 
 ```rust
 use std::ptr::NonNull;

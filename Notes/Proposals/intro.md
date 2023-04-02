@@ -9,8 +9,7 @@ This intro lists features regarding partial type inference, which will be target
 - Type inference of constructor
 - Type inference using implicit operators
 - Type inference of ref/out params in lambdas
-- (0.6) Improve type inference when inhereting multible single generic interface
-- (0.8) Improve infrence of type deconstruction
+- Type inference when implementing multiple same generic interfaces
 
 ## I like to pick it up
 
@@ -26,3 +25,7 @@ This intro lists features regarding partial type inference, which will be target
   - https://learn.microsoft.com/en-gb/archive/blogs/ericlippert/why-no-var-on-fields
   - Why kotlin is able to do that ?
   - 
+
+## Progress
+
+>TBF

@@ -247,6 +247,7 @@ void M(ICounter ic)
 > [csharplang/issues#1349](https://github.com/dotnet/csharplang/issues/1349),
 > [roslyn/issues#8214](https://github.com/dotnet/csharplang/issues/253)
 > [rust](https://doc.rust-lang.org/rust-by-example/types/inference.html)
+> [Hindley-Miller](https://medium.com/swlh/stretching-the-reach-of-implicitly-typed-variables-in-c-16882318a92)
 
 **Idea**
 

@@ -13,18 +13,19 @@ This intro lists features regarding partial type inference, which will be target
 
 ## I like to pick it up
 
-- (1.0) Constrained type inference
-- (1.1) Inference based on later methods call
-- (1.2) Improving delegate overload resolution
-- (1.3) Type inference by method group
+- Inference of method return type
 - (1.4) Default type parameters
 - (1.5) Named typed arguments
 - (1.6) Aliases defining partial type arguments
-- (1.7) Existential types
-- Inference of type signatures for single expression or void...
-  - https://learn.microsoft.com/en-gb/archive/blogs/ericlippert/why-no-var-on-fields
-  - Why kotlin is able to do that ?
-  - 
+- (1.3) Type inference by method group
+
+- (1.0) Constrained type inference
+  - including making a patcher
+- (1.2) Improving delegate overload resolution
+- 
+## If there will be enough time
+- Inference based on later method calls
+    - too hard probably ??
 
 ## Progress
 

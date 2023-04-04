@@ -14,19 +14,12 @@ This intro lists features regarding partial type inference, which will be target
 ## I like to pick it up
 
 - Inference of method return type
-- (1.4) Default type parameters
-- (1.5) Named typed arguments
-- (1.6) Aliases defining partial type arguments
-- (1.3) Type inference by method group
-
-- (1.0) Constrained type inference
-  - including making a patcher
-- (1.2) Improving delegate overload resolution
-- 
-## If there will be enough time
+- Default and named type parameters
+- Aliases defining open generic types
+- Type inference by method group
+- Type inference by where clauses
 - Inference based on later method calls
-    - too hard probably ??
-
+  
 ## Progress
 
 >TBF

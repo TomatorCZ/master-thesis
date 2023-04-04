@@ -6,6 +6,8 @@ Currently, C# allows inferring the whole type during its creation by `new()` con
 Although it's very useful, it disallows to write generic type without type arguments and lets the compiler infer its type arguments.
 We propose to use the method inference to determine the type arguments of created type.
 
+>TODO: object and collection initilizers?
+
 ## Motivation
 
 There are situations, where we have enough sources of information(target, used arguments) to determine all type arguments of some type. 

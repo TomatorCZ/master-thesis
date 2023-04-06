@@ -39,10 +39,10 @@ where TUserToken : IdentityUserToken<TKey>
 ```
 
 The user has to fill in all type arguments even if some of them are usually the same.
-A good idea would be to introduce default type parameters to solve common situations.
+A good idea would be to introduce default type arguments to solve common situations.
 It would have two advantages. 
 The user doesn't have to care about default implementation until he needs to customize it.
-The user doesn't have to fill in default implementation as type arguments which will cause better readability of code.  
+The user doesn't have to fill in default implementation which will give better readability of code.  
 
 In the example, we can see a potential second improvement.
 The clarity of the call site decreases when we have many parameters.
@@ -113,11 +113,11 @@ class T2Default {}
 var foo = new Foo(){}
 ```
 
-It can be worthly to be able to refer ancestor how implement or inherit the `interface` or `class` in scenarios, where the predecesor works with the type of his ancestor.
+It can be worthly to be able to refer ancestor implementin or inheriting the `interface` or `class` in scenarios, where the predecesor works with the type of his ancestor.
 See the example below.
 
 ```csharp
-interface IEquitable<T> {}
+interface IEquitable<T> {} // We would like to `T` be an implementor in default.
 
 class X : IEquitable<X> {}
 ```
@@ -128,13 +128,14 @@ We have to deal with common type names and method resolution in other to not int
 
 **Lowering**
 
-The problem will be how to express it in CIL code which doesn't know the default type parameters. 
-When we look at the default method argument, we can see the CIL have a special attribute [opt] for them. 
-We can create our custom attribute, which will replace the user's typed T = value and decorate the type parameter by him. In this way, we can keep information about default type parameters through *CIL*. 
+The problem will be how to express it in *CIL* code which doesn't know the default type arguments. 
+When we look at the default method argument, we can see the *CIL* have a special attribute `[opt]` for them. 
+We can create our custom attribute, which will replace the user's typed `T = value` and decorate the type parameter by him.
+In this way, we can keep information about default type arguments in *CIL*. 
 
 #### Named type parameters
 
-We will again take an example from named method parameters and introduce them in type paramenters.
+We will take an example from named method parameters again and introduce them in type parameters.
 
 ```csharp
 class Foo<T1, T2> {}
@@ -144,8 +145,8 @@ class Bar : Foo<T2:int, T1:string> {}
 
 **Lowering**
 
-We have to lower named type parameters to be able to compile the into CIL, which doesn't know them.
-This can be done by reordering them to accordingly match positional parameters.
+We have to lower named type parameters to be able to compile the into *CIL*, which doesn't know them.
+It can be done by reordering them to accordingly match positional parameters.
 The same trick is used for named method type parameters.
 
 ### Explicit partial type inference
@@ -232,7 +233,7 @@ We will prioritize types without default type parameters in the resolution in or
 
 ### Syntax
 
-We have to change grammer allowing tuser to use mentioned contructs
+We have to change grammar allowing the user to use mentioned constructs.
 
 **Declaration**
 

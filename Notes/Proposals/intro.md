@@ -4,7 +4,7 @@ This intro lists features regarding partial type inference, which will be target
 
 ## Probably will be accepted by LDM
 
-- Explicit partial type inference
+- Explicit and implicit partial type inference
 - Type inference based on target
 - Type inference of constructor
 - Type inference using implicit operators
@@ -14,7 +14,6 @@ This intro lists features regarding partial type inference, which will be target
 ## I like to pick it up
 
 - Inference of method return type
-- Default and named type parameters
 - Aliases defining open generic types
 - Type inference by method group
 - Type inference by where clauses

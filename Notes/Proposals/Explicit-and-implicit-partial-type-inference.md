@@ -12,6 +12,7 @@ by introducing
 1. `_` determining type argument inferred by compiler
 2. default type arguments
 3. named type arguments
+4. generic aliases
 
 ## Motivation
 
@@ -48,6 +49,13 @@ In the example, we can see a potential second improvement.
 The clarity of the call site decreases when we have many parameters.
 Taking the example, it is hard to distinguish which type argument is for `TUserRole` and `TRole`, because it depends only on positions that are defined in the class declaration.
 Introducing named type arguments could help with matching type arguments with type parameters and it is a complement of default arguments. 
+
+There could be a third-party library that we can't modify.
+In this scenario, we can't use default parameters because we don't have the source code.
+We could use inheritance to reduce type parameters, although introducing a new type just for introducing default implementation for some type parameters seems incorrect and even impossible in the case of `sealed` classes.
+What we could use instead of creating a new class is an alias representing that type.
+However current aliases are very strict to be used for that.
+We could extend them to support generic parameters to solve the issue.
 
 Other scenarios contain a specification of all type arguments when declaring generic types. 
 We feel, that the way is not ideal because of the unnecessary code that the programmer has to write. 
@@ -86,14 +94,16 @@ var scores = new List<int>() {1,2,3};
 IEnumerable<float> preciseScores = scores.Select<int, float>(i => i); // OK
 ```
 
-
 ## Scope
 
-Partial type inference can be solved in various ways. We can inspire from default and named arguments where we don't have to write all arguments. We will call it **Implicit partial type inference**. 
+Partial type inference can be solved in various ways. We can inspire from default and named arguments where we don't have to write all arguments. 
+Together with generic aliases, we will call it **Implicit partial type inference**. 
 
-Also, there are situations, where we want just to specify the arity of desired generic parameter or specify a parameter that is not possible to infer from the context but let the compiler infer the remaining arguments. This part aims to suggest a way how to specify which positional arguments should be inferred by the compiler. We will call it **Explicit partial type inference**.
+Also, there are situations, where we want just to specify the arity of desired generic parameter or specify a parameter that is not possible to infer from the context but let the compiler infer the remaining arguments. 
+This part aims to suggest a way how to specify which positional arguments should be inferred by the compiler. 
+We will call it **Explicit partial type inference**.
 
-## DetailedDesign
+## Detailed design
 
 ### Implicit partial type inference
 
@@ -124,7 +134,8 @@ class X : IEquitable<X> {}
 
 We can use `this` keyword to express the intention on the place for default value.
 
-We have to deal with common type names and method resolution in other to not introduce breaking changes. Because the proposed improvements are complementary to each other, we describe the rules for using them at the end of the *Detailed design* section. You can find a description of the syntax in the *Required changes* section.
+We have to deal with common type names and method resolution in other to not introduce breaking changes. Because the proposed improvements are complementary to each other, we describe the rules for using them at the end of the *Detailed design* section. 
+You can find a description of the syntax in the *Required changes* section.
 
 **Lowering**
 
@@ -148,6 +159,39 @@ class Bar : Foo<T2:int, T1:string> {}
 We have to lower named type parameters to be able to compile the into *CIL*, which doesn't know them.
 It can be done by reordering them to accordingly match positional parameters.
 The same trick is used for named method type parameters.
+
+#### Generic aliases
+
+A basic principle of generic aliases would be to be able to specify type parameters, which can be used as type arguments of aliased type.
+Since the generics includes also `where` clauses and proposed default parameters, we have to decide if we should allow them also for aliases.
+
+For a broader sight, `where` clauses are used to restrict used type parameters for two reasons.
+The first one restricts it because the type uses the restricted type parameter in a specific way. 
+The second one restricts it because it implements a base `class` or `interface` requiring the restriction.
+Based on this knowledge, it looks like we should allow it and even require it in the cases when aliased type requires type parameter restriction.
+However, we don't consider an alias to be a new type.
+It just refers to it.
+Introducing the `where` clauses allowed them to add new restrictions to the existing type.
+We don't feel that aliases should be able to do that.
+So we disallow the `where` clauses and just "inherit" the restriction from aliased type.
+
+The second one consists of the default parameter.
+It can be tricky.
+As we described lowering default parameters, involves a parameter type attribute representing the default value.
+If we enable the default parameter in aliases, it wouldn't have the same meaning as a default parameter placed in aliased type.
+We can't modify attributes contained in the third-party library, so the alias would again add "new information" (attribute which can be obtained by reflection) into that type which is not desired.
+So we don't allow to use it in aliases.
+
+Although using aliases doesn't completely replace the default parameters, it helps to do it in a restricted way in the case of third-party libraries which will don't use default type parameters.
+Look at the example.
+
+```csharp
+global using MyBase<T> = BaseClass<T, T, int, string>;
+
+class BaseClass<T1, T2, T3, T4> 
+where ...
+{...}
+```
 
 ### Explicit partial type inference
 
@@ -249,6 +293,9 @@ type_parameter
 
 default_argument
     : '=' (type | 'this')
+    ;
+using_alias_directive
+    : 'using' identifier type_parameter_list? '=' namespace_or_type_name ';'
     ;
 ```
 

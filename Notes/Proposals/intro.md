@@ -15,8 +15,11 @@ This intro lists features regarding partial type inference, which will be target
 
 - Inference of method return type
 - Type inference by where clauses
-- Inference based on later method calls
   
+## When will be enough time
+
+- Inference based on later method calls
+
 ## Discarded
 
 - Type inference by method group

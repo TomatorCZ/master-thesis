@@ -14,7 +14,6 @@ This intro lists features regarding partial type inference, which will be target
 ## I like to pick it up
 
 - Inference of method return type
-- Aliases defining open generic types
 - Type inference by method group
 - Type inference by where clauses
 - Inference based on later method calls

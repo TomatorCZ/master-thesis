@@ -35,3 +35,8 @@ We have to be aware of self-referencing functions prohibiting inference.
 ## Required changes
 
 It needs to change Roslyn pipeline of binding C# code.
+
+## Implementation notes
+
+Not required changes in syntax(`LanguageParser`) when `var Foo() => ...` is used(Either local function or private function).
+We will have to change the syntax(`LanguageParser`) when `Foo() => ...` will be used(Either local function or private function).

@@ -1,199 +1,153 @@
-# Explicit and implicit partial type inference
+# Explicit partial type inference
 
 ## Summary
 
-Allow a user to specify only necessary type arguments of
+Allow an user to specify only necessary type arguments of
 
-1. Generic method or function call
-2. Generic type
+1. Generic method or local function call
+2. Generic object and delegate creation
+3. Variable declaration of a generic type
+4. Cast
 
-by introducing
-
-1. `_` determining type argument inferred by compiler
-2. default type arguments
-3. named type arguments
-4. generic aliases
+by introducing the `_` placeholder to mark type arguments inferred by the compiler.
 
 ## Motivation
 
-We think that the mentioned improvements make the scenarios below easier for programmers in the way to not write unnecessary type arguments which can be inferred from the context.
+The current method type inference works as an "all or nothing" principle. 
+If the compiler is not able to infer command call type arguments, the user has to specify all of them.
+This requirement can be verbose, noisy, and unnecessary in cases where the compiler is able to infer almost all type arguments and need just to specify ambiguous ones.
+In these cases, we would like to give the compiler the hint for ambiguous type arguments.
+The current source of dependencies, which are used in type inference is restricted to method/function arguments which force to make the whole type argument list inference in even simple scenarios.
+We could use the `_` placeholder for type arguments, which can be inferred from the argument list, and specify the remaining type arguments by ourselves.
+The potential additional sources of type information are specified below.
 
-- Declaration of `class`, `struct`, `interface`
-- Declaration of variables
-- Calling generic methods and constructors
+- **Inference by target type** - The current method type inference doesn't use target type for determining type argument in inference resulting in to specify the whole argument list. 
+- **Inference by `where` clauses** - Utilize `where` clauses to determine the type argument.
+- **Inference by later calls** - Utilize later method calls to determine the type of the generic object (useful for object creation).
+- **Inference by inheritance or implementation** - Utilize implemented interfaces or inherited class for determining type argument.
 
-There are scenarios when implementing(or inheriting) `interface`(or `class`) requires specifying many type arguments.
-Since we have generics, it is common for frameworks to use them to offer base implementation of an algorithm that is specialized in the user's code.
-Because these frameworks try to provide a solution for all cases, the contracts can sometimes contain many type arguments which have to be filled in by the user during implementation.
-We can take an example from `EntityFramework` providing `IdentityDbContext` used for identity.
+Because of restricted type inference, `_` can be used only in restricted scenarios.
+However, the potential of this feature with combination of mentioned type inference improvements can bring more useful cases.
+See the following examples, where `_` can be used to hint the compiler type arguments, whih could be infered in case of implemented mentioned inference improvements.
 
 ```csharp
-public abstract class IdentityDbContext<TUser,TRole,TKey,TUserClaim,TUserRole,TUserLogin,TRoleClaim,TUserToken> : IdentityUserContext<TUser,TKey,TUserClaim,TUserLogin,TUserToken> 
-where TUser : IdentityUser<TKey>
-where TRole : IdentityRole<TKey> 
-where TKey : IEquatable<TKey> 
-where TUserClaim : IdentityUserClaim<TKey> 
-where TUserRole : IdentityUserRole<TKey> 
-where TUserLogin : IdentityUserLogin<TKey>
-where TRoleClaim : IdentityRoleClaim<TKey> 
-where TUserToken : IdentityUserToken<TKey>
+TResult Foo<TParam, TResult>(TParam p)
+where TResult ...
+{ ... }
+
+MyResult res = Foo<_, MyResult>(myVar); // We can hint the compiler the target type
 ```
 
-The user has to fill in all type arguments even if some of them are usually the same.
-A good idea would be to introduce default type arguments to solve common situations.
-It would have two advantages. 
-The user doesn't have to care about default implementation until he needs to customize it.
-The user doesn't have to fill in default implementation which will give better readability of code.  
+```csharp
+void Foo<TList, TElem>(TList p) 
+where TList : List<TElem>
+{}
 
-In the example, we can see a potential second improvement.
-The clarity of the call site decreases when we have many parameters.
-Taking the example, it is hard to distinguish which type argument is for `TUserRole` and `TRole`, because it depends only on positions that are defined in the class declaration.
-Introducing named type arguments could help with matching type arguments with type parameters and it is a complement of default arguments. 
-
-There could be a third-party library that we can't modify.
-In this scenario, we can't use default parameters because we don't have the source code.
-We could use inheritance to reduce type parameters, although introducing a new type just for introducing default implementation for some type parameters seems incorrect and even impossible in the case of `sealed` classes.
-What we could use instead of creating a new class is an alias representing that type.
-However current aliases are very strict to be used for that.
-We could extend them to support generic parameters to solve the issue.
-
-Other scenarios contain a specification of all type arguments when declaring generic types. 
-We feel, that the way is not ideal because of the unnecessary code that the programmer has to write. 
-See the example below. 
-We don't have to specify the second type argument, it can be inferred from the constructor. 
-However, the first argument cannot be omitted because we want to specify the precision.
+Foo<_, int>(new List<int>()) // we can hint the compiler info from `where` clauses
+```
 
 ```csharp
-using System.Collections.Generic;
-
-Calculation<float, object> calculation = new (new List<object>());
-//or
-var calculation = new Calculation<float, object>(new List<object>());
-
-public class Calculation<TPrecission, TEntity> {
-    public Calculation(List<TEntity> entities) {} 
+class Foo<T1, T2> {
+    Foo(T1 p) {}
+    public void Bar(T2 p) {}
 }
+
+var a = Foo<_, int>("str"); // we can hint the compiler type arguments obtained from later calls
+a.Bar(1);
 ```
-
-The current generic method type inference situation works as an "all or nothing" principle. 
-If the compiler is not able to infer command call type arguments, a user has to specify all of them. 
-This requirement can be noisy and unnecessary in scenarios where some type arguments can be inferred by the compiler based on other dependencies.
-
-We can take an example from the `System.Linq` library. 
-When we use the `Select` method, the first argument can be inferred from a target. 
-However, the second argument doesn't have to be obvious from the context. 
-We can see it in the example, where we want to specify the precision. 
-The better way would be to skip obvious type parameters (`int` here) and specify just ambiguous ones(`float` here).
 
 ```csharp
-using System.Collections.Generic;
-using System.Linq;
+class Foo<TElem, TParam> : IEnumarable<TElem> {
+    Foo(TParam p) {}
+}
 
-var scores = new List<int>() {1,2,3};
-// Error: IEnumerable<float> preciseScores = scores.Select(i => i);
-IEnumerable<float> preciseScores = scores.Select<int, float>(i => i); // OK
+IEnumerable<int> = new Foo<int, _>(42); // we can hint the compiler type argument obtained from interface implementation or class inheritance
 ```
+
+Even if all of these sources would be use during method inference, there will be still type arguments, which can't by inferred from the context.
+We are talking about type arguments, which are used internaly in the class or struct and are not exposed to global API.
+So It would be still beneficial to have the `_` placeholder.
+
+As you could see in the example, we see potential to use type inference in constructors.
+The motivation behind this can be to specify just the wrapper implementation and let the elements inside the wrapper by inferred.
+It would help to make documentation right by the code with meaning "This segment of code primary cares about the wrapper".
+
+```csharp
+var a = new Wrapper<_>(wrappedElement)
+```
+
+Another need where `_` placeholders can be used is specifying arity of type argument on places, where there can be amnigituities like `IEnumerable` vs `IEnumerable<_>`.
+
+Worth to mention other options which could be accomplished in the future regarding default and named type arguments.
+Having `_` placeholder can be used as a shortcut for choosing right generic overload and save typeing when we use named type parameters.
+
+```csharp
+class Foo<T1, T2 = int> {}
+class Foo<T1, T2 = int, T3 = string> {}
+
+new Foo<T1: _, T2: string, T3 = _>() // assuming that T1 can be inferred T3 is default.
+new Foo<_,_> // choosing Foo<T1, T2> based on arity
+```
+
+Method type inference(including object creation) is not the only place where we can use the `_` placeholder.
+Sometimes `var` keyword as a variable declaration is not sufficient. 
+We would like to be able to more specify the type informaton about variable but still have some implementatino details hided.
+With the `_` placeholder we would be able to specify more the shape of variable avoiding necessary.  
+
+```csharp
+Wrapper<_> wrapper = ... // I get an wrapper, which I'm interested in, but I don't care about the type arguments, because I don't need them in my code.
+wrapper.DoSomething();
+```
+At the end, casting could use the `_` placeholder as well
+
+```csharp
+Foo<int, string> myvar = (Foo<_,_>)myobject; // Hint the type arguments based on target or other potential source of type information like default or named type arguments.
+```
+
+An interesting thing would be to allow the `_` placeholder in member lookup as you can see in the example below.
+On the first see, it can look wierd.
+
+```csharp
+static class C1<T1> {
+    static class C2 <T2> {
+        public (T1, T2) Foo(T1 t, T2 t) {}
+    }
+}
+
+var a = C1<_>.C2<_>.Foo(1, 1);
+```
+
+But in combination with default parameters, It might be useful in cases, where we use entity as a global provider of something, which we determine by type.
+
+```csharp
+static class Factory<T = Default> {
+    public T Create(){...}
+}
+
+int a = Factory<_>.Create(); // Calls Factory<int>.Create();
+var b = Factory<_>.Create(); // Calls Factory<Default>.Create();
+```
+
+Although it is inlikely that it would be added into C#, we would like to investigte what should be done to enabling it for deeper understanding type inference in Roslyn.
+
+Based on mentioned advantages which `_` placeholder can bring to type inference we feel to add it to C# worthly.
 
 ## Scope
 
-Partial type inference can be solved in various ways. We can inspire from default and named arguments where we don't have to write all arguments. 
-Together with generic aliases, we will call it **Implicit partial type inference**. 
+Partial type inference can be solved in various ways.
+We chose a feature enabling to hint the compiler by specifying amigitious type arguments and let the remaining ones on him.
+It aims on cases, where we want just to specify the arity of desired generic method(type) or specify a parameter that is not possible to infer from the context but let the compiler infer the remaining arguments. 
 
-Also, there are situations, where we want just to specify the arity of desired generic parameter or specify a parameter that is not possible to infer from the context but let the compiler infer the remaining arguments. 
-This part aims to suggest a way how to specify which positional arguments should be inferred by the compiler. 
-We will call it **Explicit partial type inference**.
+## Design
 
-## Detailed design
+As we mentioned in the emotivation, we see the usage of our proposal in the following places.
 
-### Implicit partial type inference
+1. method call
+2. object construction
+3. variable declaration
+4. casting
 
-Implicit partial type inference is fully inspired by default and named arguments of argument list of function members with slight modification including bringing a new concept of `this` keyword and combination with *Explicit partial type inference*.
-
-#### Default type parameters
-
-We can use defaults in a similar way as in method declaration.
-
-```csharp
-class Foo<T1 = T1Default, T2 = T2Default> {}
-
-class T1Default {}
-
-class T2Default {}
-...
-var foo = new Foo(){}
-```
-
-It can be worthly to be able to refer ancestor implementin or inheriting the `interface` or `class` in scenarios, where the predecesor works with the type of his ancestor.
-See the example below.
-
-```csharp
-interface IEquitable<T> {} // We would like to `T` be an implementor in default.
-
-class X : IEquitable<X> {}
-```
-
-We can use `this` keyword to express the intention on the place for default value.
-
-We have to deal with common type names and method resolution in other to not introduce breaking changes. Because the proposed improvements are complementary to each other, we describe the rules for using them at the end of the *Detailed design* section. 
-You can find a description of the syntax in the *Required changes* section.
-
-**Lowering**
-
-The problem will be how to express it in *CIL* code which doesn't know the default type arguments. 
-When we look at the default method argument, we can see the *CIL* have a special attribute `[opt]` for them. 
-We can create our custom attribute, which will replace the user's typed `T = value` and decorate the type parameter by him.
-In this way, we can keep information about default type arguments in *CIL*. 
-
-#### Named type parameters
-
-We will take an example from named method parameters again and introduce them in type parameters.
-
-```csharp
-class Foo<T1, T2> {}
-
-class Bar : Foo<T2:int, T1:string> {}
-```
-
-**Lowering**
-
-We have to lower named type parameters to be able to compile the into *CIL*, which doesn't know them.
-It can be done by reordering them to accordingly match positional parameters.
-The same trick is used for named method type parameters.
-
-#### Generic aliases
-
-A basic principle of generic aliases would be to be able to specify type parameters, which can be used as type arguments of aliased type.
-Since the generics includes also `where` clauses and proposed default parameters, we have to decide if we should allow them also for aliases.
-
-For a broader sight, `where` clauses are used to restrict used type parameters for two reasons.
-The first one restricts it because the type uses the restricted type parameter in a specific way. 
-The second one restricts it because it implements a base `class` or `interface` requiring the restriction.
-Based on this knowledge, it looks like we should allow it and even require it in the cases when aliased type requires type parameter restriction.
-However, we don't consider an alias to be a new type.
-It just refers to it.
-Introducing the `where` clauses allowed them to add new restrictions to the existing type.
-We don't feel that aliases should be able to do that.
-So we disallow the `where` clauses and just "inherit" the restriction from aliased type.
-
-The second one consists of the default parameter.
-It can be tricky.
-As we described lowering default parameters, involves a parameter type attribute representing the default value.
-If we enable the default parameter in aliases, it wouldn't have the same meaning as a default parameter placed in aliased type.
-We can't modify attributes contained in the third-party library, so the alias would again add "new information" (attribute which can be obtained by reflection) into that type which is not desired.
-So we don't allow to use it in aliases.
-
-Although using aliases doesn't completely replace the default parameters, it helps to do it in a restricted way in the case of third-party libraries which will don't use default type parameters.
-Look at the example.
-
-```csharp
-global using MyBase<T> = BaseClass<T, T, int, string>;
-
-class BaseClass<T1, T2, T3, T4> 
-where ...
-{...}
-```
-
-### Explicit partial type inference
+### Method call
 
 We would like to somehow mark inferred type arguments. 
 The most natural approach would be to replace the type arguments with some keyword. 
@@ -218,8 +172,86 @@ foo<>(1,2); // Still, it is not clear which generic overload should be choose.
 ```
 
 Because of mentioned issues, we believe that marking each type argument, what the compiler will infer, is the right way how to do it.
+To make it possible, we would have to change C# grammar
 
-The next level of marking the type argument to be inferred by the compiler is wildcards usage. 
+```
+invocation_expression
+    : primary_expression '(' argument_list? ')'
+    : simple_name_u '(' argument_list? ')'
+    : member_access_u '(' argument_list? ')'
+    : null_conditional_member_access_u '(' argument_list? ')'
+    ;
+
+simple_name_u
+    : identifier type_argument_list_u?
+    ;
+
+member_access_u
+    : primary_expression '.' identifier type_argument_list_u?
+    | predefined_type '.' identifier type_argument_list_u?
+    | qualified_alias_member '.' identifier type_argument_list_u?
+    ;
+
+null_conditional_member_access_u
+    : primary_expression '?' '.' identifier type_argument_list?
+      dependent_access* dependent_member_access_u?
+    | primary_expression '?' '.' identifier type_argument_list_u?
+    ;
+    
+dependent_access
+    : '.' identifier type_argument_list?    // member access
+    | '[' argument_list ']'                 // element access
+    | '(' argument_list? ')'                // invocation
+    ;
+
+dependent_member_access_u
+    : '.' identifier type_argument_list_u?    // member access
+    ;
+
+type_argument_list_u
+    : '<' type_arguments_u '>'
+    ;
+
+type_arguments_u
+    : type_argument_u (',' type_argument_u)*
+    ;   
+
+type_argument_u
+    : type | '_'
+    ;
+
+```
+
+To be able to use it in invocation, we have to modify method invocation and type inference algorithm.
+
+> #### 11.8.9.2 Method invocations
+>
+> ...
+>
+> - **If F is generic and M includes a type argument list containing at least one `_` placeholder, F is a candidate when:**
+>   - **F has the same number of method type parameters as were supplied in the type argument list, and**
+>   - **Type inference (§11.6.3) succeeds, inferring a list of type arguments for the call, and**
+>   - **Once the type arguments are substituted for the corresponding method type parameters, all constructed types in the parameter list of F satisfy their constraints (§8.4.5), and the parameter list of F is applicable with respect to A (§11.6.4.2).**
+> - If F is generic and M includes a type argument list, F is a candidate when:
+
+> #### 11.6.3.1 General
+> 
+> ...
+> 
+> When a particular method group is specified in a method invocation, and either no type arguments are specified as part of the method invocation or the type argument list contains at least one '_', type inference is applied to each generic method in the method group.
+>
+> ...
+>
+> With a method call of the form `M(E₁ ...Eₓ)` **or `M<Y₁...Yᵥ>(E₁ ... Eₓ)`** the task of type inference is to find unique type arguments S₁...Sᵥ for each of the type parameters X₁...Xᵥ so that the call `M<S₁...Sᵥ>(E₁...Eₓ)` becomes valid **and in the case of `M<Y₁...Yᵥ>(E₁ ... Eₓ)` type argument `Sk` should by identical with `Yk` if Yk is not `_`**.
+>
+> ...
+>
+> #### 11.6.3.2 The first phase
+> **If the method call has the form `M<Y₁...Yᵥ>(E₁ ... Eₓ)` for each `Yᵢ` which is not `_`, fix type variable `Xᵢ` to `Yᵢ`.**
+> For each of the method arguments `Eᵢ`:
+>
+
+There raises an question if we can go furthur and allow `_` to be nested 
 See the following example.
 
 ```csharp
@@ -258,74 +290,78 @@ This is a reasonable argument and we feel that it should follow it.
 For this reason, we would postpone this extended feature to future improvements where we would be able to use the constraints without causing a breaking change.
 This could be done by some tool that patches the old code.
 
-### Rules
+#### Object construction
 
-**Declaration**
+We have 2 `creation_expressions`, where we can potentially use `_` placeholder.
 
-1. In the declaration, a position type parameter must not appear after the default type parameter.
-2. Only `struct`, and classes that are not `abstract` and `this` keyword can be used as a default value of a type parameter.
+1. delegate
+2. object
 
-**Type resolution**
-
-We will prioritize types without default type parameters in the resolution in order to not introduce breaking changes. That means.
-
-1. If there is a candidate, which is applicable and doesn't have default type parameters and the remaining candidates contain only generic classes with default type parameters that are also applicable, we will choose the one without default type parameters.
-2. Rules for using named arguments are the same as for method parameters.
-3. We can use `_` to specify the arity of the type.
-
-## Required changes
-
-### Syntax
-
-We have to change grammar allowing the user to use mentioned constructs.
-
-**Declaration**
+we would allow to use `_` only in `object_creation_expression` and `delegate_creation_expression`.
+To make it possible we have to change the grammar.
+For abbreviation, we refer a type name allowing to contain `_` in its type arguments to `type_name_u`.
+(`type_name_u` can be `Foo<_, int>` but not `Foo1<int, _>.Foo2<int,_>`) 
 
 ```
-type_parameters
-    : attributes? type_parameter
-    | type_parameters ',' attributes? type_parameter
+object_creation_expression
+    : 'new' type_u '(' argument_list? ')' object_or_collection_initializer?
+    | 'new' type_u object_or_collection_initializer
     ;
 
-type_parameter
-    : attributes? type identifier default_argument?
-    ;
-
-default_argument
-    : '=' (type | 'this')
-    ;
-using_alias_directive
-    : 'using' identifier type_parameter_list? '=' namespace_or_type_name ';'
+delegate_creation_expression
+    : 'new' delegate_type_u simple_type_name_u? '(' expression ')'
     ;
 ```
 
-**Usage**
+Firtly, we look at an object creation.
+Currently, C# support only target-typed `new` operator.
+However, we would like to create a generic object based on arguments only allowing us to choose *implementation*.
+See the example
 
-```
-type_argument_list
-    : '<' type_arguments '>'
-    ;
-
-type_arguments
-    : type_argument (',' type_argument)*
-    ;   
-
-type_argument
-    : type_argument_name? type_argument_value
-    ;
-
-type_argument_name
-    : identifier ':'
-    ;
-
-type_argument_value
-    : type | '_'
-    ;
+```csharp
+IEnumerable<int> myVar = new List<_>() {1,2,3};
+// We feel necessary to enable inference even there are no type arguments to be consistent with method type inference
+myVar = new List() {1,2,3};
 ```
 
-### Inference algorithm
+To make this done, we have to allow type inference of constructors, which enables us the same way of adding the `_` placeholder as we saw in method type inference.
+This would make a change in the specification.
 
->TODO
+> TODO
+
+> 12.8.16.2 Object creation expressions
+>
+> The binding-time processing of an *object_creation_expression* of the form new `T(A)`, where `T` is a *class_type*, or a *value_type*, and `A` is an optional *argument_list*, consists of the following steps:
+> 
+> - If `T` is a *value_type* and `A` is not present:
+>   - The *object_creation_expression* is a default constructor invocation. The result of the *object_creation_expression* is a value of type `T`, namely the default value for `T` as defined in [§8.3.3](types.md#833-default-constructors).
+> - Otherwise, if `T` is a *type_parameter* and `A` is not present:
+>   - If no value type constraint or constructor constraint ([§15.2.5](classes.md#1525-type-parameter-constraints)) has been specified for `T`, a binding-time error occurs.
+>   - The result of the *object_creation_expression* is a value of the run-time type that the type parameter has been bound to, namely the result of invoking the default constructor of that type. The run-time type may be a reference type or a value type.
+> - Otherwise, if `T` is a *class_type* or a *struct_type*:
+>   - If `T` is an abstract or static *class_type*, a compile-time error occurs.
+> - The instance constructor to invoke is determined using the overload resolution rules of [§12.6.4](expressions.md#1264-overload-resolution). The set of candidate instance constructors consists of all accessible instance constructors declared in `T`, which are applicable with respect to A ([§12.6.4.2](expressions.md#12642-applicable-function-member)). If the set of candidate instance constructors is empty, or if a single best instance constructor cannot be identified, a binding-time error occurs.
+> - The result of the *object_creation_expression* is a value of type `T`, namely the value produced by invoking the instance constructor determined in the step above.
+> - Otherwise, the *object_creation_expression* is invalid, and a binding-time error occurs.
+
+If F is generic and M has no type argument list, F is a candidate when:
+Type inference (§12.6.3) succeeds, inferring a list of type arguments for the call, and
+Once the inferred type arguments are substituted for the corresponding method type parameters, all constructed types in the parameter list of F satisfy their constraints (§8.4.5), and the parameter list of F is applicable with respect to A (§12.6.4.2)
+
+
+> TODO
+
+#### Variable declaration
+
+> TODO
+
+#### Casting
+
+> TODO
+
+#### Member Lookup
+
+> TODO
 
 ## Alternatives
 

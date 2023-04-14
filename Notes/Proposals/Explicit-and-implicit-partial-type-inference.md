@@ -249,7 +249,13 @@ To be able to use it in invocation, we have to modify method invocation and type
 > #### 11.6.3.2 The first phase
 > **If the method call has the form `M<Y₁...Yᵥ>(E₁ ... Eₓ)` for each `Yᵢ` which is not `_`, fix type variable `Xᵢ` to `Yᵢ`.**
 > For each of the method arguments `Eᵢ`:
+
+If we consider dynamic overload resolution, we modify compile-time checks to reflect the change.
+
+> 12.6.5 Compile-time checking of dynamic member invocation
 >
+> First, if F is a generic method and type arguments were provided, then those **which are not `_`** are substituted for the type parameters in the parameter list. However, if type arguments were not provided, no such substitution happens.
+
 
 There raises an question if we can go furthur and allow `_` to be nested 
 See the following example.
@@ -294,10 +300,43 @@ This could be done by some tool that patches the old code.
 
 We have 2 `creation_expressions`, where we can potentially use `_` placeholder.
 
-1. delegate
-2. object
+1. object
+2. delegate
 
-we would allow to use `_` only in `object_creation_expression` and `delegate_creation_expression`.
+Firtly, we will look at an object creation.
+Currently, C# support only target-typed `new` operator.
+However, we would like to create a generic object based on arguments only allowing us to choose the *implementation*.
+See the example
+
+```csharp
+IEnumerable<int> myVar = new List<_>() {1,2,3};
+// We feel necessary to enable inference even there are no type arguments to be consistent with method type inference
+myVar = new List() {1,2,3};
+```
+
+The curent overload resolution of constructors is bounded to constructors of already known type (closed type).
+We have to change how the list of constrictor candidates is selected.
+Then we can run the same method type inference and use overload resolution to pick the right type with the constructor.
+Unfortunetly, beside compile-time binding, there is also dynamic-type binding which is a part of CLR.
+Making the change only in the compiler will result in the following confusing behavior.
+
+```csharp
+class Foo<T1, T2> {
+    public Foo(T1 p1, T2 p2) {}
+}
+dynamic myVar = new object();
+object myObj = new object();
+new Foo(myObj, myObj); // OK - compile-time binding, in Roslyn
+new Foo<_,_>(myObj, myObj); // OK - compile-time binding, in Roslyn
+new Foo(myVar, myVar); // Failed in dynamic-time binding, in CLR
+new Foo<_,object>(myVar); //Failed in dynamic-time binding, in CLR
+new Foo<_,_>(myVar); //Failed in dynamic-time binding, in CLR
+```
+
+> TODO: Propose change also to CLR ??
+
+However, we think that the change is worth to implement, so we propose the change for the compiler. 
+We would allow to use `_` only in `object_creation_expression` and `delegate_creation_expression`.
 To make it possible we have to change the grammar.
 For abbreviation, we refer a type name allowing to contain `_` in its type arguments to `type_name_u`.
 (`type_name_u` can be `Foo<_, int>` but not `Foo1<int, _>.Foo2<int,_>`) 
@@ -313,43 +352,28 @@ delegate_creation_expression
     ;
 ```
 
-Firtly, we look at an object creation.
-Currently, C# support only target-typed `new` operator.
-However, we would like to create a generic object based on arguments only allowing us to choose *implementation*.
-See the example
+The second change would be to determine the constructor.
+We have to ensure that types without type parameters will be preffered in situations where *object_creation_expression* has no type arguments to prevent a breaking change.
+According to specification, let's define a *Type group*.
+*Type group* is a set of types (structs or classes) having the same (fully-quolified) name but differing in number of type parameters which they have.
+The type group always contain only *value_types* or only *class_types*.
+According to this fact, we say the *Type group* is *Value type group* if it consists of *values_types* or *Class type group* if it consists of *class_types*.
 
-```csharp
-IEnumerable<int> myVar = new List<_>() {1,2,3};
-// We feel necessary to enable inference even there are no type arguments to be consistent with method type inference
-myVar = new List() {1,2,3};
-```
-
-To make this done, we have to allow type inference of constructors, which enables us the same way of adding the `_` placeholder as we saw in method type inference.
-This would make a change in the specification.
-
-> TODO
+> So, `class Foo<T>` and `class Foo<T1,T2>` are in the same class type group.
 
 > 12.8.16.2 Object creation expressions
 >
-> The binding-time processing of an *object_creation_expression* of the form new `T(A)`, where `T` is a *class_type*, or a *value_type*, and `A` is an optional *argument_list*, consists of the following steps:
-> 
-> - If `T` is a *value_type* and `A` is not present:
->   - The *object_creation_expression* is a default constructor invocation. The result of the *object_creation_expression* is a value of type `T`, namely the default value for `T` as defined in [§8.3.3](types.md#833-default-constructors).
-> - Otherwise, if `T` is a *type_parameter* and `A` is not present:
+> The binding-time processing of an *object_creation_expression* of the form new `T(A)`, where `T` is a *type group*, and `A` is an optional *argument_list*, consists of the following steps:
+>
+> - If `T` is a *type_parameter* and `A` is not present:
 >   - If no value type constraint or constructor constraint ([§15.2.5](classes.md#1525-type-parameter-constraints)) has been specified for `T`, a binding-time error occurs.
 >   - The result of the *object_creation_expression* is a value of the run-time type that the type parameter has been bound to, namely the result of invoking the default constructor of that type. The run-time type may be a reference type or a value type.
-> - Otherwise, if `T` is a *class_type* or a *struct_type*:
->   - If `T` is an abstract or static *class_type*, a compile-time error occurs.
-> - The instance constructor to invoke is determined using the overload resolution rules of [§12.6.4](expressions.md#1264-overload-resolution). The set of candidate instance constructors consists of all accessible instance constructors declared in `T`, which are applicable with respect to A ([§12.6.4.2](expressions.md#12642-applicable-function-member)). If the set of candidate instance constructors is empty, or if a single best instance constructor cannot be identified, a binding-time error occurs.
-> - The result of the *object_creation_expression* is a value of type `T`, namely the value produced by invoking the instance constructor determined in the step above.
-> - Otherwise, the *object_creation_expression* is invalid, and a binding-time error occurs.
-
-If F is generic and M has no type argument list, F is a candidate when:
-Type inference (§12.6.3) succeeds, inferring a list of type arguments for the call, and
-Once the inferred type arguments are substituted for the corresponding method type parameters, all constructed types in the parameter list of F satisfy their constraints (§8.4.5), and the parameter list of F is applicable with respect to A (§12.6.4.2)
-
-
-> TODO
+> - Otherwise, the set of candidate constructors for the object construction is constructed in the same way as in the first step in method invocation(proposed version). The initial set is all accesible constructors in *type group* `T`. We clarify that generic constructor matches a constructor of generic type.
+> - We remove all constructors of abstract or static *class_type* from the set.
+> - If `T` has no type arguments and the set contains types having no type parameters, we run the overload resolution [§12.6.4](expressions.md#1264-overload-resolution) firstly on them.
+> - If the set of candidate instance constructors is empty, we run the overload resolution on the remaining candidates.
+> - If the set of candidate instance constructors is empty, or if a single best instance constructor cannot be identified, a binding-time error occurs.
+> - Otherwise, type containing the best instance constructor is the type of *object_creation_expression*.
 
 #### Variable declaration
 

@@ -375,15 +375,24 @@ According to this fact, we say the *Type group* is *Value type group* if it cons
 > - If the set of candidate instance constructors is empty, or if a single best instance constructor cannot be identified, a binding-time error occurs.
 > - Otherwise, type containing the best instance constructor is the type of *object_creation_expression*.
 
+**Extending type inference**
+
+The mentioned algorithm for inferring generic type of the constructor has limitations ragarding object and collection initializers.
+Although the compiler uses best common type in inference of array type, we can't use the same way in the initializers.
+Object and collection initilizers are lowered into subsequent assignments or special method call `Add` respectively.
+The `Add` method can have several overload, so to be able to deremine the type, we would have to go throught ale of the methods and try to determine the type of the collection or object.
+To do that, we can use Hindley-Milner type inference algorithm modified to work in our case. 
+Basic concept of the inference would by to modify method type inference returning type parameters constrains which would be combined after all and than checked for the substitution
+
+> TODO: Introduce the type inference algorithm
+
 #### Variable declaration
 
-> TODO
+We introduce a new declaration of variables using open generic types to determine the shape of it.
 
 #### Casting
 
-> TODO
-
-#### Member Lookup
+Employing H-M inference as a constrain ??
 
 > TODO
 

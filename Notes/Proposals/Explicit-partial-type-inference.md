@@ -16,7 +16,7 @@ by introducing the `_` placeholder to mark type arguments inferred by the compil
 The current method type inference works as an "all or nothing" principle. 
 If the compiler is not able to infer command call type arguments, the user has to specify all of them.
 This requirement can be verbose, noisy, and unnecessary in cases where the compiler is able to infer almost all type arguments and need just to specify ambiguous ones.
-In these cases, we would like to give the compiler the hint for ambiguous type arguments.
+In these cases, we would like to give the compiler a hint for ambiguous type arguments.
 The current source of dependencies, which are used in type inference is restricted to method/function arguments which prevent making the whole type argument list inference in even simple scenarios.
 We could use the `_` placeholder for type arguments, which can be inferred from the argument list, and specify the remaining type arguments by ourselves.
 The potential additional sources of type information are specified below.
@@ -76,7 +76,7 @@ It would help to make documentation right by the code with the meaning "This seg
 var a = new Wrapper<_>(wrappedElement)
 ```
 
-Another need where `_` placeholders can be used is specifying the arity of type argument on places, where there can be ambiguities like `IEnumerable` vs `IEnumerable<_>`.
+Another need where `_` placeholders can be used is specifying the arity of type argument on places, where can be ambiguities like `IEnumerable` vs `IEnumerable<_>`.
 
 Worth to mention other options which could be accomplished in the future regarding default and named type arguments.
 Having the `_` placeholder can be used as a shortcut for choosing the right generic overload and to save typing when we use named type parameters.
@@ -242,7 +242,7 @@ To be able to use it in invocation, we have to modify the method invocation and 
 >
 > ...
 >
-> With a method call of the form `M(E₁ ...Eₓ)` **or `M<Y₁...Yᵥ>(E₁ ... Eₓ)`** the task of type inference is to find unique type arguments `S₁...Sᵥ` for each of the type parameters `X₁...Xᵥ` so that the call `M<S₁...Sᵥ>(E₁...Eₓ)` becomes valid **and in the case of `M<Y₁...Yᵥ>(E₁ ... Eₓ)` type argument `Sk` should by identical with `Yk` if Yk is not `_`**.
+> With a method call of the form `M(E₁ ...Eₓ)` **or `M<Y₁...Yᵥ>(E₁ ... Eₓ)`** the task of type inference is to find unique type arguments `S₁...Sᵥ` for each of the type parameters `X₁...Xᵥ` so that the call `M<S₁...Sᵥ>(E₁...Eₓ)` becomes valid **and in the case of `M<Y₁...Yᵥ>(E₁ ... Eₓ)` type argument `Sk` should by identical with `Yk` where Yk is not `_`**.
 >
 > ...
 >

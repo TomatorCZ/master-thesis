@@ -57,7 +57,7 @@ a.Bar(1);
 ```
 
 ```csharp
-class Foo<TElem, TParam> : IEnumarable<TElem> {
+class Foo<TElem, TParam> : IEnumerable<TElem> {
     Foo(TParam p) {}
 }
 

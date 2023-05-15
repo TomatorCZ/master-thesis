@@ -245,7 +245,7 @@ For each of the method arguments `Eᵢ`:
 + to P_i refferring extended list of type variables by inferred type variables
 ```
 
-> [12.6.3.9 Exact inferences](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#12639-exact-inferences) - Propagting the constraints to type variables contained already in bounds
+> [12.6.3.9 Exact inferences](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#12639-exact-inferences) - Propagating the constraints to type variables contained already in bounds
 
 ```diff
 -If V is one of the unfixed Xᵢ then U is added to the set of exact bounds for Xᵢ.

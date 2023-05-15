@@ -175,6 +175,59 @@ foo<>(1,2); // Still, it is not clear which generic overload should be choose.
 
 Because of mentioned issues, we believe that marking each type argument, what the compiler will infer, is the right way how to do it.
 
+We also need to prohibit `<_,...>` construct when using `dynamic`. The whole overload resolution with method type inference is done by runtime when we using it, so it would need to implement this feature also in *dotnet/runtime* which is out of the current scope.
+
+#### Nested inferred type argument
+
+See the following example.
+
+```csharp
+var list = GetResult<List<_>, _>(1); // Just specifying wrapper implementation.
+
+TEnumerable GetResult<TEnumerable, TElement>(TElement element) where TEnumerable : IEnumerable<TElement> { ... }
+```
+
+It would be most beneficial during working with any generic wrappers, where we are curious about the wrapper implementation, but not which will be inside the wrapper.
+
+This kind of wildcard needs more information about the relation between type arguments to become useful.
+However, we can still use it to determine exact type of the wrapper.
+
+```csharp
+class B<T1, T2> {}
+class A<T1, T2> : B<T1, T2> {}
+
+void M<T1>(T1 p1) {}
+
+M<B<T1, T2>>(new A<int, string>()); // will instatiate T1 = B<int, string>
+```
+
+More information can be extracted from generic type constraints, which can bring also more inference power to simple `_` inferred types.
+Unfortunately, using information about constraints in type inference causes breaking change, see the following example.
+
+```csharp
+void M(object) {}
+void M<T, U>(T t) where T : IEnumerable<U> {}
+
+M("foo");
+```
+
+One option would be to somehow differ between old inference and new improved inference like that.
+
+```csharp
+void M(object) {} // 1.
+void M<T, U>(U t) where T : IEnumerable<U> {} // 2.
+
+M<_, _>("foo"); // calls 2.
+M("foo"); // calls 1.
+```
+
+Because of this breaking change, we can use the constraints only with `_` inferred types, which is not presented in the current language version so it doesn't cause a breaking change.
+
+One can feel that `M<_,_>(...)` should be resolved in the same manner as `M(...)`. 
+This is a reasonable argument and we feel that it should follow it.
+
+Although using nested type arguments will not have significant added value to type inference, they are still valid and it will be useful in the future impovements of the type inference.
+
 #### Specification changes
 
 > [8.4.2 Type arguments](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/types.md#842-type-arguments) - Identifying the `_` placehodler as a inferred type argument
@@ -299,57 +352,6 @@ Even though overload resolution of a dynamically bound operation takes place at 
 >Probably, we can wait until there will be no type variables, which we can fix accordingly to the conditions described above. 
 >Then check whether there is a non-dependent type variable containing at least one bound which doesn't contain any unfixed type variables, hide the bounds which are inferred and do the fix.
 > Although, I'm not sure if it is a correct solution.
-
-#### Nested inferred type argument
-
-See the following example.
-
-```csharp
-TResult GetResult<TResult>() where TResult : IEnumerable<string> {}
-
-var results = GetResult<List<_>>(); // Just specifying wrapper implementation.
-```
-
-It would be most beneficial during working with any generic wrappers, where we are curious about the wrapper implementation, but not which will be inside the wrapper.
-
-This kind of wildcard needs more information about the relation between type arguments to become useful.
-However, we can still use it to determine exact type of the wrapper.
-
-```csharp
-class B<T1, T2> {}
-class A<T1, T2> : B<T1, T2> {}
-
-void M<T1>(T1 p1) {}
-
-M<B<T1, T2>>(new A<int, string>()); // will instatiate T1 = B<int, string>
-```
-
-More information can be extracted from generic type constraints, which can bring also more inference power to simple `_` inferred types.
-Unfortunately, using information about constraints in type inference causes breaking change, see the following example.
-
-```csharp
-void M(object) {}
-void M<T, U>(T t) where T : IEnumerable<U> {}
-
-M("foo");
-```
-
-One option would be to somehow differ between old inference and new improved inference like that.
-
-```csharp
-void M(object) {} // 1.
-void M<T, U>(U t) where T : IEnumerable<U> {} // 2.
-
-M<_, _>("foo"); // calls 2.
-M("foo"); // calls 1.
-```
-
-Because of this breaking change, we can use the constraints only with `_` inferred types, which is not presented in the current language version so it doesn't cause a breaking change.
-
-One can feel that `M<_,_>(...)` should be resolved in the same manner as `M(...)`. 
-This is a reasonable argument and we feel that it should follow it.
-
-Although using nested type arguments will not have significant added value to type inference, they are still valid and it will be useful in the future impovements of the type inference.
 
 #### Object construction
 

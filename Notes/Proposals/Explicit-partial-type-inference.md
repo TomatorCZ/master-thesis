@@ -293,7 +293,12 @@ Even though overload resolution of a dynamically bound operation takes place at 
 
 > Note: In the current situation, it is impossible that bounds of a type variable contain the type variable itself or even create a cycle. 
 > However, it can happen when we add other contraints like `where` clauses.
+>
 > How to solve it ?
+>
+>Probably, we can wait until there will be no type variables, which we can fix accordingly to the conditions described above. 
+>Then check whether there is a non-dependent type variable containing at least one bound which doesn't contain any unfixed type variables, hide the bounds which are inferred and do the fix.
+> Although, I'm not sure if it is a correct solution.
 
 #### Nested inferred type argument
 

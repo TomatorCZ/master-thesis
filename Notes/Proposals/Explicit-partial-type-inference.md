@@ -306,7 +306,7 @@ var results = GetResult<List<_>>(); // Just specifying wrapper implementation.
 It would be most beneficial during working with any generic wrappers, where we are curious about the wrapper implementation, but not which will be inside the wrapper.
 
 This kind of wildcard needs more information about the relation between type arguments to become useful.
-However, We can still use it to determine exact type of the wrapper.
+However, we can still use it to determine exact type of the wrapper.
 
 ```csharp
 class B<T1, T2> {}
@@ -341,6 +341,7 @@ Because of this breaking change, we can use the constraints only with `_` inferr
 
 One can feel that `M<_,_>(...)` should be resolved in the same manner as `M(...)`. 
 This is a reasonable argument and we feel that it should follow it.
+
 Although using nested type arguments will not have significant added value to type inference, they are still valid and it will be useful in the future impovements of the type inference.
 
 #### Object construction

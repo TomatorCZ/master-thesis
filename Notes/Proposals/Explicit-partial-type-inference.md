@@ -57,7 +57,7 @@ a.Bar(1);
 ```
 
 ```csharp
-class Foo<TElem, TParam> : IEnumarable<TElem> {
+class Foo<TElem, TParam> : IEnumerable<TElem> {
     Foo(TParam p) {}
 }
 
@@ -77,6 +77,8 @@ var a = new Wrapper<_>(wrappedElement)
 ```
 
 Another need where `_` placeholders can be used is specifying the arity of type argument on places, where can be ambiguities like `IEnumerable` vs `IEnumerable<_>`.
+
+### Possible extensions
 
 Worth to mention other options which could be accomplished in the future regarding default and named type arguments.
 Having the `_` placeholder can be used as a shortcut for choosing the right generic overload and to save typing when we use named type parameters.

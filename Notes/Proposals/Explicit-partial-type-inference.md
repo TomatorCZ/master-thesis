@@ -135,7 +135,7 @@ Based on mentioned advantages that `_` placeholder can bring to type inference w
 ## Scope
 
 Partial type inference can be solved in various ways.
-We chose a feature enabling to hint the compiler by specifying ambitious type arguments and letting the remaining ones on him.
+We chose a feature enabling to hint the compiler by specifying ambiguous type arguments and letting the compiler infer the rest.
 It aims at cases, where we want just to specify the arity of desired generic method(type) or specify a parameter that is not possible to infer from the context but let the compiler infer the remaining arguments. 
 
 ## Design
@@ -172,92 +172,129 @@ foo<>(1,2); // Still, it is not clear which generic overload should be choose.
 ```
 
 Because of mentioned issues, we believe that marking each type argument, what the compiler will infer, is the right way how to do it.
-To make it possible, we would have to change C# grammar
 
-```
-invocation_expression
-    : primary_expression '(' argument_list? ')'
-    : simple_name_u '(' argument_list? ')'
-    : member_access_u '(' argument_list? ')'
-    : null_conditional_member_access_u '(' argument_list? ')'
-    ;
+#### Specification changes
 
-simple_name_u
-    : identifier type_argument_list_u?
-    ;
+> [8.4.2 Type arguments](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/types.md#842-type-arguments) - Identifying the `_` placehodler as a inferred type argument
 
-member_access_u
-    : primary_expression '.' identifier type_argument_list_u?
-    | predefined_type '.' identifier type_argument_list_u?
-    | qualified_alias_member '.' identifier type_argument_list_u?
-    ;
-
-null_conditional_member_access_u
-    : primary_expression '?' '.' identifier type_argument_list?
-      dependent_access* dependent_member_access_u?
-    | primary_expression '?' '.' identifier type_argument_list_u?
-    ;
-    
-dependent_access
-    : '.' identifier type_argument_list?    // member access
-    | '[' argument_list ']'                 // element access
-    | '(' argument_list? ')'                // invocation
-    ;
-
-dependent_member_access_u
-    : '.' identifier type_argument_list_u?    // member access
-    ;
-
-type_argument_list_u
-    : '<' type_arguments_u '>'
-    ;
-
-type_arguments_u
-    : type_argument_u (',' type_argument_u)*
-    ;   
-
-type_argument_u
-    : type | '_'
-    ;
-
+```diff
+Each argument in a type argument list is simply a type.
++
++ If the type is a `_` identifier, we call it inferred type argument which is valid only in cases, where the type inference is enabled (e.g. Method type inference ([§12.6.3](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#1263-type-inference))). 
 ```
 
-To be able to use it in invocation, we have to modify the method invocation and type inference algorithm.
+> [12.8.9.2 Method invocations](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#12892-method-invocations) - Changing list of candidates
 
-> #### 12.8.9.2 Method invocations
->
-> ...
->
-> - **If F is generic and M includes a type argument list containing at least one `_` placeholder, F is a candidate when:**
->   - **F has the same number of method type parameters as were supplied in the type argument list, and**
->   - **Type inference (§12.6.3) succeeds, inferring a list of type arguments for the call, and**
->   - **Once the type arguments are substituted for the corresponding method type parameters, all constructed types in the parameter list of F satisfy their constraints (§8.4.5), and the parameter list of F is applicable with respect to A (§12.6.4.2).**
-> - If F is generic and M includes a type argument list, F is a candidate when:
+```diff
+The set of candidate methods for the method invocation is constructed. For each method F associated with the method group M:
+    If F is non-generic, F is a candidate when:
+        M has no type argument list, and
+        F is applicable with respect to A (§12.6.4.2).
++   If F is generic and M includes a type argument list containing at least one inferred type argument(including nested inferred type argument) ([§8.4.2](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/types.md#842-type-arguments)), F is a candidate when:
++       F has the same number of method type parameters as were supplied in the type argument list, and
++       Type inference (§12.6.3) succeeds, inferring a list of type arguments for the call, and
++       Once the type arguments are substituted for the corresponding method type parameters, all constructed types in the parameter list of F satisfy their constraints (§8.4.5), and the parameter list of F is applicable with respect to A (§12.6.4.2).
+    If F is generic and M includes a type argument list without any inferred arguments, F is a candidate when:
+```
 
-> #### 12.6.3.1 General
-> 
-> ...
-> 
-> When a particular method group is specified in a method invocation, and either no type arguments are specified as part of the method invocation or the type argument list contains at least one '_', type inference is applied to each generic method in the method group.
->
-> ...
->
-> With a method call of the form `M(E₁ ...Eₓ)` **or `M<Y₁...Yᵥ>(E₁ ... Eₓ)`** the task of type inference is to find unique type arguments `S₁...Sᵥ` for each of the type parameters `X₁...Xᵥ` so that the call `M<S₁...Sᵥ>(E₁...Eₓ)` becomes valid **and in the case of `M<Y₁...Yᵥ>(E₁ ... Eₓ)` type argument `Sk` should by identical with `Yk` where Yk is not `_`**.
->
-> ...
->
-> #### 12.6.3.2 The first phase
-> **If the method call has the form `M<Y₁...Yᵥ>(E₁ ... Eₓ)` for each `Yᵢ` which is not `_`, fix type variable `Xᵢ` to `Yᵢ`.**
-> For each of the method arguments `Eᵢ`:
+> [12.6.3.1 General](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#12631-General) - Defining type inference including inferred type arguments
 
-If we consider dynamic overload resolution, we modify compile-time checks to reflect the change.
+```diff
+If each supplied argument does not correspond to exactly one parameter in the method (§12.6.2.2), or there is a non-optional parameter with no corresponding argument, then inference immediately fails. Otherwise, assume that the generic method has the following signature:
 
-> 12.6.5 Compile-time checking of dynamic member invocation
->
-> First, if F is a generic method and type arguments were provided, then those **which are not `_`** are substituted for the type parameters in the parameter list. However, if type arguments were not provided, no such substitution happens.
+Tₑ M<X₁...Xᵥ>(T₁ p₁ ... Tₓ pₓ)
 
+-With a method call of the form M(E₁ ...Eₓ) the task of type inference is to find unique type arguments S₁...Sᵥ for each of the type parameters X₁...Xᵥ so that the call M<S₁...Sᵥ>(E₁...Eₓ) becomes valid.
++With a method call of the form `M(E₁ ...Eₓ)` or `M<Y₁...Yᵥ>(E₁ ... Eₓ)` the task of type inference is to find unique type arguments `S₁...Sᵥ` for each of the type parameters `X₁...Xᵥ` so that the call `M<S₁...Sᵥ>(E₁...Eₓ)` becomes valid and in the case of `M<Y₁...Yᵥ>(E₁ ... Eₓ)` type argument `S_k` should by identical with `Y_k` in that way that each inferred type argument `_` contained in `Y_k` can be anything.
++
++ We are introducing type variables P_i, where P_1...P_v are type pararemeters of M and P_{v+1}...P_{v+l} are inferred type arguments ordered in depth-first search of the type argument list.
+```
 
-There raises the question if we can go further and allow `_` to be nested 
+> [12.6.3.2 The first phase](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#12632-the-first-phase) - Adding type arguments to exact bounds of corresponding type parameter
+
+```diff
++For each type argument Y_k add Y_k to the set of exact bounds of type variable V_k
+
+For each of the method arguments `Eᵢ`:
+- Rename P_i
++ to P_i refferring extended list of type variables by inferred type variables
+```
+
+> [12.6.3.2 The second phase](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#12633-the-second-phase) - Restricting conditions for fixing
+
+```diff
+- All unfixed type variables Pᵢ which do not depend on (§12.6.3.6) any Pₑ are fixed (§12.6.3.12).
++ All unfixed type variables Pᵢ which do not depend on (§12.6.3.6) any Pₑ, and all type variables contained in their bounds are fixed, are fixed (§12.6.3.12).
+-If no such type variables exist, all unfixed type variables Xᵢ are fixed for which all of the following hold:
+-    There is at least one type variable Xₑ that depends on Xᵢ
+-    Xᵢ has a non-empty set of bounds
++If no such type variables exist, all unfixed type variables Pᵢ are fixed for which all of the following hold:
++    There is at least one type variable Pₑ that depends on Pᵢ
++    Pᵢ has a non-empty set of bounds
++    All type variables contained in their bounds are fixed
+- Rename X_i
++ to P_i refferring extended list of type variables by inferred type variables
+```
+
+> [12.6.3.6 Dependence](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#12636-dependence) - Renaming X_i to P_i refferring extended list of type variables by inferred type arguments
+
+```diff
+- Rename P_i
++ to P_i refferring extended list of type variables by inferred type variables
+```
+
+> [12.6.3.9 Exact inferences](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#12639-exact-inferences) - Propagting the constraints to type variables contained already in bounds
+
+```diff
+-If V is one of the unfixed Xᵢ then U is added to the set of exact bounds for Xᵢ.
++If P is one of the unfixed Pᵢ then U is added to the set of exact bounds for Pᵢ.
++ For each upper bound B_u of P_i containing at least one unfixed type variable P_k, an upper-bound inference is made from U to B_u
++ For each exact bound B_e of P_i containing at least one unfixed type variable P_k, an exact-bound inference is made from U to B_e
++ For each lower bound B_l of P_i containing at least one unfixed type variable P_k, an lower-bound inference is made from U to B_l
+```
+
+> [12.6.3.10 Lower-bound inferences](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#126310-lower-bound-inferences) - Propagting the constraints to type variables contained already in bounds
+
+```diff
+-If V is one of the unfixed Xᵢ then U is added to the set of exact bounds for Xᵢ.
++If P is one of the unfixed Pᵢ then U is added to the set of lower bounds for Pᵢ.
++ For each upper bound B_u of P_i containing at least one unfixed type variable P_k, an lower-bound inference is made from U to B_u
++ For each exact bound B_e of P_i containing at least one unfixed type variable P_k, an lower-bound inference is made from U to B_e
++ For each lower bound B_l of P_i containing at least one unfixed type variable P_k, an lower-bound inference is made from U to B_l
+```
+
+> [12.6.3.11 Upper-bound inferences](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#126311-upper-bound-inferences) - Propagting the constraints to type variables contained already in bounds
+
+```diff
+-If V is one of the unfixed Xᵢ then U is added to the set of exact bounds for Xᵢ.
++If P is one of the unfixed Pᵢ then U is added to the set of upper bounds for Pᵢ.
++ For each upper bound B_u of P_i containing at least one unfixed type variable P_k, an upper-bound inference is made from U to B_u
++ For each exact bound B_e of P_i containing at least one unfixed type variable P_k, an upper-bound inference is made from U to B_e
++ For each lower bound B_l of P_i containing at least one unfixed type variable P_k, an upper-bound inference is made from U to B_l
+```
+
+> [12.6.3.12 Fixing](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#126312-fixing) - Substituting fixed variables in bounds to fixed results.
+
+```diff
+- Rename X_i
++ to P_i refferring extended list of type variables by inferred type variables
+- The set of candidate types Uₑ starts out as the set of all types in the set of bounds for Xᵢ
++ The set of candidate types Uₑ starts out as the set of all types in the set of bounds for Vᵢ with substituted fixed type variables.
+```
+
+> [12.6.5 Compile-time checking of dynamic member invocation](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#1265-compile-time-checking-of-dynamic-member-invocation) - Prohibiting inferred type arguments with dynamic
+
+```diff
++Because type inference when `dynamic` is used is done in run-time, we prohibit using inferred type argument in the type argument list, because the run-time doesn't support it.
+Even though overload resolution of a dynamically bound operation takes place at run-time, it is sometimes possible at compile-time to know the list of function members from which an overload will be chosen:
+```
+
+> Note: In the current situation, it is impossible that bounds of a type variable contain the type variable itself or even create a cycle. 
+> However, it can happen when we add other contraints like `where` clauses.
+> How to solve it ?
+
+#### Nested inferred type argument
+
 See the following example.
 
 ```csharp
@@ -269,6 +306,17 @@ var results = GetResult<List<_>>(); // Just specifying wrapper implementation.
 It would be most beneficial during working with any generic wrappers, where we are curious about the wrapper implementation, but not which will be inside the wrapper.
 
 This kind of wildcard needs more information about the relation between type arguments to become useful.
+However, We can still use it to determine exact type of the wrapper.
+
+```csharp
+class B<T1, T2> {}
+class A<T1, T2> : B<T1, T2> {}
+
+void M<T1>(T1 p1) {}
+
+M<B<T1, T2>>(new A<int, string>()); // will instatiate T1 = B<int, string>
+```
+
 More information can be extracted from generic type constraints, which can bring also more inference power to simple `_` inferred types.
 Unfortunately, using information about constraints in type inference causes breaking change, see the following example.
 
@@ -293,8 +341,7 @@ Because of this breaking change, we can use the constraints only with `_` inferr
 
 One can feel that `M<_,_>(...)` should be resolved in the same manner as `M(...)`. 
 This is a reasonable argument and we feel that it should follow it.
-For this reason, we would postpone this extended feature to future improvements where we would be able to use the constraints without causing a breaking change.
-This could be done by some tool that patches the old code.
+Although using nested type arguments will not have significant added value to type inference, they are still valid and it will be useful in the future impovements of the type inference.
 
 #### Object construction
 
@@ -310,4 +357,6 @@ This could be done by some tool that patches the old code.
 
 ## Alternatives
 
-We can choose different char or keywords for determining compiler inferred type argument. Other options consist of `*`, `var`, `?`, `<<whitespace>>`. Although, we think that `_` fits better because the same char is used in deconstruction assignments or patterns.
+We can choose different char or keywords for determining compiler inferred type argument. 
+Other options consist of `*`, `var`, `?`, `<<whitespace>>`, or no token at all (e.g. `Foo<,>(..,)`). 
+Although, we think that `_` fits better because the same char is used in deconstruction assignments or patterns.

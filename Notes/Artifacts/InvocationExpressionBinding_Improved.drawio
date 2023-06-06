@@ -1,0 +1,173 @@
+<mxfile host="app.diagrams.net" modified="2023-06-06T14:28:34.595Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.37" etag="iEgMDfqzSEQVP-R8nR5K" version="21.3.3" type="device">
+  <diagram name="Page-1" id="du5PRKcVOTlr9LgR9WWD">
+    <mxGraphModel dx="1434" dy="788" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="HiPX2ZG_8M-1gJtPcTxc-1" target="HiPX2ZG_8M-1gJtPcTxc-2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-1" value="Input:&lt;br&gt;&lt;b&gt;int temp = Foo(arg1, ...);&lt;/b&gt;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="322.5" y="20" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-7" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" parent="1" source="HiPX2ZG_8M-1gJtPcTxc-2" target="HiPX2ZG_8M-1gJtPcTxc-3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-8" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="HiPX2ZG_8M-1gJtPcTxc-45" target="HiPX2ZG_8M-1gJtPcTxc-4" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-46" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" parent="1" source="HiPX2ZG_8M-1gJtPcTxc-2" target="HiPX2ZG_8M-1gJtPcTxc-45" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-2" value="&lt;b&gt;BindLocalDeclarationStatement&lt;/b&gt; (&lt;i&gt;Binder_Statements.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="305" y="100" width="205" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-48" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="HiPX2ZG_8M-1gJtPcTxc-3" target="HiPX2ZG_8M-1gJtPcTxc-49" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-3" value="&lt;b&gt;BindVariableTypeWithAnnotations&lt;/b&gt;&lt;br&gt;(&lt;i&gt;Binder_Statements.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="151.25" y="160" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-9" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="HiPX2ZG_8M-1gJtPcTxc-4" target="HiPX2ZG_8M-1gJtPcTxc-5" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-4" value="&lt;b&gt;BindVariableDeclaration&lt;/b&gt;&lt;br&gt;(&lt;i&gt;Binder_Statements.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="456.75" y="240" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-12" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" parent="1" source="HiPX2ZG_8M-1gJtPcTxc-5" target="HiPX2ZG_8M-1gJtPcTxc-10" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-13" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" parent="1" source="HiPX2ZG_8M-1gJtPcTxc-5" target="HiPX2ZG_8M-1gJtPcTxc-11" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-5" value="&lt;b&gt;BindInvocationExpression&lt;/b&gt;&lt;br&gt;(&lt;i&gt;Binder_Invocation.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="451.75" y="300" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-17" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="HiPX2ZG_8M-1gJtPcTxc-10" target="HiPX2ZG_8M-1gJtPcTxc-16" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-10" value="&lt;b&gt;BoundMethodGroup&lt;/b&gt;&lt;br&gt;(&lt;i&gt;Binder_invocation.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="360" y="360" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-19" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" parent="1" source="HiPX2ZG_8M-1gJtPcTxc-51" target="HiPX2ZG_8M-1gJtPcTxc-14" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-53" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="HiPX2ZG_8M-1gJtPcTxc-11" target="HiPX2ZG_8M-1gJtPcTxc-51" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-11" value="&lt;b&gt;BindNamesAndArguments&lt;/b&gt;&lt;br&gt;(&lt;i&gt;Binder_Expressions.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="600.25" y="350" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-21" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="HiPX2ZG_8M-1gJtPcTxc-14" target="HiPX2ZG_8M-1gJtPcTxc-20" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-14" value="&lt;b&gt;BindInvocationExpression&lt;br&gt;&lt;/b&gt;(&lt;i&gt;Binder_Invocation.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="341.25" y="540" width="157.5" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-18" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="HiPX2ZG_8M-1gJtPcTxc-16" target="HiPX2ZG_8M-1gJtPcTxc-14" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-16" value="&lt;b&gt;BindTypeArguments&lt;/b&gt;&lt;br&gt;(&lt;i&gt;Binder_Symbols.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="360" y="430" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-41" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="HiPX2ZG_8M-1gJtPcTxc-34" target="HiPX2ZG_8M-1gJtPcTxc-40" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="206.25" y="1030" as="sourcePoint" />
+            <mxPoint x="206.25" y="1010" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-34" value="&lt;b&gt;CoerceArguments&lt;/b&gt;&lt;br&gt;(&lt;i&gt;Binder_Expression.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="66.25" y="980" width="125" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-37" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="HiPX2ZG_8M-1gJtPcTxc-35" target="HiPX2ZG_8M-1gJtPcTxc-34" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="127.5" y="1040" as="sourcePoint" />
+            <mxPoint x="127.5" y="1010" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-35" value="&lt;b&gt;BindInvocationExpressionContinued&lt;br&gt;&lt;/b&gt;(&lt;i&gt;Binder_Invocation.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="20" y="1060" width="217.5" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-40" value="Output:&lt;br&gt;&lt;b&gt;BoundCall&lt;/b&gt;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="56.25" y="900" width="140" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-42" value="" style="swimlane;startSize=0;" parent="1" vertex="1">
+          <mxGeometry x="293.88" y="620" width="264" height="510" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-43" value="Overload resolution" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="HiPX2ZG_8M-1gJtPcTxc-42" vertex="1">
+          <mxGeometry x="9" width="130" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-20" value="&lt;b&gt;MethodInvocationOverloadResolution&lt;/b&gt;&lt;br&gt;(&lt;i&gt;OverloadResolution.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="HiPX2ZG_8M-1gJtPcTxc-42" vertex="1">
+          <mxGeometry x="14" y="30" width="220" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-22" value="&lt;b&gt;AddMemberToCandidateSet&lt;/b&gt;&lt;br&gt;(&lt;i&gt;OverloadResolution.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="HiPX2ZG_8M-1gJtPcTxc-42" vertex="1">
+          <mxGeometry x="39" y="90" width="170" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-24" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="HiPX2ZG_8M-1gJtPcTxc-42" source="HiPX2ZG_8M-1gJtPcTxc-20" target="HiPX2ZG_8M-1gJtPcTxc-22" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-28" value="IsApplicable&lt;br&gt;&lt;i style=&quot;font-weight: normal;&quot;&gt;(OverloadResolution.cs)&lt;/i&gt;" style="swimlane;whiteSpace=wrap;html=1;" parent="HiPX2ZG_8M-1gJtPcTxc-42" vertex="1">
+          <mxGeometry x="19" y="150" width="210" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-30" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="HiPX2ZG_8M-1gJtPcTxc-28" source="HiPX2ZG_8M-1gJtPcTxc-26" target="HiPX2ZG_8M-1gJtPcTxc-27" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-26" value="&lt;b&gt;Infer&lt;/b&gt;&lt;br&gt;(&lt;i&gt;MethodTypeInference.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="HiPX2ZG_8M-1gJtPcTxc-28" vertex="1">
+          <mxGeometry x="27" y="110" width="156" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-27" value="&lt;b&gt;CheckArgumentForApplicability&lt;/b&gt;&lt;br&gt;(&lt;i&gt;OverloadResolutions.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="HiPX2ZG_8M-1gJtPcTxc-28" vertex="1">
+          <mxGeometry x="14.25" y="160" width="181.5" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-56" value="Return the inference context to the state before the previous inference" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="HiPX2ZG_8M-1gJtPcTxc-28" vertex="1">
+          <mxGeometry x="45" y="210" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-57" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="HiPX2ZG_8M-1gJtPcTxc-28" source="HiPX2ZG_8M-1gJtPcTxc-27" target="HiPX2ZG_8M-1gJtPcTxc-56" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-54" value="Use already created context, take a snapshot and try the inference" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="HiPX2ZG_8M-1gJtPcTxc-28" vertex="1">
+          <mxGeometry x="45" y="30" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-55" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="HiPX2ZG_8M-1gJtPcTxc-28" source="HiPX2ZG_8M-1gJtPcTxc-54" target="HiPX2ZG_8M-1gJtPcTxc-26" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-25" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="HiPX2ZG_8M-1gJtPcTxc-42" source="HiPX2ZG_8M-1gJtPcTxc-22" target="HiPX2ZG_8M-1gJtPcTxc-28" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="474" y="290" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-31" value="Choose best candidate&lt;br&gt;(&lt;i&gt;OverloadResolution.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="HiPX2ZG_8M-1gJtPcTxc-42" vertex="1">
+          <mxGeometry x="54" y="440" width="140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-33" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="HiPX2ZG_8M-1gJtPcTxc-42" source="HiPX2ZG_8M-1gJtPcTxc-28" target="HiPX2ZG_8M-1gJtPcTxc-31" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-36" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="HiPX2ZG_8M-1gJtPcTxc-31" target="HiPX2ZG_8M-1gJtPcTxc-35" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="358.75" y="1080" as="targetPoint" />
+            <mxPoint x="495.25" y="1100" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-45" value="Create &lt;b&gt;TypeInferenceContext&lt;/b&gt;&amp;nbsp;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="463.25" y="160" width="137" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-50" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" target="HiPX2ZG_8M-1gJtPcTxc-4" edge="1" source="HiPX2ZG_8M-1gJtPcTxc-49">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="365.25" y="240" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-49" value="Pass the result into &lt;b&gt;BindVariableDeclaration&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="176.25" y="230" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-51" value="If there is another call of generic method(or constructor) without type arguments(or containing inferred ones), where there is only one candidate after type inference which doesn&#39;t failed due to constraint contradiction, merge the context to the &lt;b&gt;TypeInferenceContext.&lt;/b&gt;&amp;nbsp;Use the parameter type for determining target type of the call during the type inference." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="557.88" y="410" width="244.75" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-59" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.971;exitY=0.916;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;exitPerimeter=0;" parent="1" source="HiPX2ZG_8M-1gJtPcTxc-58" target="HiPX2ZG_8M-1gJtPcTxc-26" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="HiPX2ZG_8M-1gJtPcTxc-58" value="Use inferred type argument list(if any), the target type(if any) and info about arguments, which their type couldn&#39;t be inferred because of a lack of the information." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="90" y="700" width="137" height="105" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,220 +1,347 @@
-<mxfile host="app.diagrams.net" modified="2023-06-06T14:42:43.286Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.37" etag="BDmP83JJpAuN6jDt3D7v" version="21.3.3" type="device">
+<mxfile host="app.diagrams.net" modified="2023-06-09T17:25:57.151Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.41" etag="UNNDv--Q83OBRSQPkKWv" version="21.3.8" type="device">
   <diagram name="Page-1" id="kxhbpXD4t4TTEIjENoJl">
-    <mxGraphModel dx="1434" dy="788" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2963" dy="1640" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-9" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="5hsE9kRwm3gZ5ivZTZri-5" target="5hsE9kRwm3gZ5ivZTZri-6" edge="1">
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-55" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="5hsE9kRwm3gZ5ivZTZri-5" target="5hsE9kRwm3gZ5ivZTZri-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-56" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="5hsE9kRwm3gZ5ivZTZri-5" target="6Q5ysckcyFLwRDlW2aEn-26">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-63" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="5hsE9kRwm3gZ5ivZTZri-5" target="5hsE9kRwm3gZ5ivZTZri-8">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="5hsE9kRwm3gZ5ivZTZri-5" value="&lt;b&gt;BindClassCreationExpression&lt;br&gt;&lt;/b&gt;(&lt;i&gt;Binder_Expressions.cs&lt;/i&gt;)" style="whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
           <mxGeometry x="505" y="280" width="180" height="40" as="geometry" />
         </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-57" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="5hsE9kRwm3gZ5ivZTZri-6" target="6Q5ysckcyFLwRDlW2aEn-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="5hsE9kRwm3gZ5ivZTZri-6" value="&lt;b&gt;BindArgumentsAndNames&lt;br&gt;&lt;/b&gt;(&lt;i&gt;Binder_Expressions.cs&lt;/i&gt;)" style="whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
-          <mxGeometry x="290" y="280" width="160" height="40" as="geometry" />
+          <mxGeometry x="865" y="280" width="160" height="40" as="geometry" />
         </mxCell>
         <mxCell id="5hsE9kRwm3gZ5ivZTZri-26" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="5hsE9kRwm3gZ5ivZTZri-8" target="5hsE9kRwm3gZ5ivZTZri-12" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="5hsE9kRwm3gZ5ivZTZri-8" value="&lt;b&gt;BindInitializerExpression&lt;/b&gt;&lt;br&gt;(&lt;i&gt;Binder_Expressions.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
-          <mxGeometry x="635" y="360" width="150" height="40" as="geometry" />
+          <mxGeometry x="195" y="280" width="150" height="40" as="geometry" />
         </mxCell>
         <mxCell id="5hsE9kRwm3gZ5ivZTZri-27" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="5hsE9kRwm3gZ5ivZTZri-13" edge="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="800" y="530" as="targetPoint" />
+            <mxPoint x="360" y="450" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="5hsE9kRwm3gZ5ivZTZri-12" value="&lt;b&gt;BindCollectionInitializerElement&lt;/b&gt;&lt;br&gt;(&lt;i&gt;Binder_Expressions.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
-          <mxGeometry x="615" y="440" width="190" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-28" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" target="5hsE9kRwm3gZ5ivZTZri-15" edge="1" source="5hsE9kRwm3gZ5ivZTZri-13">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="800" y="570" as="sourcePoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-30" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="5hsE9kRwm3gZ5ivZTZri-15" target="5hsE9kRwm3gZ5ivZTZri-74" edge="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="690" y="1080" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-70" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" parent="1" source="5hsE9kRwm3gZ5ivZTZri-15" target="5hsE9kRwm3gZ5ivZTZri-69" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-72" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;edgeStyle=orthogonalEdgeStyle;" parent="1" source="5hsE9kRwm3gZ5ivZTZri-15" target="5hsE9kRwm3gZ5ivZTZri-71" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-15" value="overload resolution + best candidate" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
-          <mxGeometry x="650" y="600" width="120" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-29" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=205;entryDy=30;entryPerimeter=0;" parent="1" source="5hsE9kRwm3gZ5ivZTZri-19" target="5hsE9kRwm3gZ5ivZTZri-21" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-19" value="&lt;b&gt;CoerceArguments&lt;/b&gt;&lt;br&gt;(&lt;i&gt;Binder_Expression.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
-          <mxGeometry x="299" y="1120" width="125" height="40" as="geometry" />
+          <mxGeometry x="175" y="360" width="190" height="40" as="geometry" />
         </mxCell>
         <mxCell id="5hsE9kRwm3gZ5ivZTZri-21" value="Output:&lt;br&gt;&lt;b&gt;&amp;nbsp;BoundObjectCreationExpression&lt;/b&gt;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
-          <mxGeometry x="30" y="1110" width="205" height="50" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-35" value="" style="swimlane;startSize=0;fillColor=#ffffff;strokeColor=#000000;swimlaneFillColor=default;fillStyle=solid;" parent="1" vertex="1">
-          <mxGeometry x="299" y="400" width="230" height="562" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-7" value="&lt;b&gt;ObjectCreationOverloadResolution&lt;/b&gt;&lt;br&gt;(&lt;i&gt;OverloadResolution.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="5hsE9kRwm3gZ5ivZTZri-35" vertex="1">
-          <mxGeometry x="10" y="28" width="210" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-14" value="&amp;nbsp;&lt;b&gt;AddConstructorToCandidateSet&lt;/b&gt;&lt;br&gt;(&lt;i&gt;OverloadResolution.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="5hsE9kRwm3gZ5ivZTZri-35" vertex="1">
-          <mxGeometry x="20" y="90" width="190" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-22" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="5hsE9kRwm3gZ5ivZTZri-35" edge="1" source="5hsE9kRwm3gZ5ivZTZri-7">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="124" y="70" as="sourcePoint" />
-            <mxPoint x="115" y="90" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-16" value="IsApplicable&lt;br&gt;(OverloadResolution.cs)" style="swimlane;whiteSpace=wrap;html=1;" parent="5hsE9kRwm3gZ5ivZTZri-35" vertex="1">
-          <mxGeometry x="15" y="150" width="200" height="310" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-60" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="5hsE9kRwm3gZ5ivZTZri-16" source="5hsE9kRwm3gZ5ivZTZri-17" target="5hsE9kRwm3gZ5ivZTZri-55" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-17" value="&lt;b&gt;CheckArgumentForApplicability&lt;/b&gt;&lt;br&gt;(&lt;i&gt;OverloadResolutions.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="5hsE9kRwm3gZ5ivZTZri-16" vertex="1">
-          <mxGeometry x="5.25" y="172" width="181.5" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-58" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="5hsE9kRwm3gZ5ivZTZri-16" source="5hsE9kRwm3gZ5ivZTZri-56" target="5hsE9kRwm3gZ5ivZTZri-54" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-56" value="Use already created context, take a snapshot and try the inference" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="5hsE9kRwm3gZ5ivZTZri-16" vertex="1">
-          <mxGeometry x="36" y="32" width="120" height="60" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-59" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="5hsE9kRwm3gZ5ivZTZri-16" source="5hsE9kRwm3gZ5ivZTZri-54" target="5hsE9kRwm3gZ5ivZTZri-17" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-54" value="&lt;b&gt;Infer&lt;/b&gt;&lt;br&gt;(&lt;i&gt;MethodTypeInference.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="5hsE9kRwm3gZ5ivZTZri-16" vertex="1">
-          <mxGeometry x="18" y="114.5" width="156" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-55" value="Return the inference context to the state before the previous inference" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="5hsE9kRwm3gZ5ivZTZri-16" vertex="1">
-          <mxGeometry x="36" y="232" width="120" height="60" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-23" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="5hsE9kRwm3gZ5ivZTZri-35" source="5hsE9kRwm3gZ5ivZTZri-14" target="5hsE9kRwm3gZ5ivZTZri-16" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-18" value="Choose best candidate&lt;br&gt;(&lt;i&gt;OverloadResolution.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="5hsE9kRwm3gZ5ivZTZri-35" vertex="1">
-          <mxGeometry x="44" y="502" width="140" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-24" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="5hsE9kRwm3gZ5ivZTZri-35" source="5hsE9kRwm3gZ5ivZTZri-16" target="5hsE9kRwm3gZ5ivZTZri-18" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-36" value="Overload resolution" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="5hsE9kRwm3gZ5ivZTZri-35" vertex="1">
-          <mxGeometry x="10" y="-2" width="130" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-10" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" parent="1" target="5hsE9kRwm3gZ5ivZTZri-47" edge="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="290" y="300" as="sourcePoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-48" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" parent="1" source="5hsE9kRwm3gZ5ivZTZri-47" target="5hsE9kRwm3gZ5ivZTZri-35" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-47" value="If there is another call of generic method(or constructor) without type arguments(or containing inferred ones), where there is only one candidate after type inference which doesn&#39;t failed due to constraint contradiction, merge the context to the&amp;nbsp;&lt;b style=&quot;border-color: var(--border-color);&quot;&gt;TypeInferenceContext.&lt;/b&gt;&amp;nbsp;Use the parameter type for determining target type of the call during the type inference." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
-          <mxGeometry x="10" y="330" width="250" height="140" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-61" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" parent="1" source="5hsE9kRwm3gZ5ivZTZri-57" target="5hsE9kRwm3gZ5ivZTZri-54" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-57" value="Use inferred type argument list(if any), the target type(if any) and info about arguments, which their type couldn&#39;t be inferred because of a lack of the information." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
-          <mxGeometry x="30" y="577.5" width="160" height="105" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-66" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" parent="1" source="5hsE9kRwm3gZ5ivZTZri-62" target="5hsE9kRwm3gZ5ivZTZri-18" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-62" value="If all inferences failed but there is one and only one candidate, which failed due to lack of information, use that context for further inference" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
-          <mxGeometry x="40" y="867" width="140" height="110" as="geometry" />
+          <mxGeometry x="184.5" y="1060" width="205" height="50" as="geometry" />
         </mxCell>
         <mxCell id="5hsE9kRwm3gZ5ivZTZri-65" value="" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="5hsE9kRwm3gZ5ivZTZri-12" target="5hsE9kRwm3gZ5ivZTZri-13" edge="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="800" y="490" as="sourcePoint" />
-            <mxPoint x="800" y="530" as="targetPoint" />
+            <mxPoint x="360" y="410" as="sourcePoint" />
+            <mxPoint x="360" y="450" as="targetPoint" />
           </mxGeometry>
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-65" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="5hsE9kRwm3gZ5ivZTZri-13" target="6Q5ysckcyFLwRDlW2aEn-64">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="5hsE9kRwm3gZ5ivZTZri-13" value="&amp;nbsp;&lt;b&gt;BindCollectionInitializerElementAddMethod&lt;/b&gt;&lt;br&gt;(&lt;i&gt;Binder_Expresions.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
-          <mxGeometry x="580" y="520" width="260" height="40" as="geometry" />
+          <mxGeometry x="140" y="440" width="260" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-68" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" parent="1" source="5hsE9kRwm3gZ5ivZTZri-18" target="5hsE9kRwm3gZ5ivZTZri-8" edge="1">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="560" y="922" />
-              <mxPoint x="560" y="380" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-69" value="Use the inference context from constructor inference" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
-          <mxGeometry x="827" y="590" width="120" height="60" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-82" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;edgeStyle=orthogonalEdgeStyle;" parent="1" source="5hsE9kRwm3gZ5ivZTZri-15" target="5hsE9kRwm3gZ5ivZTZri-81" edge="1">
+        <mxCell id="dTu2HUq-j0SkNZjbdT4D-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="dTu2HUq-j0SkNZjbdT4D-2" target="dTu2HUq-j0SkNZjbdT4D-6" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-71" value="After each overload resolution of &lt;b&gt;Add &lt;/b&gt;method, there has to be only one remaining candidate (with inference failure due to lack of info or success). If not, inference failed" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
-          <mxGeometry x="827" y="660" width="190" height="90" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-78" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="5hsE9kRwm3gZ5ivZTZri-74" target="5hsE9kRwm3gZ5ivZTZri-75" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-74" value="Check the inference context. If all type variables are fixed, construct the type with constructor and appropriate &lt;b&gt;Add&lt;/b&gt; methods inferred previously" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
-          <mxGeometry x="450" y="990" width="170" height="90" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-79" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="5hsE9kRwm3gZ5ivZTZri-75" target="5hsE9kRwm3gZ5ivZTZri-19" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-75" value="type checking" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
-          <mxGeometry x="475" y="1120" width="120" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-25" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="5hsE9kRwm3gZ5ivZTZri-35" target="5hsE9kRwm3gZ5ivZTZri-74" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="5hsE9kRwm3gZ5ivZTZri-81" value="For object initializer, we are in easier situation, there are no overloads..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
-          <mxGeometry x="827" y="760" width="120" height="60" as="geometry" />
-        </mxCell>
-        <mxCell id="dTu2HUq-j0SkNZjbdT4D-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="dTu2HUq-j0SkNZjbdT4D-2" target="dTu2HUq-j0SkNZjbdT4D-6">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="dTu2HUq-j0SkNZjbdT4D-2" value="Input:&lt;br&gt;&lt;b style=&quot;border-color: var(--border-color);&quot;&gt;List&amp;lt;int&amp;gt; temp = new List(1) { 1 }&lt;/b&gt;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+        <mxCell id="dTu2HUq-j0SkNZjbdT4D-2" value="Input:&lt;br&gt;&lt;b style=&quot;border-color: var(--border-color);&quot;&gt;List&amp;lt;int&amp;gt; temp = new List(1) { 1 }&lt;/b&gt;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
           <mxGeometry x="354.5" width="201.25" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="dTu2HUq-j0SkNZjbdT4D-3" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="dTu2HUq-j0SkNZjbdT4D-6" target="dTu2HUq-j0SkNZjbdT4D-8">
+        <mxCell id="dTu2HUq-j0SkNZjbdT4D-3" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" parent="1" source="dTu2HUq-j0SkNZjbdT4D-6" target="dTu2HUq-j0SkNZjbdT4D-8" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="dTu2HUq-j0SkNZjbdT4D-4" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="dTu2HUq-j0SkNZjbdT4D-11" target="dTu2HUq-j0SkNZjbdT4D-10">
+        <mxCell id="dTu2HUq-j0SkNZjbdT4D-4" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="dTu2HUq-j0SkNZjbdT4D-11" target="dTu2HUq-j0SkNZjbdT4D-10" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="dTu2HUq-j0SkNZjbdT4D-5" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="dTu2HUq-j0SkNZjbdT4D-6" target="dTu2HUq-j0SkNZjbdT4D-11">
+        <mxCell id="dTu2HUq-j0SkNZjbdT4D-5" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" parent="1" source="dTu2HUq-j0SkNZjbdT4D-6" target="dTu2HUq-j0SkNZjbdT4D-11" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="dTu2HUq-j0SkNZjbdT4D-6" value="&lt;b&gt;BindLocalDeclarationStatement&lt;/b&gt; (&lt;i&gt;Binder_Statements.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+        <mxCell id="dTu2HUq-j0SkNZjbdT4D-6" value="&lt;b&gt;BindLocalDeclarationStatement&lt;/b&gt; (&lt;i&gt;Binder_Statements.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
           <mxGeometry x="368.25" y="80" width="205" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="dTu2HUq-j0SkNZjbdT4D-7" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="dTu2HUq-j0SkNZjbdT4D-8" target="dTu2HUq-j0SkNZjbdT4D-13">
+        <mxCell id="dTu2HUq-j0SkNZjbdT4D-7" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="dTu2HUq-j0SkNZjbdT4D-8" target="dTu2HUq-j0SkNZjbdT4D-13" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="dTu2HUq-j0SkNZjbdT4D-8" value="&lt;b&gt;BindVariableTypeWithAnnotations&lt;/b&gt;&lt;br&gt;(&lt;i&gt;Binder_Statements.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+        <mxCell id="dTu2HUq-j0SkNZjbdT4D-8" value="&lt;b&gt;BindVariableTypeWithAnnotations&lt;/b&gt;&lt;br&gt;(&lt;i&gt;Binder_Statements.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
           <mxGeometry x="214.5" y="140" width="200" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="dTu2HUq-j0SkNZjbdT4D-9" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="dTu2HUq-j0SkNZjbdT4D-10" target="5hsE9kRwm3gZ5ivZTZri-5">
+        <mxCell id="dTu2HUq-j0SkNZjbdT4D-9" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="dTu2HUq-j0SkNZjbdT4D-10" target="5hsE9kRwm3gZ5ivZTZri-5" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="595.25" y="280" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="dTu2HUq-j0SkNZjbdT4D-10" value="&lt;b&gt;BindVariableDeclaration&lt;/b&gt;&lt;br&gt;(&lt;i&gt;Binder_Statements.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+        <mxCell id="dTu2HUq-j0SkNZjbdT4D-10" value="&lt;b&gt;BindVariableDeclaration&lt;/b&gt;&lt;br&gt;(&lt;i&gt;Binder_Statements.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
           <mxGeometry x="520" y="220" width="150" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="dTu2HUq-j0SkNZjbdT4D-11" value="Create &lt;b&gt;TypeInferenceContext&lt;/b&gt;&amp;nbsp;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+        <mxCell id="dTu2HUq-j0SkNZjbdT4D-11" value="Create &lt;b&gt;TypeInferenceContext&lt;/b&gt;&amp;nbsp;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
           <mxGeometry x="526.5" y="140" width="137" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="dTu2HUq-j0SkNZjbdT4D-12" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="dTu2HUq-j0SkNZjbdT4D-13" target="dTu2HUq-j0SkNZjbdT4D-10">
+        <mxCell id="dTu2HUq-j0SkNZjbdT4D-12" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="dTu2HUq-j0SkNZjbdT4D-13" target="dTu2HUq-j0SkNZjbdT4D-10" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="428.5" y="220" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="dTu2HUq-j0SkNZjbdT4D-13" value="Pass the result into &lt;b&gt;BindVariableDeclaration&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+        <mxCell id="dTu2HUq-j0SkNZjbdT4D-13" value="Pass the result into &lt;b&gt;BindVariableDeclaration&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
           <mxGeometry x="239.5" y="210" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-1" value="" style="swimlane;startSize=0;" vertex="1" parent="1">
+          <mxGeometry x="760" y="360" width="370" height="760" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-2" value="Argument binding" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-1">
+          <mxGeometry x="5" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-3" value="Bind argument as usual" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-1">
+          <mxGeometry x="39.75" y="81.25" width="80" height="37.5" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-4" value="Use the type in the binding" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-1">
+          <mxGeometry x="39.75" y="340" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fillColor=#d5e8d4;strokeColor=#82b366;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-1" source="6Q5ysckcyFLwRDlW2aEn-7" target="6Q5ysckcyFLwRDlW2aEn-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fillColor=#f8cecc;strokeColor=#b85450;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-1" source="6Q5ysckcyFLwRDlW2aEn-7" target="6Q5ysckcyFLwRDlW2aEn-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-7" value="Has argument overloads" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-1">
+          <mxGeometry x="280" y="520" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-8" value="Has return type a natural type?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-1">
+          <mxGeometry x="177.25" y="200" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-9" value="Has parameter type a natural type" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-1">
+          <mxGeometry x="177.25" y="320" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fillColor=#d5e8d4;strokeColor=#82b366;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-1" source="6Q5ysckcyFLwRDlW2aEn-8" target="6Q5ysckcyFLwRDlW2aEn-3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="230" y="262" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="140" y="240" />
+              <mxPoint x="140" y="100" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fillColor=#f8cecc;strokeColor=#b85450;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-1" source="6Q5ysckcyFLwRDlW2aEn-8" target="6Q5ysckcyFLwRDlW2aEn-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fillColor=#f8cecc;strokeColor=#b85450;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-1" source="6Q5ysckcyFLwRDlW2aEn-14" target="6Q5ysckcyFLwRDlW2aEn-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fillColor=#d5e8d4;strokeColor=#82b366;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-1" source="6Q5ysckcyFLwRDlW2aEn-14" target="6Q5ysckcyFLwRDlW2aEn-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-14" value="Has invocation expr overloads ?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-1">
+          <mxGeometry x="280" y="400" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-15" value="Use the type and the context in the binding and get type arguments at the end of the whole inference" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-1">
+          <mxGeometry x="39.75" y="640" width="120" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fillColor=#d5e8d4;strokeColor=#82b366;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-1" source="6Q5ysckcyFLwRDlW2aEn-9" target="6Q5ysckcyFLwRDlW2aEn-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fillColor=#f8cecc;strokeColor=#b85450;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-1" source="6Q5ysckcyFLwRDlW2aEn-9" target="6Q5ysckcyFLwRDlW2aEn-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;fillColor=#f8cecc;strokeColor=#b85450;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-1" source="6Q5ysckcyFLwRDlW2aEn-19">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="119.75999999999999" y="100.15254237288127" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-19" value="Is the argument generic method or ctor which needs to be inferred?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-1">
+          <mxGeometry x="159.75" y="40" width="115" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fillColor=#d5e8d4;strokeColor=#82b366;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-1" source="6Q5ysckcyFLwRDlW2aEn-19" target="6Q5ysckcyFLwRDlW2aEn-8">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260.5" y="142.5" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-21" value="Add target type and infer it in usual way, if failed, do it as target-typed" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-1">
+          <mxGeometry x="39.75" y="525" width="120" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-22" value="Infer it in usual way, if failed, do it as target-typed" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-1">
+          <mxGeometry x="39.75" y="410" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-23" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-1" source="6Q5ysckcyFLwRDlW2aEn-25" target="6Q5ysckcyFLwRDlW2aEn-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-24" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-1" source="6Q5ysckcyFLwRDlW2aEn-25" target="6Q5ysckcyFLwRDlW2aEn-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-25" value="we could do here better, however it would complicate the algorithm" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-1">
+          <mxGeometry x="165" y="460" width="110" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-26" value="" style="swimlane;startSize=0;" vertex="1" parent="1">
+          <mxGeometry x="456.63" y="400" width="276.75" height="570" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-27" value="Overload resolution" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-26">
+          <mxGeometry x="9" width="130" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-28" value="&lt;b style=&quot;border-color: var(--border-color);&quot;&gt;ObjectCreationOverloadResolution&lt;/b&gt;&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;(&lt;i style=&quot;border-color: var(--border-color);&quot;&gt;OverloadResolution.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-26">
+          <mxGeometry x="46.75" y="30" width="220" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-29" value="&amp;nbsp;&lt;b style=&quot;border-color: var(--border-color);&quot;&gt;AddConstructorToCandidateSet&lt;/b&gt;&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;(&lt;i style=&quot;border-color: var(--border-color);&quot;&gt;OverloadResolution.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-26">
+          <mxGeometry x="71.75" y="90" width="170" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-30" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-26" source="6Q5ysckcyFLwRDlW2aEn-28" target="6Q5ysckcyFLwRDlW2aEn-29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-31" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-26" source="6Q5ysckcyFLwRDlW2aEn-29" target="6Q5ysckcyFLwRDlW2aEn-34">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="181.2500000000001" y="150.00000000000023" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-34" value="" style="swimlane;startSize=0;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-26">
+          <mxGeometry x="56.75" y="160" width="200" height="387" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-35" value="&lt;b&gt;IsApplicable&lt;/b&gt;&lt;br&gt;(&lt;i&gt;OverloadResolution.cs&lt;/i&gt;)" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-34">
+          <mxGeometry x="-10" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-36" value="Use already created context, take a snapshot and try the inference" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-34">
+          <mxGeometry x="40" y="57" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-37" value="&lt;b&gt;Infer&lt;/b&gt;&lt;br&gt;(&lt;i&gt;MethodTypeInference.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-34">
+          <mxGeometry x="31" y="137" width="138" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-38" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-34" source="6Q5ysckcyFLwRDlW2aEn-36" target="6Q5ysckcyFLwRDlW2aEn-37">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-39" value="&lt;b&gt;CheckArgumentForApplicability&lt;/b&gt;&lt;br&gt;(&lt;i&gt;OverloadResolutions.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-34">
+          <mxGeometry x="9.25" y="207" width="181.5" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-40" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-34" source="6Q5ysckcyFLwRDlW2aEn-37" target="6Q5ysckcyFLwRDlW2aEn-39">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-41" value="Return the inference context to the state before the previous inference" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-34">
+          <mxGeometry x="40" y="297" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-42" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-34" source="6Q5ysckcyFLwRDlW2aEn-39" target="6Q5ysckcyFLwRDlW2aEn-41">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-70" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=87.5;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="6Q5ysckcyFLwRDlW2aEn-44" target="5hsE9kRwm3gZ5ivZTZri-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-44" value="" style="swimlane;startSize=0;" vertex="1" parent="1">
+          <mxGeometry x="140" y="670" width="260" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-45" value="CoerceArguments" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-44">
+          <mxGeometry x="40" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-46" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fillColor=#d5e8d4;strokeColor=#82b366;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-44" source="6Q5ysckcyFLwRDlW2aEn-48" target="6Q5ysckcyFLwRDlW2aEn-51">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-47" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fillColor=#f8cecc;strokeColor=#b85450;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-44" source="6Q5ysckcyFLwRDlW2aEn-48" target="6Q5ysckcyFLwRDlW2aEn-52">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-48" value="Is it target-typed generic method call or constructor" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-44">
+          <mxGeometry x="130" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fillColor=#d5e8d4;strokeColor=#82b366;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-44" source="6Q5ysckcyFLwRDlW2aEn-51" target="6Q5ysckcyFLwRDlW2aEn-54">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fillColor=#f8cecc;strokeColor=#b85450;" edge="1" parent="6Q5ysckcyFLwRDlW2aEn-44" source="6Q5ysckcyFLwRDlW2aEn-51" target="6Q5ysckcyFLwRDlW2aEn-53">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-51" value="Needs to be re-inferred ?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-44">
+          <mxGeometry x="150" y="160" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-52" value="Coerce as usual" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-44">
+          <mxGeometry x="10" y="43" width="80" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-53" value="Use type variables in inferred context" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-44">
+          <mxGeometry x="10" y="180" width="105" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-54" value="Infer it with the inferrer context" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="6Q5ysckcyFLwRDlW2aEn-44">
+          <mxGeometry x="10" y="260" width="90" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-58" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6Q5ysckcyFLwRDlW2aEn-3" target="6Q5ysckcyFLwRDlW2aEn-26">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="750" y="460" />
+              <mxPoint x="750" y="380" />
+              <mxPoint x="595" y="380" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-59" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6Q5ysckcyFLwRDlW2aEn-4" target="6Q5ysckcyFLwRDlW2aEn-26">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="750" y="720" />
+              <mxPoint x="750" y="380" />
+              <mxPoint x="595" y="380" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-60" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6Q5ysckcyFLwRDlW2aEn-22" target="6Q5ysckcyFLwRDlW2aEn-26">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="750" y="800" />
+              <mxPoint x="750" y="380" />
+              <mxPoint x="595" y="380" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-61" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6Q5ysckcyFLwRDlW2aEn-21" target="6Q5ysckcyFLwRDlW2aEn-26">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="750" y="920" />
+              <mxPoint x="750" y="380" />
+              <mxPoint x="595" y="380" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-62" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6Q5ysckcyFLwRDlW2aEn-15" target="6Q5ysckcyFLwRDlW2aEn-26">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="750" y="1035" />
+              <mxPoint x="750" y="380" />
+              <mxPoint x="595" y="380" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-68" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6Q5ysckcyFLwRDlW2aEn-64" target="6Q5ysckcyFLwRDlW2aEn-26">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="430" y="575" />
+              <mxPoint x="430" y="380" />
+              <mxPoint x="595" y="380" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-64" value="Save inferrer context, make overloaded resolution, after the inference, there should be just one candidate where inference succeeded or failed due to lack of info, if not, rollback the inferrer" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="192.5" y="520" width="155" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-67" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="6Q5ysckcyFLwRDlW2aEn-66" target="6Q5ysckcyFLwRDlW2aEn-64">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-66" value="Use the same way of argument binding" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="30" y="510" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-69" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6Q5ysckcyFLwRDlW2aEn-32" target="6Q5ysckcyFLwRDlW2aEn-48">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="430" y="1020" />
+              <mxPoint x="430" y="650" />
+              <mxPoint x="330" y="650" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-32" value="Choose best candidates (ctor + Add methods)&lt;br&gt;(&lt;i&gt;OverloadResolution.cs&lt;/i&gt;)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="543.38" y="1000" width="140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="6Q5ysckcyFLwRDlW2aEn-33" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6Q5ysckcyFLwRDlW2aEn-34" target="6Q5ysckcyFLwRDlW2aEn-32">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="637.8800000000001" y="830.0000000000002" as="sourcePoint" />
+            <mxPoint x="613.38" y="980" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>

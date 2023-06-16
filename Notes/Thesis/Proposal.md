@@ -1,0 +1,493 @@
+# Improving type inference
+
+## Summary
+
+Allow a user to specify only necessary type arguments of
+
+1. Generic method or local function call
+2. Generic object creation
+
+by introducing the `_` placeholder to mark type arguments inferred by the compiler.
+
+Introduces 
+
+1. inference using target type
+2. inference using initializer list
+3. inference using where clauses
+
+of generic object creation.
+
+## Motivation
+
+The current method type inference works as an "all or nothing" principle. 
+If the compiler is not able to infer command call type arguments, the user has to specify all of them. 
+This requirement can be verbose, noisy, and unnecessary in cases where the compiler is able to infer almost all type arguments and need just to specify ambiguous ones. 
+In these cases, we would like to give the compiler a hint for ambiguous type arguments. 
+The current source of dependencies, which are used in type inference is restricted to method/function arguments which prevent making the whole type argument list inference in even simple scenarios. 
+We could use the `_` placeholder for type arguments, which can be inferred from the argument list, and specify the remaining type arguments by ourselves. The potential additional sources of type information are specified below.
+
+- **Inference by target type** - The current method type inference doesn't use target type for determining type arguments in inference resulting in specifying the whole argument list.
+
+```csharp
+object person = ...
+int age = person.GetFieldValue("Age"); // Error: T can't be inferred
+
+public static class ObjectExtensions {
+    public static T GetFieldValue<T>(this object target, string field) { ... }
+}
+```
+
+- **Inference by `where` clauses** - Utilizing `where` clauses to determine the type argument.
+
+```csharp
+using System.Collections.Generic;
+
+var element = Foo(new List<int>()); //Error: TElem can't be inferred
+
+TElem Foo<TList, TElem>(TList p) where TList : IEnumerable<TElem> {...}
+```
+
+- **Inference by later interaction with the object** - Utilizing later method calls or assignments to determine the type of the generic object (useful for object creation).
+
+```csharp
+var number = new Complex {RealPart = 1, ImaginaryPart = true}; // Error: TReal and TImaginary can't be inferred
+
+public class Complex<TReal, TImaginary> 
+{
+    public TReal RealPart {get; set;}
+    public TImaginary ImaginaryPart {get;set;}
+}
+```
+
+Introducing improved method type inference involving the features above would bring breaking changes into the next C# version which we try to avoid.
+However, there can be possibility in the future which would allow us to introduce breaking changes like this.
+So we would like to already observe what dificulties involve to introduce better type inference like we know from RUST or Haskell.
+
+For the first problem we would like to replace unsufficient type inference by giving the compiler hints about types and the obvious ones to let the compiler decide.
+An example:
+
+```csharp
+var temp = ToCollection<List<_>, _>(1); // We are specifying the generic class, but its type argugument can be inferred by the compiler
+
+TList ToCollection<TList, TElem>(TElem p1) where TList : IEnumerable<TElem> {...}
+```
+
+The example is goal-directed and introducing `_` doesn't bring very much. However, imagine that the element would be a type with long name. 
+Or there can by more type arguments, which are obvious and only one needs to be specified. 
+In these situations, `_` can save a lot of key strokes.
+In cases where `_` is a name of type(very wierd idea), we will prioritize it and turn off the hints for the method type inferrer.
+And because we are introducing a new concept of `_`, we doesn't introducing a breaking change.
+
+For the second part of the problem, we can introduce constructor type inference, where we can try improved type inference by adding new type constraints.
+It would also bring a braking change, however we can enable it just in case of used angle brackets (e.g. `new Klass<...>()`).
+Because constructor type inference is not presented in the current C# version, we are free to experiment with it, improve the inferrer and use it later when the method type inference would be ready for this change.
+Reasons for adding constructor type inference remain same, there are many types with more than 4 type parameters in standard library and there are not necessary to specify all of them in the type argument list.
+
+### Possible extensions
+
+Worth to mention other options which could be accomplished in the future regarding default and named type arguments.
+Having the `_` placeholder can be used as a shortcut for choosing the right generic overload and to save typing when we use named type parameters.
+
+```csharp
+class Foo<T1, T2 = int> {}
+class Foo<T1, T2 = int, T3 = string> {}
+
+new Foo<T3: _, T2: string, T1 = _>(); // Assuming that T1 can be inferred and T3 is default.
+new Foo(T2: string)(); // T1 and T3 are defaults
+new Foo<_,_>(); // Choosing Foo<T1, T2> based on the arity
+```
+
+Method type inference(including object creation) is not the only place where we can use the `_` placeholder.
+Sometimes `var` keyword as a variable declaration is not sufficient. 
+We would like to be able to specify more the type information about variable but still have some implementation details hidden.
+With the `_` placeholder we would be able to specify more the shape of the variable avoiding unnecessary specification of type arguments. 
+
+```csharp
+Wrapper<_> wrapper = ... // I get an wrapper, which I'm interested in, but I don't care about the type arguments, because I don't need them in my code.
+wrapper.DoSomething();
+```
+At the end, casting could use the `_` placeholder as well.
+
+```csharp
+Foo<int, string> myvar = (Foo<_,_>)myobject; // Hint the type arguments based on target or other potential source of type information like default or named type arguments.
+```
+
+An interesting thing would be to allow the `_` placeholder in member lookup as you can see in the example below.
+On the first see, it can look wierd.
+
+```csharp
+static class C1<T1> {
+    static class C2 <T2> {
+        public (T1, T2) Foo(T1 t, T2 t) {}
+    }
+}
+
+var a = C1<_>.C2<_>.Foo(1, 1);
+```
+
+But in combination with default parameters, It might be useful in cases, where we use entity as a global provider of something, which we determine by type.
+
+```csharp
+static class Factory<T = Default> {
+    public static T Create(){...}
+}
+
+int a = Factory<_>.Create(); // Calls Factory<int>.Create();
+var b = Factory<_>.Create(); // Calls Factory<Default>.Create();
+```
+
+Although it is unlikely that it would be added into C# because of implementation complexity and hard readebility of code.
+
+## Scope
+
+Partial type inference can be solved in various ways.
+We chose a feature enabling to hint the compiler by specifying ambiguous type arguments and letting the compiler infer the rest.
+It aims at cases, where we want just to specify the arity of desired generic method(type) or specify a parameter that is not possible to infer from the context but let the compiler infer the remaining arguments. 
+
+## Design
+
+### Choosing the placeholder
+
+We base our choose on usages specified below.
+
+1. Type argument list of generic method call (e.g. `Foo<T1, T2>(...)`)
+2. Type argument list of type creation (e.g. `new Bar<T1, T2>(...)`)
+3. Type argument list of local variable (e.g. `Bar<T1, T2> temp = ...`)
+4. Expressing array type (e.g. `T1[]`)
+5. Expressing inferred type alone `T1` in local variable
+
+**Diamond operator**
+
+1. In the case of generic method calls it doesn't much make a sense since method type inference is enabled by default without using angle brackets.
+
+```csharp
+Foo<>(arg1, arg2, arg3); // Doesn't bring us any additional info
+```
+
+2. There is an advantage. It can turn on the type inference. However, it would complicate overload resolution because we would have to search for every generic type of the same name but no metter what arity. But could make a restriction. Usually, there is not more then one generic type with the same name. So when there will be just one type of that name, we can turn the inference on.
+
+```csharp
+new Bar<>(); // Many constructors which we have to investigate for applicability
+new Baz<>(); // Its OK, we know what set of constructors to investigate.\
+
+class Bar { ... }
+class Bar<T1> { ... }
+class Bar<T1, T2> { ... }
+
+class Baz<T1,T2> {...}
+```
+
+3. It could make sense to specify just a wrapper of some type which gives us general API doesn't involving it's type arguments. It would say that the part of the code just care about the wrapper. However, we think that it doesn't give us much freedom because type arguments usually appears in public API and only few of them are for internal use. 
+
+```csharp
+Wrapper<> temp = ...
+```
+
+4. It doesn't seem very well.
+
+```csharp
+<>[] temp = ...
+```
+
+5. It clashes with `var` and looks wierd.
+
+```csharp
+<> temp = ... // equivalent to `var temp = ...`
+```
+
+**Whitespace seperated by commas**
+
+1. it is able to specify arity of generic method. However, it seems to be messy when it is used in generic methods with many generic type parameters. Also it already have its own meaning of expressing open generic type.
+
+```csharp
+Foo<,string,List<>,>(arg1, arg2, arg3);
+```
+
+2. the same reasoning as above. However it doesn
+
+```csharp
+new Bar<,string,List<>,>(arg1, arg2) { arg3 };
+```
+
+3. It doesn't work with array type.
+
+```csharp
+Bar<,string,List<>,> temp = ...
+```
+
+4. It doesn't seems very well.
+
+```csharp
+[] temp = ...
+Foo<,[],>(arg1, arg2)
+```
+
+5. It looks like CSharp it not staticly-typed langauge, clashed with `var` and probably introduce many implemenetation problems in the parser.
+
+```csharp
+temp = ...
+```
+
+**_ seperated by commas**
+
+1. It specifies the arity of generic method. It explicitly says that we want to infer this type argument. It seems to be less messy.
+
+```csharp
+Foo<_, string, List<_>, _>(arg1, arg2, arg3);
+```
+
+2. The same reasons as above
+
+```csharp
+new Bar<_, string, List<_>, _>(arg1, arg2, arg3);
+```
+
+3. the same reasons as above.
+
+```csharp
+Bar<_, string, List<_>, _>(arg1, arg2);
+```
+
+4. Looks quite OK.
+
+```csharp
+_[] temp = ...
+```
+
+5. Clashes with `var` and seems to be wierd
+
+```csharp
+_ temp = ...
+```
+
+**var seperated by commas**
+
+1. More key strokes. It starts to raise question if it brings an advantage of safe key strokes.
+
+```csharp
+Foo<var, string, List<var>, var>(arg1, arg2, arg3);
+```
+
+2. The same reasons as above
+
+```csharp
+new Bar<var, string, List<var>, var>(arg1, arg2, arg3);
+```
+
+3. the same reasons as above.
+
+```csharp
+Bar<var, string, List<var>, var>(arg1, arg2);
+```
+
+1. Looks OK.
+
+```csharp
+var[] temp = ...
+```
+
+5. State of the art
+
+```csharp
+var temp = ...
+```
+
+**Something else seperated by commas**
+
+Doesn't make a lot of sense because it need to assign new meaning to that character in comparism with `_`, `var`. `<>`, `<,,,>`. Asterisk `*` can be considered, however it can remind a pointer. 
+
+**Conslusion**
+
+I prefer `_` character with enabling `<>` operator in case of constructor inference when there is only one generic type with that name. Additionaly to that, I would prohibit using `_` in the same places like `var`. 
+
+### Nullable Annotation
+
+Since we have nullable analysis, we could permit to specify nullability like this `_?`. 
+However, we don't think it would have any significant benefits.
+
+### Partial method type inference
+
+For every generic method or function call, we will enable to use `_` as a placeholder for inferred type if there is no type if that name.
+The placeholder can be nested (e.g. `G<_, List<_>>`).
+The power of type inference remains same.
+
+**Implementation**
+
+1. Detecting inferred arguments
+
+We will threat `_` in the same way as `var` keyword. 
+We will make a special symbol `SourceInferredTypeArgumentSymbol`.
+When we will bind an invocation expression, we will specially threat the `_` placeholder. 
+During investigating of method simple name (not containing name of class), if the look up doesn't find any type symbol, we will create `SourceInferredTypeArgumentSymbol` instead of raising an error of unknown type name.
+It will prioritize usage of `_` as type name (type parameter name, struct or class name) instead of threatening it as `SourceInferredTypeArgumentSymbol` which will doesn't change behavior of code compiled by previous version of the compiler.  
+
+2. Conditions for type inference
+
+So we have type argument list and entering into the overload resolution. 
+We want to infer type parameters if the method is generic, its argument list doesn't contain any dynamic argument and doesn't have type argument list or type argument list contain `SourceInferredTypeArgumentSymbol`. 
+It doesn't matter how nested it is. We don't have to check if the receiver is dynamic because there is now overload resultion in that case.
+
+3. Type inference
+
+Description of type inference will be presented in type inference of constructors.
+
+4. Checking generic method calls or functions involving `dynamic` keyword 
+
+For type arguments, which doesn't contain any `SourceInferredTypeArgumentSymbol` (even nested), are substituted in parameter lists. 
+Those parameters, which doesn't contain any type parameter, are checked with corresponding arguments. Checking involves respecting the type parameters' constraints and applicability of arguments. 
+
+5. Nullable analysis.
+   
+The condition for entering into type inference is similar to the second point. 
+We have to bind the type arguments again with information about nullability and run the inference in the same manner as the current version of the compiler with adjusted type inferrer which will be described later.
+
+**Examples**
+
+> Common use cases
+
+```csharp
+// Inferred: [TCollection = List<MySuperComplicatedElement<Arg1, Arg2>>, TElem = MySuperComplicatedElement<Arg1, Arg2>]
+// Use case: Specifying just a type of collection because other arguments can be inferred. Sometimes, the `where` constraints are crucial for the type inference. In that case we will use the hint because type inference is not so powerful.
+var temp1 = ToCollection<List<_>, _>(new MySuperComplicatedElement<Arg1, Arg2>()); 
+// Inferred: [TResult = MyResult, TAlgorithm = MyAlg, TOptions = MyAlgOpt, TInput = MyInput]
+// Use case: Most of the type arguments can be inferred from arguments. Sometimes the return type contains type paremeter as well and can be crucial for the type inference. In that case, we will use the hint because type inference is not so powerful
+MyResult temp2 = Run<_,_,_,MyResult>(new MyAlg(), new MyAlgOpt(), new MyInput());
+// Inferred: [TPressision = double]
+// Use case: Type parameters can be used for internal usage. In that case we would like to provide the compiler hint 
+Result temp3 = Computation<double, _, Result, _>(new Data(), new Opts());
+
+// Definitions
+TCollection ToCollection<TCollection, TElem>(TElem p1) where TCollection : IEnumerable<TElem> { ... } 
+TResult Run<TAlgorithm, TOptions, TInput, TResult>(TAlgorithm alg, TOptions opts, TInput input) { ... }
+Result Computation<TPressision, TData, TResult, TOpts>(TData data, TOpts opts) { ... } 
+```
+
+> Tests
+
+```csharp
+F1<_, string>(1); // Inferred: [T1 = int, T2 = string] Simple test
+F2<_,_>(1,""); // Inferred: [T1 = int, T2 = string] Choose overload based on arity
+F3<int, _, string, _>(new G2<string, string>); // Inferred: [T1 = int, T2 = string, T3 = string, T4 = string] Constructed type
+F4<_, _, string>(x => x + 1, y => y.ToString(),z => z.Length); // Inferred: [T1 = int, T2 = int, T3 = string] Circle of dependency
+F5<string>(1); // Inferred: [T1 = string] Expanded form #1
+F5<_>(1, ""); // Inferred: [T1 = string] Expanded form #2
+F5<_>(1, "", ""); // Inferred: [T1 = string] Expanded form #3
+
+B1<int> temp1 = null;
+F6<A1<_>>(temp1); // Inferred: [ T1 = A1<int> ] Wrapper conversion
+
+B2<int, string> temp2 = null;
+F6<A2<_, string>>(temp2); // Inferred: [ T1 = A2<int, string> ] Wrapper conversion with type argument
+
+C2<int, B> temp3 = null;
+F6<I2<_, A>>(temp3); // Inferred: [ I2<int, A> ] Wrapper conversion with type argument conversion
+
+dynamic temp4 = "";
+F7<string, _>("", temp4, 1); // Inferred: [T1 = int] Error: T1 = string & int
+F7<_, string>(1, temp4, 1); // Inferred: [T1 = int] Warning: Inferred type argument is not supported by runtime (type hints will not be used at all)
+temp.F7<string, _>(temp4);  // Inferred: [T1 = int] Warning: Inferred type argument is not supported by runtime (type hints will not be used at all)
+
+GH.F1<_,_>(""); // Error: Can't infer T2
+GH.F1<_,int>(""); // Error: Can't infer T2
+GH.F1<_,byte>(257); // Error: Can't infer T2
+
+#nullable enable
+string? temp5 = null;
+string temp6 = "";
+C2<int, string> temp7 = new C2<int, string>();
+C2<int, string?> temp8 = new C2<int, string?>();
+C2<string, int> temp9 = new C2<string, int>();
+
+F8<int, _>(temp5); // Inferred: [T1 = int, T2 = string!] 
+F8<int, _>(temp6); // Inferred: [T1 = int, T2 = string!] 
+F8<int?, _>(temp5); // Inferred: [T1 = int?, T2 = string!] 
+F8<int?, _>(temp6); // Inferred: [T1 = int?, T2 = string!] 
+F9<int, _>(temp5); // Inferred: [T1 = int, T2 = string?] 
+F9<int, _>(temp6); // Inferred: [T1 = int, T2 = string!] 
+F9<int?, _>(temp5); // Inferred: [T1 = int?, T2 = string?] 
+F9<int?, _>(temp6); // Inferred: [T1 = int?, T2 = string!] 
+
+
+F10<I2<_, string?>>(temp7); // Inferred: [T1 = I2<int, string?>!] Can convert string to string? because of covariance
+F10<C2<_, string?>>(temp7); // Error: Can't convert string? to string because of invariance
+F10<I2<_, _>>(temp7); // Inferred: [T1 = I2<System.Int32, System.String!>!]
+F10<C2<_, _>>(temp7); // Inferred: [T1 = C2<System.Int32, System.String!>!]
+F10<I2<_, _>>(temp8); // Inferred: [T1 = I2<System.Int32, System.String?>!]
+F10<C2<_, _>>(temp8); // Inferred: [T1 = C2<System.Int32, System.String?>!]
+F10<I2<_, string>>(temp8); // Error: Can't convert string? to string because of covariance
+F10<C2<_, string>>(temp8); // Error: Can't convert string? to string because of invariance
+F10<I2<string?, int>>(temp9); // Inferred: [T1 = C2<System.Int32, System.String?>!] Can convert string to string? because of contravariance
+
+void F8<T1, T2>(T2? p2) { }
+void F9<T1, T2>(T2 p2) { }
+void F10<T1>(T1 p1) {}
+#nullable disable
+
+//Definitions
+void F1<T1, T2>(T1 p1) {}
+void F2<T1, T2>(T1 p1, T2 p2) {}
+void F2<T1>(T1 p1, string p2) {}
+void F3<T1, T2, T3, T4>(G2<T2, T4> p24) {}
+class G2<T1, T2> {}
+void F4<T1, T2, T3>(Func<T1, T2> p12, Func<T2, T3> p23, Func<T3, T1> p31) { }
+void F5<T>(int p1, params T[] args) {}
+void F6<T1>(T1 p1) {}
+class A {}
+class B : A{}
+class A1<T> {}
+class A2<T1, T2> {}
+class B1<T> : A1<T> {}
+class B2<T1, T2> : A2<T1, T2> {}
+interface I2<in T1, out T2> {}
+class C2<T1, T2> : I2<T1, T2> {}
+void F7<T1, T2>(T1 p1, T2 p2, T1 p3) {}
+void F11<T1, T2>(T2 p2) { }
+
+//Seperated Assembly
+F1<_> (null); // Inferred: [T1 = _] class `_` turned the inference off
+
+F1<T1>(T1 p1) {}
+class _ {}
+```
+
+### Type inference of constructor
+
+As we mentioned in the motivation, we will experiment with improving type inference in object creation.
+The inference will influence following expressions.
+
+1. Object creation
+2. Array creation
+
+Beside mentioned partial type inference, we will include information about target type and initializer list together with type parameter constraints.
+
+**Implementation**
+
+1. Detecting inferred arguments
+
+2. Conditions for type inference
+
+3. Checking constructor call involving `dynamic` keyword 
+
+For the rest of the points we will use a diagram to better describe the process.
+
+![ObjectCreationBinding](./../Artifacts/ObjectCreationExpressionBinding_Improved.drawio.png)
+
+4. Passing information about target type
+
+5. Binding arguments
+
+6. Getting information from initializer
+
+7. Constructor inference
+
+8. Coercing arguments
+
+9. Nullable analysis
+
+**Examples**
+
+> Common use cases
+
+```csharp
+
+```

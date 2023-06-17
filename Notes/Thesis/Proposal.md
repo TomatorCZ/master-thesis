@@ -11,9 +11,9 @@ by introducing the `_` placeholder to mark type arguments inferred by the compil
 
 Introduces 
 
-1. inference using target type
-2. inference using initializer list
-3. inference using where clauses
+1. type inference using target type
+2. type inference using initializer list
+3. type inference using `where` clauses
 
 of generic object creation.
 
@@ -26,7 +26,7 @@ In these cases, we would like to give the compiler a hint for ambiguous type arg
 The current source of dependencies, which are used in type inference is restricted to method/function arguments which prevent making the whole type argument list inference in even simple scenarios. 
 We could use the `_` placeholder for type arguments, which can be inferred from the argument list, and specify the remaining type arguments by ourselves. The potential additional sources of type information are specified below.
 
-- **Inference by target type** - The current method type inference doesn't use target type for determining type arguments in inference resulting in specifying the whole argument list.
+- **Inference by target type** - The current method type inference doesn't use target type for determining type arguments in type inference resulting in specifying the whole argument list.
 
 ```csharp
 object person = ...
@@ -59,29 +59,30 @@ public class Complex<TReal, TImaginary>
 }
 ```
 
-Introducing improved method type inference involving the features above would bring breaking changes into the next C# version which we try to avoid.
-However, there can be possibility in the future which would allow us to introduce breaking changes like this.
-So we would like to already observe what dificulties involve to introduce better type inference like we know from RUST or Haskell.
+Introducing improved method type inference involving the features above would bring breaking changes into the next C# version which we try to avoid. 
+Although, there can be a way in the future which would allow us to introduce breaking changes like this. 
+So we would like to already observe what difficulties involve to introduce better type inference as we know from RUST or Haskell.
 
-For the first problem we would like to replace unsufficient type inference by giving the compiler hints about types and the obvious ones to let the compiler decide.
-An example:
+For the first problem we would like to replace unsufficient type inference by giving the compiler hints about ambiguous types and letting the compiler infer the obvious ones.
+
+> An example
 
 ```csharp
-var temp = ToCollection<List<_>, _>(1); // We are specifying the generic class, but its type argugument can be inferred by the compiler
+var temp = ToCollection<List<_>, _>(1); // We are specifying the generic class, but its type argument can be inferred by the compiler
 
 TList ToCollection<TList, TElem>(TElem p1) where TList : IEnumerable<TElem> {...}
 ```
 
-The example is goal-directed and introducing `_` doesn't bring very much. However, imagine that the element would be a type with long name. 
-Or there can by more type arguments, which are obvious and only one needs to be specified. 
-In these situations, `_` can save a lot of key strokes.
-In cases where `_` is a name of type(very wierd idea), we will prioritize it and turn off the hints for the method type inferrer.
-And because we are introducing a new concept of `_`, we doesn't introducing a breaking change.
+The example is goal-directed and introducing `_` doesn't bring very much. However, imagine that the element would be a type with a long name. 
+Or there can be more type arguments, which are obvious and only one needs to be specified. 
+In these situations, `_` can save a lot of keystrokes.
+In cases where `_` is a name of a type(very weird idea), we will prioritize it and turn the hints off for the method type inferrer.
+And because we are introducing a new concept of `_`, we don't introduce a breaking change.
 
 For the second part of the problem, we can introduce constructor type inference, where we can try improved type inference by adding new type constraints.
-It would also bring a braking change, however we can enable it just in case of used angle brackets (e.g. `new Klass<...>()`).
+It would also bring a breaking change, however, we can enable it just in case of used angle brackets (e.g. `new Klass<...>()`).
 Because constructor type inference is not presented in the current C# version, we are free to experiment with it, improve the inferrer and use it later when the method type inference would be ready for this change.
-Reasons for adding constructor type inference remain same, there are many types with more than 4 type parameters in standard library and there are not necessary to specify all of them in the type argument list.
+Reasons for adding constructor type inference remain the same, there are many types with more than 4 type parameters in the standard library and there are not necessary to specify all of them in the type argument list.
 
 ### Possible extensions
 
@@ -142,13 +143,13 @@ Although it is unlikely that it would be added into C# because of implementation
 
 Partial type inference can be solved in various ways.
 We chose a feature enabling to hint the compiler by specifying ambiguous type arguments and letting the compiler infer the rest.
-It aims at cases, where we want just to specify the arity of desired generic method(type) or specify a parameter that is not possible to infer from the context but let the compiler infer the remaining arguments. 
+It aims at cases, where we want just to specify the arity of desired generic method(type) or specify a parameter that is not possible to infer from the context but let the compiler infer the remaining arguments. Also, we prototyped to use more info about type dependencies in the type inference.
 
 ## Design
 
 ### Choosing the placeholder
 
-We base our choose on usages specified below.
+We base our choice on the usages specified below.
 
 1. Type argument list of generic method call (e.g. `Foo<T1, T2>(...)`)
 2. Type argument list of type creation (e.g. `new Bar<T1, T2>(...)`)
@@ -158,17 +159,17 @@ We base our choose on usages specified below.
 
 **Diamond operator**
 
-1. In the case of generic method calls it doesn't much make a sense since method type inference is enabled by default without using angle brackets.
+1. In the case of generic method calls it doesn't much make sense since method type inference is enabled by default without using angle brackets.
 
 ```csharp
 Foo<>(arg1, arg2, arg3); // Doesn't bring us any additional info
 ```
 
-2. There is an advantage. It can turn on the type inference. However, it would complicate overload resolution because we would have to search for every generic type of the same name but no metter what arity. But could make a restriction. Usually, there is not more then one generic type with the same name. So when there will be just one type of that name, we can turn the inference on.
+2. There is an advantage. It can turn on the type inference. However, it would complicate overload resolution because we would have to search for every generic type of the same name no matter what arity. But could make a restriction. Usually, there is not more than one generic type with the same name. So when there will be just one type of that name, we can turn the inference on.
 
 ```csharp
 new Bar<>(); // Many constructors which we have to investigate for applicability
-new Baz<>(); // Its OK, we know what set of constructors to investigate.\
+new Baz<>(); // Its OK, we know what set of constructors to investigate.
 
 class Bar { ... }
 class Bar<T1> { ... }
@@ -177,7 +178,7 @@ class Bar<T1, T2> { ... }
 class Baz<T1,T2> {...}
 ```
 
-3. It could make sense to specify just a wrapper of some type which gives us general API doesn't involving it's type arguments. It would say that the part of the code just care about the wrapper. However, we think that it doesn't give us much freedom because type arguments usually appears in public API and only few of them are for internal use. 
+3. It could make sense to specify just a wrapper of some type that gives us general API that doesn't involve its type arguments. It would say that the part of the code just cares about the wrapper. However, we think that it doesn't give us much freedom because type arguments usually appear in public API and only a few of them are for internal use. 
 
 ```csharp
 Wrapper<> temp = ...
@@ -197,13 +198,13 @@ Wrapper<> temp = ...
 
 **Whitespace seperated by commas**
 
-1. it is able to specify arity of generic method. However, it seems to be messy when it is used in generic methods with many generic type parameters. Also it already have its own meaning of expressing open generic type.
+1. It is able to specify the arity of the generic method. However, it seems to be messy when it is used in generic methods with many generic type parameters. Also, it already has its own meaning of expressing open generic type.
 
 ```csharp
 Foo<,string,List<>,>(arg1, arg2, arg3);
 ```
 
-2. the same reasoning as above. However it doesn
+1. The same reasoning as above.
 
 ```csharp
 new Bar<,string,List<>,>(arg1, arg2) { arg3 };
@@ -222,7 +223,7 @@ Bar<,string,List<>,> temp = ...
 Foo<,[],>(arg1, arg2)
 ```
 
-5. It looks like CSharp it not staticly-typed langauge, clashed with `var` and probably introduce many implemenetation problems in the parser.
+5. It looks like CSharp would not be a statically-typed language, clashed with `var` and probably introduce many implementation problems in the parser.
 
 ```csharp
 temp = ...
@@ -230,19 +231,19 @@ temp = ...
 
 **_ seperated by commas**
 
-1. It specifies the arity of generic method. It explicitly says that we want to infer this type argument. It seems to be less messy.
+1. It specifies the arity of the generic method. It explicitly says that we want to infer this type argument. It seems to be less messy.
 
 ```csharp
 Foo<_, string, List<_>, _>(arg1, arg2, arg3);
 ```
 
-2. The same reasons as above
+2. The same reasons as above.
 
 ```csharp
 new Bar<_, string, List<_>, _>(arg1, arg2, arg3);
 ```
 
-3. the same reasons as above.
+3. The same reasons as above.
 
 ```csharp
 Bar<_, string, List<_>, _>(arg1, arg2);
@@ -254,7 +255,7 @@ Bar<_, string, List<_>, _>(arg1, arg2);
 _[] temp = ...
 ```
 
-5. Clashes with `var` and seems to be wierd
+5. Clashes with `var` and seems to be wierd.
 
 ```csharp
 _ temp = ...
@@ -262,7 +263,7 @@ _ temp = ...
 
 **var seperated by commas**
 
-1. More key strokes. It starts to raise question if it brings an advantage of safe key strokes.
+1. More keystrokes. It starts to raise the question if it brings the advantage of saving keystrokes.
 
 ```csharp
 Foo<var, string, List<var>, var>(arg1, arg2, arg3);
@@ -274,7 +275,7 @@ Foo<var, string, List<var>, var>(arg1, arg2, arg3);
 new Bar<var, string, List<var>, var>(arg1, arg2, arg3);
 ```
 
-3. the same reasons as above.
+3. The same reasons as above.
 
 ```csharp
 Bar<var, string, List<var>, var>(arg1, arg2);
@@ -286,7 +287,7 @@ Bar<var, string, List<var>, var>(arg1, arg2);
 var[] temp = ...
 ```
 
-5. State of the art
+5. State of the art.
 
 ```csharp
 var temp = ...
@@ -294,11 +295,13 @@ var temp = ...
 
 **Something else seperated by commas**
 
-Doesn't make a lot of sense because it need to assign new meaning to that character in comparism with `_`, `var`. `<>`, `<,,,>`. Asterisk `*` can be considered, however it can remind a pointer. 
+Doesn't make a lot of sense because it needs to assign new meaning to that character in comparison with `_`, `var`, `<>`, `<,,,>`. 
+Asterisk `*` can be considered, however, it can remind a pointer.  
 
 **Conslusion**
 
-I prefer `_` character with enabling `<>` operator in case of constructor inference when there is only one generic type with that name. Additionaly to that, I would prohibit using `_` in the same places like `var`. 
+I prefer `_` character with enabling `<>` operator in the case of constructor inference when there is only one generic type with that name. 
+Additionally to that, I would prohibit using `_` in the same places as `var`.
 
 ### Nullable Annotation
 
@@ -307,39 +310,39 @@ However, we don't think it would have any significant benefits.
 
 ### Partial method type inference
 
-For every generic method or function call, we will enable to use `_` as a placeholder for inferred type if there is no type if that name.
+For every generic method or function call, we will enable to use `_` as a placeholder for inferred type if there is no type of that name.
 The placeholder can be nested (e.g. `G<_, List<_>>`).
-The power of type inference remains same.
+The power of type inference remains the same.
 
 **Implementation**
 
-1. Detecting inferred arguments
+1. Detecting inferred type arguments
 
-We will threat `_` in the same way as `var` keyword. 
+We will treat `_` in the same way as `var` keyword. 
 We will make a special symbol `SourceInferredTypeArgumentSymbol`.
-When we will bind an invocation expression, we will specially threat the `_` placeholder. 
-During investigating of method simple name (not containing name of class), if the look up doesn't find any type symbol, we will create `SourceInferredTypeArgumentSymbol` instead of raising an error of unknown type name.
-It will prioritize usage of `_` as type name (type parameter name, struct or class name) instead of threatening it as `SourceInferredTypeArgumentSymbol` which will doesn't change behavior of code compiled by previous version of the compiler.  
+When we will bind an invocation expression, we will specially treat the `_` placeholder. 
+During the investigation of the method's simple name, if the lookup doesn't find any type symbol, we will create `SourceInferredTypeArgumentSymbol` instead of raising an error of an unknown type name.
+It will prioritize usage of `_` as a type name (type parameter name, struct, or class name) instead of treating it as `SourceInferredTypeArgumentSymbol` which will doesn't change the behavior of code compiled by a previous version of the compiler.  
 
 2. Conditions for type inference
 
-So we have type argument list and entering into the overload resolution. 
-We want to infer type parameters if the method is generic, its argument list doesn't contain any dynamic argument and doesn't have type argument list or type argument list contain `SourceInferredTypeArgumentSymbol`. 
-It doesn't matter how nested it is. We don't have to check if the receiver is dynamic because there is now overload resultion in that case.
+So we have a type argument list and enter the overload resolution. 
+We want to infer type parameters if the method is generic, its argument list doesn't contain any dynamic argument and doesn't have a type argument list or the type argument list contains `SourceInferredTypeArgumentSymbol`. 
+It doesn't matter how nested it is. We don't have to check if the receiver is dynamic because there is no overload resolution in that case.
 
 3. Type inference
 
-Description of type inference will be presented in type inference of constructors.
+A description of type inference will be presented in the type inference of constructors.
 
 4. Checking generic method calls or functions involving `dynamic` keyword 
 
-For type arguments, which doesn't contain any `SourceInferredTypeArgumentSymbol` (even nested), are substituted in parameter lists. 
-Those parameters, which doesn't contain any type parameter, are checked with corresponding arguments. Checking involves respecting the type parameters' constraints and applicability of arguments. 
+Type arguments, which don't contain any `SourceInferredTypeArgumentSymbol` (even nested), are substituted in parameter lists. 
+Those parameters, which don't contain any type parameter, are checked with corresponding arguments. Checking involves respecting the type parameters' constraints and applicability of arguments. 
 
 5. Nullable analysis.
    
 The condition for entering into type inference is similar to the second point. 
-We have to bind the type arguments again with information about nullability and run the inference in the same manner as the current version of the compiler with adjusted type inferrer which will be described later.
+We have to bind the type arguments again with information about nullability and run the inference in the same manner as the current version of the compiler with an adjusted type inferrer which will be described later.
 
 **Examples**
 
@@ -347,13 +350,13 @@ We have to bind the type arguments again with information about nullability and 
 
 ```csharp
 // Inferred: [TCollection = List<MySuperComplicatedElement<Arg1, Arg2>>, TElem = MySuperComplicatedElement<Arg1, Arg2>]
-// Use case: Specifying just a type of collection because other arguments can be inferred. Sometimes, the `where` constraints are crucial for the type inference. In that case we will use the hint because type inference is not so powerful.
+// Use case: Specifying a type of collection because other arguments can be inferred. Sometimes, the `where` constraints are crucial for the type inference. In that case, we will use the hint because type inference is not so powerful.
 var temp1 = ToCollection<List<_>, _>(new MySuperComplicatedElement<Arg1, Arg2>()); 
 // Inferred: [TResult = MyResult, TAlgorithm = MyAlg, TOptions = MyAlgOpt, TInput = MyInput]
-// Use case: Most of the type arguments can be inferred from arguments. Sometimes the return type contains type paremeter as well and can be crucial for the type inference. In that case, we will use the hint because type inference is not so powerful
+// Use case: Most of the type arguments can be inferred from arguments. Sometimes the return type contains a type parameter as well and it can be crucial for the type inference. In that case, we will use the hint because type inference is not so powerful.
 MyResult temp2 = Run<_,_,_,MyResult>(new MyAlg(), new MyAlgOpt(), new MyInput());
 // Inferred: [TPressision = double]
-// Use case: Type parameters can be used for internal usage. In that case we would like to provide the compiler hint 
+// Use case: Type parameters can be used for internal usage. In that case, we would like to provide the compiler hint.
 Result temp3 = Computation<double, _, Result, _>(new Data(), new Opts());
 
 // Definitions
@@ -464,70 +467,77 @@ Beside mentioned partial type inference, we will include information about targe
 
 1. Detecting inferred arguments
 
-We will theat `_` in the same way as in the method type inference.
-Special handling of `_` will be turn on when we will bind `ClassCreationExpression` or `ArrayExpressionExpression`. 
-That means, we will not to support it in the `DelegateCreationExpression`.
+We will treat `_` in the same way as in the method type inference.
+Special handling of `_` will be turned on when we will bind `ClassCreationExpression` or `ArrayExpressionExpression`. 
+That means, we will not support it in the `DelegateCreationExpression`.
 
 2. Conditions for type inference
 
-The inference is entered when type argument list exist however doesn't constain any type parameters (diamond operator`<>`), or type argument list contains `SourceInferredTypeArgumentSymbol`.
+The inference is entered when there is an empty type argument list (diamond operator`<>`), or type argument list contains `SourceInferredTypeArgumentSymbol`.
 
 3. Checking constructor call involving `dynamic` keyword 
 
-For type arguments, which doesn't contain any `SourceInferredTypeArgumentSymbol` (even nested), are substituted in parameter lists. 
-Those parameters, which doesn't contain any type parameter, are checked with corresponding arguments. Checking involves respecting the type parameters' constraints and applicability of arguments. 
+Type arguments, which don't contain any `SourceInferredTypeArgumentSymbol` (even nested), are substituted in parameter lists. 
+Those parameters, which don't contain any type parameter, are checked with corresponding arguments. Checking involves respecting the type parameters' constraints and applicability of arguments. 
 
 4. Array type inference
 
-We changes best common type of set of expressions by adding constraint from type argument list of array creation (e.g. `new G<_>[] {...}`, `G<_>` is added to the set of bounds(We will describe how to handle `_` and in which bounds should be `G<_>` in the description of constructor type inference)).
-We also add constraint from target type (e.g. `IEnumerable<int> temp = new [1]`, Do upper bound inference of `IEnumerable<int>` and `T[]`).
-This will ensure, that type information form target and type argument list is added to the inferrer.
-We don't have to care about constructor and where clauses because they don't help us to find type argument and initializer is already used in best common type algorithm.
+We change the best common type of set of expressions by adding new constraints from type argument list of array creation (e.g. `new G<_>[] {...}`, `G<_>` is added to the set of bounds(We will describe how to handle `_` and in which bounds should be `G<_>` in the description of constructor type inference)).
+We also add constraints from the target type (e.g. `IEnumerable<int> temp = new [1]`, Do upper bound inference of `IEnumerable<int>` and `T[]`).
+This will ensure, that type information from the target and type argument list is added to the inferrer.
+We don't have to care about the constructor and `where` clauses because they don't help us to find type argument and the initializer is already used in the best common type algorithm.
 
-For the rest of the points we will use the following diagram to better describe the process.
+5. Passing information about target type
+
+For the rest of the points, we will use the following diagram to better describe the process.
 
 > Object creation binding
 
 ![ObjectCreationBinding](./../Artifacts/ObjectCreationExpressionBinding_Improved.drawio.png)
 
-5. Passing information about target type
-
 Information about the target can come from two places. 
-The first place is Variable declaration statement. 
-In that case we bind the variable if we can (e.g. it is not `var`) and pass it to bind the declarator expression. The second place can be parameter type. 
-In that case it is somehow tricky. There are three possible scenarios. 
-We already know type of the parameter (It doesn't contain any type parameters). We don't know type of the parameter because it contains type parameter, although after the inference, we will know it. 
+The first place is `VariableDeclarationStatement`. 
+In that case, we bind the variable if we can (e.g. it is not `var`) and pass it to the binding of the declarator expression. The second place can be parameter type. 
+This case is tricky. There are three possible scenarios. 
+We already know the type of the parameter (It doesn't contain any type parameters). We don't know the type of the parameter because it contains the type parameter, although, after the inference, we will know it. 
 And the last option is when type inference fails and doesn't find type arguments. 
-We will describe how target type is passed in these scenarios in the following paraghraphs. 
+We will describe how the target type is passed in these scenarios in the following paragraphs. 
 
 6. Binding arguments
 
-There can be situation, when argument is another creation expression which needs type inference.
-In the time of arguments binding, we would like to know parameter types because of passing it into the binding process. 
-We can do it by postponing binding of `ObjectCreationExpression`s and `ArrayCreationExpression`s to the time, when we start to investigate each of the constructor candidate. 
-In that time we already have exact list of the parameters. 
-So in the binding process before constructor overload resolution, we will convert above mentioned expression into `BoundUnconvertedObjectCreationExpression` and `BoundUnconvertedArrayCreationExpression`. 
-When we arrive in front of checking applicability of canstructor. We will look at approprite type of parameters and do the following. If the argument is on of "BoundUnvonverted" expressions and the type of parameter doesn't contain type parameter, bind the expression with passing the info about the target. Otherwise try to bind it without info about target type, if it succeeds, use the type in further inference, if not, wait after the inference. It can happen, that the inference still succeded and we can try to bind the argument again with already determined type of target. 
+There can be situations when the argument is another object creation expression that needs type inference.
+At the time, we would like to know parameter types in order to pass them into the binding process. 
+We can do it by postponing the binding of `ObjectCreationExpression`s and `ArrayCreationExpression`s to the time when we start to investigate each of the constructor candidates. 
+At that time we already have an exact list of the parameters. 
+Let's do that. 
+In the binding process before constructor overload resolution, we will convert above mentioned expression into `BoundUnconvertedObjectCreationExpression` and `BoundUnconvertedArrayCreationExpression`. 
+When we arrive in front of checking the applicability of the constructor(before type inference). 
+We will look at the appropriate type of parameters and do the following. 
+If the argument has the type of "BoundUnvonverted" expressions and the type of parameter doesn't contain a type parameter, bind the expression by passing the info about the target. 
+Otherwise, try to bind it without info about the target type, if it succeeds, use the type in further inference, if not, wait after the inference. 
+It can happen, that the inference still succeeds and we can try to bind the argument again with an already determined type of target. 
 
-> Note: Of cource we could do here better and use more info about target even we don't know the exact type. 
-> However it would complicated the algorithm because of overloads. 
-> So We propose more simple alternative, which still have benefits in common use cases.
+> Note: We could do here better and use info about the target even if we don't know the exact type. 
+> However, it would complicate the algorithm because of overloads. 
+> So we propose a simplier alternative, which still has benefits in common use cases.
 
 7. Getting information from initializer
 
-This step is a litte bit complicated because of overloads. 
-If it is a collection initializer and there are more than one overload of `Add` method, we don't know which parameter type constraint to use till its overload resolution. However, we think having overloads of `Add` method is not very common. So we could do the following. 
-If it is a Object initializer, Array initializer, collection initializer with only one method `Add` or collection initializer using indexer with only one indexer, we will collect the argument type constraints. 
-Because in that case, we know that are not any other possible constraints which should hold. 
-So we will go through all initializers and if the initializer parameter type contains type parameter, we collect the argument types contraint in the same manner as in the constructor argument list.
+This step is a little bit complicated because of method overloads. 
+If it is a collection initializer and there is more than one overload of `Add` method, we don't know which parameter type constraint to use till its overload resolution. 
+However, we think having overloads of `Add` method is not very common. 
+So we could do the following. 
+If it is an Object initializer, Array initializer, collection initializer with only one method `Add` or collection initializer using an indexer with only one indexer, we will collect the argument type constraints. 
+Because in that case, we know that are not any other possible constraints that should hold. 
+So we will go through all initializers and if the initializer parameter type contains a type parameter, we collect the argument types constraint in the same manner as in the constructor argument list.
 
 8.  Coercing arguments
 
-After we infer type parameters of the type and choose right constructor, we have to try binding "UnconvertedExpressions" again with target type info and convert it into proper Bound nodes.
+After we infer the type parameters and choose the right constructor, we have to try to bind "UnconvertedExpressions" again with target type info and convert it into proper bound nodes.
 
 9.  Bindining initializer list
 
-Then we procced as usual to bind the initializer list.
+Then we proceed as usual to bind the initializer list.
 
 10.  Constructor inference
 
@@ -535,41 +545,41 @@ Then we procced as usual to bind the initializer list.
 
 ![TypeInference](./../Artifacts/MethodTypeInferrer_Improved.drawio.png) 
 
-We will extend the API to enable to obtain info about target type, type argument hints (e.g. `Foo<_, G<_>, int>()`), parameter constraints from initializers (e.g. `Add(T p1)`, `Bar<_> {1,2}` so constraint is `int = T`). And list of type parameters. 
+We will extend the API to enable obtaining info about target type, type argument hints (e.g. `Foo<_, G<_>, int>()`), and parameter constraints from initializers (e.g. `Add(T p1)`, `Bar<_> {1,2}` so the constraint will be `int = T`) 
 
-We will also create another type of type variable which would be `SourceInferredTypeArgumentSymbol` and threat it in the same manner as with Type parameters. 
-We introduce new bound of type `Shape` which doesn't allow to be converted into different type (e.g. `string` shouldn't be permited to be converted to `string?`).
- And we add type arguments to corresponding bound shape of type parameter. 
+We will also create another type of type variable which would be `SourceInferredTypeArgumentSymbol` and treat it in the same manner as with type parameters. 
+We introduce a new bound of type `Shape` which doesn't allow to be converted into different type (e.g. `string` shouldn't be permitted to be converted to `string?`).
+ And we add type arguments to the corresponding shape bound of the type parameter. 
  
  Because from now on the bounds can contain unfixed type variables. 
  We introduce two new types of dependencies. 
- The first on is `TypeVarDependency` which holds the info if given type variable contains in its bounds(exluding shape bound) givin type variable. 
- The second dependency is `ShapeVarDependency` and its same just for the shape bound.
+ The first one is `TypeVarDependency` which holds the info if a given type variable contains another given type variable in its bounds(excluding shape bound). 
+ The second dependency is `ShapeVarDependency` and it's the same for the shape bound.
 
-We then run the firt phase as usual. 
-When we enter `AddBound` momment. We have to be careful here. 
-The adding bound can contain type variable or already inferred bounds can contain type variable.
-We want to propagate these type dependencies also into that type variables.
-So for bound containing type variable, we will run the inference with either adding bound(if the bound containing the type variable is not the bound which we are adding) or each of bounds of type variable(if it is the adding bound.) We will respect the kind of bonds in inferences. 
-It can happen the we would have type variable at both sides of the source, target pair. 
-in that case we will ignore the type variables in source and just skip it. 
-We don't lose the dependency because we run the inferences for each of pair containing type variable in the source.
+We then run the first phase as usual. 
+When we enter `AddBound` moment, we have to be careful here. 
+The adding bound can contain a type variable or already inferred bounds can contain a type variable.
+We want to propagate these type dependencies to their bounds.
+So for each bound containing a type variable, we will run the inference with the currently added bound(Already collected bouns will be targets, and the adding bound will be a source).
+If the adding bound also contains a type variable, we will do the inference for each bound(The adding bound will be a target and the bounds will be sources). 
+We will respect the kind of bonds in inferences. 
+It can happen that we will have a type variable on both sides of the constraint. 
+In that case, we will ignore the type variables in the source and just skip it. 
+We don't lose the dependency because we run the inferences for each pair containing the type variable in the source.
 
-Durring the second phase, we have to be careful about dependencies. We can't fix type variable which is `ShapeVarDependent` on unfixed type variable. However we will allow to fix type variable which is  `TypeVarDependent` on another type variable, however has at least one bound which doesn't contain any unfixed type variables. We will allow it only in that moment, when there will not be any unfixed type variable which is not dependent. This will prevent situation, where there is circular dependency between type variables, but there are also another sources of type info which can "break" this circle.
+During the second phase, we have to be careful about dependencies. We can't fix a type variable that is `ShapeVarDependent` on an unfixed type variable. 
+Although we will allow fixing type variable which is  `TypeVarDependent` on another type variable but has at least one bound which doesn't contain any unfixed type variables. 
+We will allow it only in a moment when there will not be any unfixed type variable that is not dependent. This will solve situations, where there is a circular dependency between type variables, but there are also other sources of type info that can "break" this circle.
 
-Fixing is done in usual way with one exception. When the type variable has shape bound. We have to keep the type exactly same and just check if it is ok with other constrains.
+Fixing is done in the usual way with one exception. When the type variable has a shape bound. We have to keep the type exactly the same and just check if it is ok with other constraints.
 
-After the Type inference, we receive infered type parameters
+After the Type inference, we receive inferred type parameters
 
-**Examples**
+11. Nullable analysis
 
-
-
-11.   Nullable analysis
-
-Because in the current C# version there is no constructor overloading, there is no need for rewriting the types genereted from constructors.
-However, now it can happen that the inference infer some different type(with different nullability, or failed because of that).
-In this situations, we have to rewrite type genereted by the constructor if constructor type inference found different type.
+Because in the current C# version, there is no constructor overloading, there is no need for rewriting the types generated from constructors.
+However, now it can happen that the inference infers some different type(with different nullability, or failed because of that).
+In this situation, we have to rewrite the type generated by the constructor if the constructor type inference found a type differing from the previous type inference.
 
 **Examples**
 
@@ -579,7 +589,7 @@ In this situations, we have to rewrite type genereted by the constructor if cons
 using System.Collections.Generic;
 
 // Inferred: [T = int] Assuming that there are no other generic type with `List` name
-// Use case: We want to determine type of the element by initializer list.
+// Use case: We want to determine the type of the element by the initializer list.
 var temp1 = new List<>{ 1, 2, 3}; 
 
 // Inferred: [TKey = string, TValue = int]

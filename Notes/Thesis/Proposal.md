@@ -464,25 +464,70 @@ Beside mentioned partial type inference, we will include information about targe
 
 1. Detecting inferred arguments
 
+We will theat `_` in the same way as in the method type inference.
+Special handling of `_` will be turn on when we will bind `ClassCreationExpression` or `ArrayExpressionExpression`. 
+That means, we will not to support it in the `DelegateCreationExpression`.
+
 2. Conditions for type inference
+
+The inference is entered when type argument list exist however doesn't constain any type parameters (diamond operator`<>`), or type argument list contains `SourceInferredTypeArgumentSymbol`.
 
 3. Checking constructor call involving `dynamic` keyword 
 
-For the rest of the points we will use a diagram to better describe the process.
+For type arguments, which doesn't contain any `SourceInferredTypeArgumentSymbol` (even nested), are substituted in parameter lists. 
+Those parameters, which doesn't contain any type parameter, are checked with corresponding arguments. Checking involves respecting the type parameters' constraints and applicability of arguments. 
+
+4. Array type inference
+
+We changes best common type of set of expressions by adding constraint from type argument list of array creation (e.g. `new G<_>[] {...}`, `G<_>` is added to the set of bounds(We will describe how to handle `_` and in which bounds should be `G<_>` in the description of constructor type inference)).
+We also add constraint from target type (e.g. `IEnumerable<int> temp = new [1]`, Do upper bound inference of `IEnumerable<int>` and `T[]`).
+This will ensure, that type information form target and type argument list is added to the inferrer.
+We don't have to care about constructor and where clauses because they don't help us to find type argument and initializer is already used in best common type algorithm.
+
+For the rest of the points we will use the following diagram to better describe the process.
+
+> Object creation binding
 
 ![ObjectCreationBinding](./../Artifacts/ObjectCreationExpressionBinding_Improved.drawio.png)
 
-4. Passing information about target type
+5. Passing information about target type
 
-5. Binding arguments
+Information about the target can come from two places. The first place is Variable declaration statement. In that case we bind the variable if we can (e.g. it is not `var`) and pass it to bind the declarator expression. The second place can be parameter type. In that case it is somehow tricky. There are three possible scenarios. We already know type of the parameter (It doesn't contain any type parameters). We don't know type of the parameter because it contains type parameter, although after the inference, we will know it. And the last option is when type inference fails and doesn't find type arguments. We will describe how target type is passed in these scenarios in the following paraghraphs. 
 
-6. Getting information from initializer
+6. Binding arguments
 
-7. Constructor inference
+There can be situation, when argument is another creation expression which needs type inference.
+In the time of arguments binding, we would like to know parameter types because of passing it into the binding process. 
+We can do it by postponing binding of `ObjectCreationExpression`s and `ArrayCreationExpression`s to the time, when we start to investigate each of the constructor candidate. 
+In that time we already have exact list of the parameters. 
+So in the binding process before constructor overload resolution, we will convert above mentioned expression into `BoundUnconvertedObjectCreationExpression` and `BoundUnconvertedArrayCreationExpression`. 
+When we arrive in front of checking applicability of canstructor. We will look at approprite type of parameters and do the following. If the argument is on of "BoundUnvonverted" expressions and the type of parameter doesn't contain type parameter, bind the expression with passing the info about the target. Otherwise try to bind it without info about target type, if it succeeds, use the type in further inference, if not, wait after the inference. It can happen, that the inference still succeded and we can try to bind the argument again with already determined type of target. 
 
-8. Coercing arguments
+> Note: Of cource we could do here better and use more info about target even we don't know the exact type. However it would complicated the algorithm because of overloads. So We propose more simple alternative, which still have benefits in common use cases.
 
-9. Nullable analysis
+7. Getting information from initializer
+
+This step is a litte bit complicated because of overloads. If it is a collection initializer and there are more than one overload of `Add` method, we don't know which parameter type constraint to use till its overload resolution. However, we think having overloads of `Add` method is not very common. So we could do the following. If it is a Object initializer, Array initializer, collection initializer with only one method `Add` or collection initializer using indexer with only one indexer, we will collect the argument type constraints. Because in that case, we know that are not any other possible constraints which should hold. So we will go through all initializers and if the initializer parameter type contains type parameter, we collect the argument types contraint in the same manner as in the constructor argument list.
+
+8.  Coercing arguments
+
+After we infer type parameters of the type and choose right constructor, we have to try binding "UnconvertedExpressions" again with target type info and convert it into proper Bound nodes.
+
+9.  Bindining initializer list
+
+Then we procced as usual to bind the initializer list.
+
+10.  Constructor inference
+
+> Type inference
+
+![TypeInference](./../Artifacts/MethodTypeInferrer_Improved.drawio.png) 
+
+12.  Nullable analysis
+
+Because in the current C# version there is no constructor overloading, there is no need for rewriting the types genereted from constructors.
+However, now it can happen that the inference infer some different type(with different nullability, or failed because of that).
+In this situations, we have to rewrite type genereted by the constructor if constructor type inference found different type.
 
 **Examples**
 
@@ -506,6 +551,10 @@ IEnumerable<int> temp2 = new List<>();
 // Inferred: [Tuple<string, int>[]]
 // Use case: Information about target type can be "forwarded" into the nested expressions
 IEnumerable<Tuple<string, int>> temp3 = new[] { new("",1 ) };
+
+// Inferred: [T = int]
+// Using type hints in type argument list
+new C1<_>[] {new C2<int>()};
 
 // Inferred: [T = int]
 // Use case: Information about the target is propagated even in generic calls

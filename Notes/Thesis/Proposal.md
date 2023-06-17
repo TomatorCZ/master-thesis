@@ -387,9 +387,9 @@ F7<string, _>("", temp4, 1); // Inferred: [T1 = int] Error: T1 = string & int
 F7<_, string>(1, temp4, 1); // Inferred: [T1 = int] Warning: Inferred type argument is not supported by runtime (type hints will not be used at all)
 temp.F7<string, _>(temp4);  // Inferred: [T1 = int] Warning: Inferred type argument is not supported by runtime (type hints will not be used at all)
 
-GH.F1<_,_>(""); // Error: Can't infer T2
-GH.F1<_,int>(""); // Error: Can't infer T2
-GH.F1<_,byte>(257); // Error: Can't infer T2
+F1<_,_>(""); // Error: Can't infer T2
+F1<_,int>(""); // Error: Can't infer T2
+F1<_,byte>(257); // Error: Can't infer T2
 
 #nullable enable
 string? temp5 = null;
@@ -489,5 +489,183 @@ For the rest of the points we will use a diagram to better describe the process.
 > Common use cases
 
 ```csharp
+using System.Collections.Generic;
 
+// Inferred: [T = int] Assuming that there are no other generic type with `List` name
+// Use case: We want to determine type of the element by initializer list.
+var temp1 = new List<>{ 1, 2, 3}; 
+
+// Inferred: [TKey = string, TValue = int]
+// Use case: Doesn't matter how the add method looks like
+var temp2 = new Dictionary<_,_>{ {"key", 1} };
+
+// Inferred: [T = int]
+// Use case: Type parameters can be determinded by target type
+IEnumerable<int> temp2 = new List<>();
+
+// Inferred: [Tuple<string, int>[]]
+// Use case: Information about target type can be "forwarded" into the nested expressions
+IEnumerable<Tuple<string, int>> temp3 = new[] { new("",1 ) };
+
+// Inferred: [T = int]
+// Use case: Information about the target is propagated even in generic calls
+Foo(new List<>(), 1);
+
+//Inferred: [TKey = string, TValue = int]
+// Use case: Using indexers to determine type parameters
+var temp4 = new Dictionary<_,_>()
+{
+    ["foo"] = 34,
+    ["bar"] = 42
+};
+
+// Inferred: [TCollection = List<int>, TElem = int]
+// Use case: Using where constraint to determine other type parameters.
+var temp5 = new Bag<_,_>(new List<int>());
+
+// It is possible to combile info from several soruces (target type, initializer list, type arguemnt list, constructor, where constraint)
+
+//Declarations
+class Dictionary<T1, T2, T3> {}
+void Foo<T>(IEnumerable<T> p1, T p2) {}
+class Bag<TCollection, TElem> where TCollection : IEnumerable<TElem>
+{
+    public Bag(TCollection collection) {}
+}
 ```
+
+> Tests
+
+> Similar to Method type inference
+
+```csharp
+new C1<_, string>(1); // Inferred: [T1 = int, T2 = string] Simple test
+new C2<_,_>(1,""); // Inferred: [T1 = int, T2 = string] Choose overload based on arity
+new C3<int, _, string, _>(new G2<string, string>); // Inferred: [T1 = int, T2 = string, T3 = string, T4 = string] Constructed type
+new C4<_, _, string>(x => x + 1, y => y.ToString(),z => z.Length); // Inferred: [T1 = int, T2 = int, T3 = string] Circle of dependency
+new C5<string>(1); // Inferred: [T1 = string] Expanded form #1
+new C5<_>(1, ""); // Inferred: [T1 = string] Expanded form #2
+new C5<_>(1, "", ""); // Inferred: [T1 = string] Expanded form #3
+
+B1<int> temp1 = null;
+new C6<A1<_>>(temp1); // Inferred: [ T1 = A1<int> ] Wrapper conversion
+
+B2<int, string> temp2 = null;
+new C6<A2<_, string>>(temp2); // Inferred: [ T1 = A2<int, string> ] Wrapper conversion with type argument
+
+C2<int, B> temp3 = null;
+new C6<I2<_, A>>(temp3); // Inferred: [ I2<int, A> ] Wrapper conversion with type argument conversion
+
+dynamic temp4 = "";
+new C7<string, _>("", temp4, 1); // Inferred: [T1 = int] Error: T1 = string & int
+new C7<_, string>(1, temp4, 1); // Inferred: [T1 = int] Warning: Inferred type argument is not supported by runtime (type hints will not be used at all)
+
+F1<_,_>(""); // Error: Can't infer T2
+F1<_,int>(""); // Error: Can't infer T2
+F1<_,byte>(257); // Error: Can't infer T2
+
+#nullable enable
+string? temp5 = null;
+string temp6 = "";
+GC2<int, string> temp7 = new GC2<int, string>();
+GC2<int, string?> temp8 = new GC2<int, string?>();
+GC2<string, int> temp9 = new GC2<string, int>();
+
+new C8<int, _>(temp5); // Inferred: [T1 = int, T2 = string!] 
+new C8<int, _>(temp6); // Inferred: [T1 = int, T2 = string!] 
+new C8<int?, _>(temp5); // Inferred: [T1 = int?, T2 = string!] 
+new C8<int?, _>(temp6); // Inferred: [T1 = int?, T2 = string!] 
+new C9<int, _>(temp5); // Inferred: [T1 = int, T2 = string?] 
+new C9<int, _>(temp6); // Inferred: [T1 = int, T2 = string!] 
+new C9<int?, _>(temp5); // Inferred: [T1 = int?, T2 = string?] 
+new C9<int?, _>(temp6); // Inferred: [T1 = int?, T2 = string!] 
+
+
+new C10<I2<_, string?>>(temp7); // Inferred: [T1 = I2<int, string?>!] Can convert string to string? because of covariance
+new C10<C2<_, string?>>(temp7); // Error: Can't convert string? to string because of invariance
+new C10<I2<_, _>>(temp7); // Inferred: [T1 = I2<System.Int32, System.String!>!]
+new C10<C2<_, _>>(temp7); // Inferred: [T1 = C2<System.Int32, System.String!>!]
+new C10<I2<_, _>>(temp8); // Inferred: [T1 = I2<System.Int32, System.String?>!]
+new C10<C2<_, _>>(temp8); // Inferred: [T1 = C2<System.Int32, System.String?>!]
+new C10<I2<_, string>>(temp8); // Error: Can't convert string? to string because of covariance
+new C10<C2<_, string>>(temp8); // Error: Can't convert string? to string because of invariance
+enw C10<I2<string?, int>>(temp9); // Inferred: [T1 = C2<System.Int32, System.String?>!] Can convert string to string? because of contravariance
+
+class C8<T1, T2>
+{
+    public C8(T2? p2) { }
+}
+class C9<T1, T2>
+{
+    public C9(T2 p2) { }
+}
+class C10<T1>
+{
+    public C10(T1 p1) {}
+}
+#nullable disable
+
+//Definitions
+class C1<T1, T2> 
+{
+    public C1(T1 p1) {}
+}
+class C2<T1, T2> 
+{
+    public C2(T1 p1, T2 p2) {}
+}
+class C2<T1> 
+{
+    public C2(T1 p1, string p2) {}
+}
+class C3<T1, T2, T3, T4> 
+{
+    public C3(G2<T2, T4> p24) {}
+}
+class G2<T1, T2> {}
+class C4<T1, T2, T3>
+{
+    public C4(Func<T1, T2> p12, Func<T2, T3> p23, Func<T3, T1> p31) {}
+}
+class C5<T1> 
+{
+    public C5(int p1, params T1[] args) {}
+}
+class C6<T1> {
+    public C6(T1 p1) {}
+}
+class A {}
+class B : A{}
+class A1<T> {}
+class A2<T1, T2> {}
+class B1<T> : A1<T> {}
+class B2<T1, T2> : A2<T1, T2> {}
+interface I2<in T1, out T2> {}
+class GC2<T1, T2> : I2<T1, T2> {}
+class C7<T1, T2> 
+{
+    public C7(T1 p1, T2 p2, T1 p3) {}
+}
+class C11<T1, T2> 
+{
+    public (T2 p2) { }
+}
+
+//Seperated Assembly
+new C1<_> (null); // Inferred: [T1 = _] class `_` turned the inference off
+
+class C1<T1> 
+{
+    C1(T1 p1) {}
+}
+class _ {}
+```
+
+> Target-typed, Constrains, Initializers
+
+```csharp
+// Target typed (Array)
+// Constraints (Array)
+// Initializers (Object, Collection(List, Dictionary, Add overloads), Array)
+// Combination of getting infromation from constructor, target type, initializer, type argument list.
+``` 

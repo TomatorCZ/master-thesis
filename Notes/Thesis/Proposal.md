@@ -664,8 +664,85 @@ class _ {}
 > Target-typed, Constrains, Initializers
 
 ```csharp
-// Target typed (Array)
-// Constraints (Array)
-// Initializers (Object, Collection(List, Dictionary, Add overloads), Array)
-// Combination of getting infromation from constructor, target type, initializer, type argument list.
+using System.Collections.Generic;
+// Inferred: [T = int]
+// Target type(type of variable declaration) is passed to type inference of constructor
+C1<int> temp1 = new C2<_>();
+
+// Inferred: [T = int]
+// Target type is passed to type inference of constructor after overload resolution of `F1<T>`
+F1(new C2<_>(), 1);
+
+//Inferred: [T = int]
+//It works for constructors and initializers as well
+new C3<_>(new C2<_>(), 1);
+
+// Inferred: [T = int] 
+IEnumerable<int> temp2 = new[1];
+
+//Inferred: [T = C2<int>]
+IEnumerable<C1<int>> temp3 = new C2<_>[1];
+
+// Inferred: [T1 = C1<int>, T2 = int]
+// Using constraints to determine type parameters
+new C4<_,_>(1);
+
+// Inferred: [T1 = int, T2 = string]
+// Using Object intializer list to determine type parameters
+new C5<_,_> {Prop1 = 1, Prop2 = ""}; 
+
+//Inferred: [T1 = 1, T2 = string]
+//Using Collection Initializer list to determine type parameters
+new C6<_,_> {{1, ""}};
+
+// Error: Can't infered because Add method has overloads.
+new C7<_,_> {1, "" }; 
+
+//Inferred: [T1 = int, T2 = string]
+// Using indexers to determine type parameters
+new C8<_,_> 
+{
+    ["A"] = 1;
+};
+
+// Inferred: [T1 = int, T2 = int, T3 = int, T4 = int, T5 = int, T = int]
+// Combinining type constraints from target, constructor, type argument list, object initializer and where clause to determine type of parameters
+F1(new C9<_,_,_,int,_>(1) {Prop1 = 1},1);
+
+class C1<T> {}
+class C2<T> : C1<T> {}
+void F1<T>(C1<T> p1, T p2) {}
+class C3<T>
+{
+    public C3(C1<T> p1, T p2) {}
+}
+class C4<T1, T2> where T1 : C1<T2> 
+{
+    public C4(T2 p1) {}
+}
+class C5<T1, T2>
+{
+    public T1 Prop1 {get;set;}
+    public T2 Prop2 {get;set;}
+}
+class C6<T1, T2> : IEnumerable 
+{
+    ...
+    public void Add(T1 p1, T2 p2) {} 
+}
+class C7<T1, T2> : IEnumerable
+{
+    ...
+    public void Add(T1 p1) {}
+    public void Add(T2 p2){}
+}
+class C8<T1, T2>
+{
+    public T1 this[T2 p1] {get {throw new NotImplementedException();} set {throw new NotImplementedException();}}
+}
+class C9<T1, T2, T3, T4, T5> : C1<T3> where T5 : C1<T4>
+{
+    public C9(T1 p1) {}
+    public T2 Prop1 {get;set;}
+}
 ``` 

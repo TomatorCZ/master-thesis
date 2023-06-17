@@ -492,7 +492,13 @@ For the rest of the points we will use the following diagram to better describe 
 
 5. Passing information about target type
 
-Information about the target can come from two places. The first place is Variable declaration statement. In that case we bind the variable if we can (e.g. it is not `var`) and pass it to bind the declarator expression. The second place can be parameter type. In that case it is somehow tricky. There are three possible scenarios. We already know type of the parameter (It doesn't contain any type parameters). We don't know type of the parameter because it contains type parameter, although after the inference, we will know it. And the last option is when type inference fails and doesn't find type arguments. We will describe how target type is passed in these scenarios in the following paraghraphs. 
+Information about the target can come from two places. 
+The first place is Variable declaration statement. 
+In that case we bind the variable if we can (e.g. it is not `var`) and pass it to bind the declarator expression. The second place can be parameter type. 
+In that case it is somehow tricky. There are three possible scenarios. 
+We already know type of the parameter (It doesn't contain any type parameters). We don't know type of the parameter because it contains type parameter, although after the inference, we will know it. 
+And the last option is when type inference fails and doesn't find type arguments. 
+We will describe how target type is passed in these scenarios in the following paraghraphs. 
 
 6. Binding arguments
 
@@ -503,11 +509,17 @@ In that time we already have exact list of the parameters.
 So in the binding process before constructor overload resolution, we will convert above mentioned expression into `BoundUnconvertedObjectCreationExpression` and `BoundUnconvertedArrayCreationExpression`. 
 When we arrive in front of checking applicability of canstructor. We will look at approprite type of parameters and do the following. If the argument is on of "BoundUnvonverted" expressions and the type of parameter doesn't contain type parameter, bind the expression with passing the info about the target. Otherwise try to bind it without info about target type, if it succeeds, use the type in further inference, if not, wait after the inference. It can happen, that the inference still succeded and we can try to bind the argument again with already determined type of target. 
 
-> Note: Of cource we could do here better and use more info about target even we don't know the exact type. However it would complicated the algorithm because of overloads. So We propose more simple alternative, which still have benefits in common use cases.
+> Note: Of cource we could do here better and use more info about target even we don't know the exact type. 
+> However it would complicated the algorithm because of overloads. 
+> So We propose more simple alternative, which still have benefits in common use cases.
 
 7. Getting information from initializer
 
-This step is a litte bit complicated because of overloads. If it is a collection initializer and there are more than one overload of `Add` method, we don't know which parameter type constraint to use till its overload resolution. However, we think having overloads of `Add` method is not very common. So we could do the following. If it is a Object initializer, Array initializer, collection initializer with only one method `Add` or collection initializer using indexer with only one indexer, we will collect the argument type constraints. Because in that case, we know that are not any other possible constraints which should hold. So we will go through all initializers and if the initializer parameter type contains type parameter, we collect the argument types contraint in the same manner as in the constructor argument list.
+This step is a litte bit complicated because of overloads. 
+If it is a collection initializer and there are more than one overload of `Add` method, we don't know which parameter type constraint to use till its overload resolution. However, we think having overloads of `Add` method is not very common. So we could do the following. 
+If it is a Object initializer, Array initializer, collection initializer with only one method `Add` or collection initializer using indexer with only one indexer, we will collect the argument type constraints. 
+Because in that case, we know that are not any other possible constraints which should hold. 
+So we will go through all initializers and if the initializer parameter type contains type parameter, we collect the argument types contraint in the same manner as in the constructor argument list.
 
 8.  Coercing arguments
 
@@ -523,7 +535,37 @@ Then we procced as usual to bind the initializer list.
 
 ![TypeInference](./../Artifacts/MethodTypeInferrer_Improved.drawio.png) 
 
-12.  Nullable analysis
+We will extend the API to enable to obtain info about target type, type argument hints (e.g. `Foo<_, G<_>, int>()`), parameter constraints from initializers (e.g. `Add(T p1)`, `Bar<_> {1,2}` so constraint is `int = T`). And list of type parameters. 
+
+We will also create another type of type variable which would be `SourceInferredTypeArgumentSymbol` and threat it in the same manner as with Type parameters. 
+We introduce new bound of type `Shape` which doesn't allow to be converted into different type (e.g. `string` shouldn't be permited to be converted to `string?`).
+ And we add type arguments to corresponding bound shape of type parameter. 
+ 
+ Because from now on the bounds can contain unfixed type variables. 
+ We introduce two new types of dependencies. 
+ The first on is `TypeVarDependency` which holds the info if given type variable contains in its bounds(exluding shape bound) givin type variable. 
+ The second dependency is `ShapeVarDependency` and its same just for the shape bound.
+
+We then run the firt phase as usual. 
+When we enter `AddBound` momment. We have to be careful here. 
+The adding bound can contain type variable or already inferred bounds can contain type variable.
+We want to propagate these type dependencies also into that type variables.
+So for bound containing type variable, we will run the inference with either adding bound(if the bound containing the type variable is not the bound which we are adding) or each of bounds of type variable(if it is the adding bound.) We will respect the kind of bonds in inferences. 
+It can happen the we would have type variable at both sides of the source, target pair. 
+in that case we will ignore the type variables in source and just skip it. 
+We don't lose the dependency because we run the inferences for each of pair containing type variable in the source.
+
+Durring the second phase, we have to be careful about dependencies. We can't fix type variable which is `ShapeVarDependent` on unfixed type variable. However we will allow to fix type variable which is  `TypeVarDependent` on another type variable, however has at least one bound which doesn't contain any unfixed type variables. We will allow it only in that moment, when there will not be any unfixed type variable which is not dependent. This will prevent situation, where there is circular dependency between type variables, but there are also another sources of type info which can "break" this circle.
+
+Fixing is done in usual way with one exception. When the type variable has shape bound. We have to keep the type exactly same and just check if it is ok with other constrains.
+
+After the Type inference, we receive infered type parameters
+
+**Examples**
+
+
+
+11.   Nullable analysis
 
 Because in the current C# version there is no constructor overloading, there is no need for rewriting the types genereted from constructors.
 However, now it can happen that the inference infer some different type(with different nullability, or failed because of that).

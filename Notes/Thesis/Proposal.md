@@ -164,7 +164,7 @@ The binding-time processing of an *object_creation_expression* of the form new `
 
 - If `T` is a *value_type* and `A` is not present:
   - The *object_creation_expression* is a default constructor invocation. 
-    - If the type is *generic_inferred* or *partially_inferred*, type inference of default constructor occurs to determine the type arguments. If it suceeds, construct the type using inferred type arguments. Otherwise, a binding-time error occurs.
+    - If the type is *generic_inferred* or *partially_inferred*, type inference of default constructor occurs to determine the type arguments. If it suceeds, construct the type using inferred type arguments. If it failed and there is no chance to get target type now or later, binding-time error occurs. Otherwise, repeat the binding when the target type will be determined and add it to inputs of type inference.
     - If the type inference above succeeded or the type is not inferred, the result of the *object_creation_expression* is a value of (constructed) type `T`, namely the default value for `T` as defined in [§8.3.3](types.md#833-default-constructors).
 - Otherwise, if `T` is a *type_parameter* and `A` is not present:
   - If no value type constraint or constructor constraint ([§15.2.5](classes.md#1525-type-parameter-constraints)) has been specified for `T`, a binding-time error occurs.
@@ -173,15 +173,112 @@ The binding-time processing of an *object_creation_expression* of the form new `
   - If `T` is an abstract or static *class_type*, a compile-time error occurs.
   - The instance constructor to invoke is determined using the overload resolution rules of [§12.6.4](expressions.md#1264-overload-resolution). The set of candidate instance constructors is determined as follows:
     - `T` is not inferrred (*generic_inferred* or *partially_inferred*), the constructor is accessible in `T`, and is applicable with respect to `A` ([§12.6.4.2](expressions.md#12642-applicable-function-member)). 
-    - If `T` is *generic_constructed* or *partially_constructed* and the constructor is accessible in `T`, type inference of constructor happens. Once the *inferred_type_arguments* are inferred and together with remaining type arguments are substituted for the corresponding type parameters, all constructed types in the parameter list of the constructor satisfy their constraints, and the parameter list of the constructor is applicable with respect to `A` ([§12.6.4.2](expressions.md#12642-applicable-function-member)).
-  - If the set of candidate instance constructors is empty, or if a single best instance constructor cannot be identified, a binding-time error occurs.
+    - If `T` is *generic_constructed* or *partially_constructed* and the constructor is accessible in `T`, type inference of constructor is performed. Once the *inferred_type_arguments* are inferred and together with remaining type arguments are substituted for the corresponding type parameters, all constructed types in the parameter list of the constructor satisfy their constraints, and the parameter list of the constructor is applicable with respect to `A` ([§12.6.4.2](expressions.md#12642-applicable-function-member)).
+  - A binding-time error occurs when:
+    - The set of candidate instance constructors is empty, or if a single best instance constructor cannot be identified, and there is no chance to know the target type now or later.
+  - If the set of candidate instance constructors is still empty, or if a single best instance constructor cannot be identified, repeat the binding of the *object_creation_expression* to the time, when target type will be known and add it to inputs of type inference.
   - The result of the *object_creation_expression* is a value of type `T`, namely the value produced by invoking the instance constructor determined in the two steps above.
   - Otherwise, the *object_creation_expression* is invalid, and a binding-time error occurs.
 
 ### Type inference
 
-> TODO
-> The describe process of type inference
+We change the [type inference](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#1263-type-inference) as follows.
+
+* Type inference of generic method invocation is performed when the invocation:
+  * Doesn't have type argument list.
+  * The type argument list contains at least one *inferred_type_argument*.
+  > Example
+  > 
+  > ```csharp
+  > M(...); // Type inference is invoked.
+  > M<_, string>(...); // Type inference is invoked.
+  > M<List<_>, string>(...); // Type inference is invoked.
+  > ```
+
+* Type inference for constructor is performed when the generic type of *object_creation_expression*:
+  * Has diamond operator.
+  * its *type_argument_list* contains at least on inferred_type_argument*.
+  > Example
+  >
+  > ```csharp
+  > new C<>(...); // Type inference is invoked.
+  > new C<_, string>(...); // Type inference is invoked.
+  > new C<List<_>, string>(...); // Type inference is invoked.
+  > ```
+
+* When the method invocation contains type argument list containing inferred type argument, the input for type inference is extended as follows:
+  * We replace each `_` identifier by a new type variable `X`.
+  * We perform *shape type inference* from each type argument to corresponding type parameter.
+
+* Inputs for constructor type inference is constructed as follows:
+  * If the inferred type contains nonempty *type_argument_list*, we process it in the same manner as in method invocation.
+  * If the target type should be used based on the expression binding, perform *upper-bound inference* from it to the type containing the constructor
+  * If the expression contains object initializer list, for each element of the list perform *lower-bound inference* from the type of the element to the type of *initializer_target*. If the binding of the element fails, skip it.
+  * If the expression contains *where* clauses defining type constrains of type parameters of the type containing constructor, for each constrain not representing constructor constrain, reference type constrain, value type constraint and unmanaged type constraint perform *lowr-bound inference* from the constraint to the corresponding type parameter.
+  * If the expression contains collection initializer list and the type doesn't have 
+
+#### Type inference algorith change
+
+* Shape dependence
+  * An *unfixed* type variable `Xᵢ` *shape-depends directly on* an *unfixed* type variable `Xₑ` if `Xₑ` represents *inferred_type_argument* and it is contained in *shape bound* of the type variable `Xᵢ`.
+  * `Xₑ` *shape-depends on* `Xᵢ` if `Xₑ` *shape-depends directly on* `Xᵢ` or if `Xᵢ` *shape-depends directly on* `Xᵥ` and `Xᵥ` *shape-depends on* `Xₑ`. Thus “*shape-depends on*” is the transitive but not reflexive closure of “*shape-depends directly on*”.
+* Type dependence
+  * An *unfixed* type variable `Xᵢ` *type-depends directly on* an *unfixed* type variable `Xₑ` if `Xₑ` occurs in any bound of type variable `Xᵢ`.
+  * `Xₑ` *type-depends on* `Xᵢ` if `Xₑ` *type-depends directly on* `Xᵢ` or if `Xᵢ` *type-depends directly on* `Xᵥ` and `Xᵥ` *type-depends on* `Xₑ`. Thus “*type-depends on*” is the transitive but not reflexive closure of “*type-depends directly on*”.
+* Shape-bound inference
+  * A *shape-bound* inference from a type `U` to a type `V` is made as follows:
+    * If `V` is one of the *unfixed* `Xᵢ` then `U` is shape-bound of `V`.
+    * When new bound `U` is added to the set of lower-bounds of `V`:
+      * We perform *lower-bound* inference from `U` to all lower-bounds of `V`, which contains an unfixed type variable
+      * We perform *exact* inference from `U` to all exact-bounds of `V`, which contains an unfixed type variable.
+      * We perform *upper-bound* inference from `U` to all upper-bounds of `V`, which contains an unfixed type variable.
+      *  We perform *lower-bound* inference from all lower-bounds of `V` to `U` if `U` contains an unfixed type variable.
+      *  We perform *exact* inference from all exact-bounds of `V` to `U` if `U` contains unfixed type variable.
+      *  We perform *upper-type* inference from all upper-bounds of `V` to `U` if `U` contains an unfixed type variable.
+    * Otherwise, on inferences are made
+* Lower-bound inference
+  * When new bound `U` is added to the set of lower-bounds of `V`:
+    *  We perform *lower-bound* inference from `U` to shape-bound of `V` , if has any and the shape-bound contains an unfixed type variable.
+    * We perform *upper-bound* inference from shape-bound of `V` to `U`, if `V` has a shape-bound and `U` contains an unfixed type variable.
+    * We perform *exact* inference from `U` to all lower-bounds of `V`, which contains an unfixed type variable
+    * We perform *lower-bound* inference from `U` to all exact-bounds and upper-bounds of `V`, which contains an unfixed type variable.
+    *  We perform *exact* inference from all lower-bounds of `V` to `U` if `U` contains an unfixed type variable
+    *  We perform *upper-bound* type inference from all exact-bounds and upper-bounds of `V` to `U` if `U` contains unfixed type variable.
+* Upper-bound inference
+  * When new bound `U` is added to the set of upper-bounds of `V`:
+    *  We perform *upper-bound* inference from `U` to shape-bound of `V` , if has any and the shape-bound contains an unfixed type variable.
+    * We perform *lower-bound* inference from shape-bound of `V` to `U`, if `V` has a shape-bound and `U` contains an unfixed type variable.
+    * We perform *exact* inference from `U` to all upper-bounds of `V`, which contains an unfixed type variable
+    * We perform *upper-bound* inference from `U` to all exact-bounds and lower-bounds of `V`, which contains an unfixed type variable.
+    *  We perform *exact* inference from all upper-bounds of `V` to `U` if `U` contains an unfixed type variable
+    *  We perform *lower-bound* type inference from all exact-bounds and lower-bounds of `V` to `U` if `U` contains unfixed type variable.
+* Exact inference
+  * When new bound `U` is added to the set of lower-bounds of `V`:
+    *  We perform *exact-bound* inference from `U` to shape-bound of `V` , if has any and the shape-bound contains an unfixed type variable.
+    * We perform *exact* inference from shape-bound of `V` to `U`, if `V` has a shape-bound and `U` contains an unfixed type variable.
+    * We perform *exact* inference from `U` to all exact-bounds of `V`, which contains an unfixed type variable
+    * We perform *lower-bound* inference from `U` to all lower-bounds of `V`, which contains an unfixed type variable
+    * We perform *upper-bound* inference from `U` to all upper-bounds of `V`, which contains an unfixed type variable
+    * We perform *exact* inference from all exact-bounds of `V` to `U`, which contains an unfixed type variable
+    * We perform *upper-bound* inference from all lower-bounds of `V` to `U`, which contains an unfixed type variable
+    * We perform *lower-bound* inference from all upper-bounds of `V` to `U`, which contains an unfixed type variable
+  
+* Second phase
+  * Firstly, All *unfixed* type variables `Xᵢ` which do not *depend on* ([§12.6.3.6](expressions.md#12636-dependence)), *shape-depend on*, and *type-depend on* any `Xₑ` are fixed ([§12.6.3.12](expressions.md#126312-fixing)).
+  * If no such type variables exist, all *unfixed* type variables `Xᵢ` are *fixed* for which all of the following hold:
+    * There is at least one type variable `Xₑ` that *depends on*, *shape-depends on*, or *type-depends on* `Xᵢ`
+    * There is no type variable `Xₑ` on which `Xᵢ` *shape-depends on*.
+    * `Xᵢ` has a non-empty set of bounds and has at least on bound which doesn't contain any *unfixed* type variable.
+  * Otherwise continue as in standard
+    
+* Fixing
+  * An *unfixed* type variable `Xᵢ` with a set of bounds is *fixed* as follows:
+    * If the type variable has a shape bound, check the type has no conflicts with other bounds of that type variable in the same way as in the standard. It it has no conflicts, the type variable is *fixed* to that type. Otherwise type inference failed.
+    * Otherwise, fix it as standard says. 
+
+
+#### Type inference for constructor
+
 > Note about runtime binding
 > Note about complexity
 

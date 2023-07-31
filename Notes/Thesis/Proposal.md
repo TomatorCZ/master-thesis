@@ -215,7 +215,8 @@ We change the [type inference](https://github.com/dotnet/csharpstandard/blob/dra
   * If the target type should be used based on the expression binding, perform *upper-bound inference* from it to the type containing the constructor
   * If the expression contains object initializer list, for each element of the list perform *lower-bound inference* from the type of the element to the type of *initializer_target*. If the binding of the element fails, skip it.
   * If the expression contains *where* clauses defining type constrains of type parameters of the type containing constructor, for each constrain not representing constructor constrain, reference type constrain, value type constraint and unmanaged type constraint perform *lowr-bound inference* from the constraint to the corresponding type parameter.
-  * If the expression contains collection initializer list and the type doesn't have 
+  * If the expression contains a collection initializer list and the type doesn't have overloads of the `Add` method, for each *initializer_element* of the list perform *lower-bound inference* from the types of the elements contained in the *initializer_element* to the types of the method's parameters. If the binding of any element fails, skip it.  
+  * If the expression contains indicies in a collection initialozer list, use the indexer defined in the type and perform *lower_bound_inference* from the types in *initializer_element* to types of matching parameters of the indexer. 
 
 #### Type inference algorith change
 
@@ -276,24 +277,23 @@ We change the [type inference](https://github.com/dotnet/csharpstandard/blob/dra
     * If the type variable has a shape bound, check the type has no conflicts with other bounds of that type variable in the same way as in the standard. It it has no conflicts, the type variable is *fixed* to that type. Otherwise type inference failed.
     * Otherwise, fix it as standard says. 
 
-
 #### Type inference for constructor
 
-> Note about runtime binding
-> Note about complexity
+> Note: Complexity
+>
+> Because performing type inference can even take exponential time, the restriction was made above to avoid it. 
+> It regards to permit only one method `Add` in the collections and binding of elements in the constructors where before the overload resultion we bind all *object_creation_expressions* without target info and then in case of overload resulution success and some of these elements failed in the binding, we try to bind it again with already known target type information.
 
 ### Compile-time checking of dynamic member invocation
 
-> TODO
+We change the [compile-time checking](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#1265-compile-time-checking-of-dynamic-member-invocation) in order to be useful during partial type inferece.
+
+- First, if `F` is a generic method and type arguments were provided, then those, that aren't *inferred_type_argument* are substituted for the type parameters in the parameter list. However, if type arguments were not provided, no such substitution happens.
+- Then, any parameter whose type is open (i.e., contains a type parameter; see [§8.4.3](types.md#843-open-and-closed-types)) is elided, along with its corresponding parameter(s).
 
 ### Nullability
 
-> TODO
-
-## Possible extensions
-[extensions]: #possible-extensions
-
-> TODO
+We can use examination mark `?` to say that inferred type argument should be nullable type (e.g. `F<_?>(...)`).
 
 ## Drawbacks
 [drawbacks]: #drawbacks
@@ -307,6 +307,36 @@ What other designs have been considered? What is the impact of not doing this?
 
 ## Unresolved questions
 [unresolved]: #unresolved-questions
+
+* Type inference for arrays
+
+  In a similar way as we propose partial type inference in method type inference. 
+  It can be used in *array_creation_expression* as well(e.g. `new C<_>[]{...}`). 
+  However, It has the following complication.
+  To avoid a breaking change, the type inference has to be as powerful as in method type inference. There is a question if it is still as valueble as in cases with methods.
+
+* Type inference of delegates
+
+  We can do the same thing for `delegate_creation_expression`. However, these expressions seems to be used rarely, so is it valuable to add the type inference for them as well ?
+
+* Type inference for local variables
+
+  Sometimes `var` keyword as a variable declaration is not sufficient.
+  We would like to be able to specify more the type information about variable but still have some implementation details hidden.
+  With the `_` placeholder we would be able to specify more the shape of the variable avoiding unnecessary specification of type arguments.
+
+  ```csharp
+  Wrapper<_> wrapper = ... // I get an wrapper, which I'm interested in, but I don't care about the type arguments, because I don't need them in my code.
+  wrapper.DoSomething();
+  ```
+
+* Type inference for casting
+
+  This can be useful with combination with prepering collection literals.
+
+  ```csharp
+  var temp = (Span<_>)[1,2,3];
+  ```
 
 * Is there a better choice for choosing the placeholder for inferred type argument ?
 

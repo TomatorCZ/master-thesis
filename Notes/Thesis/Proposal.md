@@ -237,37 +237,37 @@ We change the [type inference](https://github.com/dotnet/csharpstandard/blob/dra
 * Type dependence
   * An *unfixed* type variable `Xᵢ` *type-depends directly on* an *unfixed* type variable `Xₑ` if `Xₑ` occurs in any bound of type variable `Xᵢ`.
   * `Xₑ` *type-depends on* `Xᵢ` if `Xₑ` *type-depends directly on* `Xᵢ` or if `Xᵢ` *type-depends directly on* `Xᵥ` and `Xᵥ` *type-depends on* `Xₑ`. Thus “*type-depends on*” is the transitive but not reflexive closure of “*type-depends directly on*”.
-* Shape-bound inference
-  * A *shape-bound* inference from a type `U` to a type `V` is made as follows:
-    * If `V` is one of the *unfixed* `Xᵢ` then `U` is shape-bound of `V`.
-    * When new bound `U` is added to the set of lower-bounds of `V`:
-      * We perform *lower-bound* inference from `U` to all lower-bounds of `V`, which contains an unfixed type variable
+* Shape inference
+  * A *shape* inference from a type `U` to a type `V` is made as follows:
+    * If `V` is one of the *unfixed* `Xᵢ` then `U` is a shape bound of `V`.
+    * When a shape bound `U` of `V` is set:
+      * We perform *upper-bound* inference from `U` to all lower-bounds of `V`, which contains an unfixed type variable
       * We perform *exact* inference from `U` to all exact-bounds of `V`, which contains an unfixed type variable.
-      * We perform *upper-bound* inference from `U` to all upper-bounds of `V`, which contains an unfixed type variable.
+      * We perform *lower-bound* inference from `U` to all upper-bounds of `V`, which contains an unfixed type variable.
       *  We perform *lower-bound* inference from all lower-bounds of `V` to `U` if `U` contains an unfixed type variable.
       *  We perform *exact* inference from all exact-bounds of `V` to `U` if `U` contains unfixed type variable.
       *  We perform *upper-type* inference from all upper-bounds of `V` to `U` if `U` contains an unfixed type variable.
     * Otherwise, on inferences are made
 * Lower-bound inference
-  * When new bound `U` is added to the set of lower-bounds of `V`:
-    *  We perform *lower-bound* inference from `U` to shape-bound of `V` , if has any and the shape-bound contains an unfixed type variable.
-    * We perform *upper-bound* inference from shape-bound of `V` to `U`, if `V` has a shape-bound and `U` contains an unfixed type variable.
+  * When a new bound `U` is added to the set of lower-bounds of `V`:
+    *  We perform *lower-bound* inference from `U` to the shape of `V` , if it has any and the shape contains an unfixed type variable.
+    * We perform *upper-bound* inference from the shape of `V` to `U`, if `V` has a shape and `U` contains an unfixed type variable.
     * We perform *exact* inference from `U` to all lower-bounds of `V`, which contains an unfixed type variable
     * We perform *lower-bound* inference from `U` to all exact-bounds and upper-bounds of `V`, which contains an unfixed type variable.
     *  We perform *exact* inference from all lower-bounds of `V` to `U` if `U` contains an unfixed type variable
     *  We perform *upper-bound* type inference from all exact-bounds and upper-bounds of `V` to `U` if `U` contains unfixed type variable.
 * Upper-bound inference
   * When new bound `U` is added to the set of upper-bounds of `V`:
-    *  We perform *upper-bound* inference from `U` to shape-bound of `V` , if has any and the shape-bound contains an unfixed type variable.
-    * We perform *lower-bound* inference from shape-bound of `V` to `U`, if `V` has a shape-bound and `U` contains an unfixed type variable.
+    *  We perform *upper-bound* inference from `U` to the shape of `V` , if it has any and the shape contains an unfixed type variable.
+    * We perform *lower-bound* inference from the shape of `V` to `U`, if `V` has a a shape and `U` contains an unfixed type variable.
     * We perform *exact* inference from `U` to all upper-bounds of `V`, which contains an unfixed type variable
     * We perform *upper-bound* inference from `U` to all exact-bounds and lower-bounds of `V`, which contains an unfixed type variable.
     *  We perform *exact* inference from all upper-bounds of `V` to `U` if `U` contains an unfixed type variable
     *  We perform *lower-bound* type inference from all exact-bounds and lower-bounds of `V` to `U` if `U` contains unfixed type variable.
 * Exact inference
   * When new bound `U` is added to the set of lower-bounds of `V`:
-    *  We perform *exact-bound* inference from `U` to shape-bound of `V` , if has any and the shape-bound contains an unfixed type variable.
-    * We perform *exact* inference from shape-bound of `V` to `U`, if `V` has a shape-bound and `U` contains an unfixed type variable.
+    *  We perform *exact-bound* inference from `U` to the shape of `V` , if has any and the shape contains an unfixed type variable.
+    * We perform *exact* inference from the shape of `V` to `U`, if `V` has a shape and `U` contains an unfixed type variable.
     * We perform *exact* inference from `U` to all exact-bounds of `V`, which contains an unfixed type variable
     * We perform *lower-bound* inference from `U` to all lower-bounds of `V`, which contains an unfixed type variable
     * We perform *upper-bound* inference from `U` to all upper-bounds of `V`, which contains an unfixed type variable
@@ -276,35 +276,35 @@ We change the [type inference](https://github.com/dotnet/csharpstandard/blob/dra
     * We perform *lower-bound* inference from all upper-bounds of `V` to `U`, which contains an unfixed type variable
   
 * Second phase
-  * Firstly, All *unfixed* type variables `Xᵢ` which do not *depend on* ([§12.6.3.6](expressions.md#12636-dependence)), *shape-depend on*, and *type-depend on* any `Xₑ` are fixed ([§12.6.3.12](expressions.md#126312-fixing)).
+  * Firstly, all *unfixed* type variables `Xᵢ` which do not *depend on* ([§12.6.3.6](expressions.md#12636-dependence)), *shape-depend on*, and *type-depend on* any `Xₑ` are fixed ([§12.6.3.12](expressions.md#126312-fixing)).
   * If no such type variables exist, all *unfixed* type variables `Xᵢ` are *fixed* for which all of the following hold:
     * There is at least one type variable `Xₑ` that *depends on*, *shape-depends on*, or *type-depends on* `Xᵢ`
     * There is no type variable `Xₑ` on which `Xᵢ` *shape-depends on*.
     * `Xᵢ` has a non-empty set of bounds and has at least on bound which doesn't contain any *unfixed* type variable.
-  * Otherwise continue as in standard
+  * Otherwise continue as the standard says.
     
 * Fixing
   * An *unfixed* type variable `Xᵢ` with a set of bounds is *fixed* as follows:
-    * If the type variable has a shape bound, check the type has no conflicts with other bounds of that type variable in the same way as in the standard. It it has no conflicts, the type variable is *fixed* to that type. Otherwise type inference failed.
-    * Otherwise, fix it as standard says. 
+    * If the type variable has a shape bound, check the type has no conflicts with other bounds of that type variable in the same way as the standard says. It it has no conflicts, the type variable is *fixed* to that type. Otherwise type inference failed.
+    * Otherwise, fix it as the standard says. 
 
 #### Type inference for constructor
 
 > Note: Complexity
 >
-> Because performing type inference can even take exponential time, the restriction was made above to avoid it. 
-> It regards to permit only one method `Add` in the collections and binding of elements in the constructors where before the overload resultion we bind all *object_creation_expressions* without target info and then in case of overload resulution success and some of these elements failed in the binding, we try to bind it again with already known target type information.
+> Because performing type inference can even take exponential time when a type system contains overloading, the restriction was made above to avoid it. 
+> It regards to permit only one method `Add` in the collections and binding arguments before the overload resolution when we bind all *object_creation_expressions* without target info and then in case of overload resolution success and some of these arguments failed in the binding, we try to bind it again with already known target type information.
 
 ### Compile-time checking of dynamic member invocation
 
 We change the [compile-time checking](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#1265-compile-time-checking-of-dynamic-member-invocation) in order to be useful during partial type inferece.
 
 - First, if `F` is a generic method and type arguments were provided, then those, that aren't *inferred_type_argument* are substituted for the type parameters in the parameter list. However, if type arguments were not provided, no such substitution happens.
-- Then, any parameter whose type is open (i.e., contains a type parameter; see [§8.4.3](types.md#843-open-and-closed-types)) is elided, along with its corresponding parameter(s).
+- Then, any parameter whose type is open (i.e., contains a type parameter; see §8.4.3) is elided, along with its corresponding parameter(s).
 
 ### Nullability
 
-We can use examination mark `?` to say that inferred type argument should be nullable type (e.g. `F<_?>(...)`).
+We can use an examination mark `?` to say that the inferred type argument should be a nullable type (e.g. `F<_?>(...)`).
 
 ## Drawbacks
 [drawbacks]: #drawbacks
@@ -322,11 +322,11 @@ What other designs have been considered? What is the impact of not doing this?
 * Type inference for arrays
 
   In a similar way as we propose partial type inference in method type inference. 
-  It can be used in *array_creation_expression* as well(e.g. `new C<_>[]{...}`). 
+  It can be used in *array_creation_expression* as well (e.g. `new C<_>[]{...}`). 
   However, It has the following complication.
-  To avoid a breaking change, the type inference has to be as powerful as in method type inference. There is a question if it is still as valueble as in cases with methods.
+  To avoid a breaking change, the type inference has to be as powerful as in method type inference. There is a question if it is still as valuable as in cases with methods.
 
-* Type inference of delegates
+* Type inference for delegates
 
   We can do the same thing for `delegate_creation_expression`. However, these expressions seems to be used rarely, so is it valuable to add the type inference for them as well ?
 
@@ -343,7 +343,7 @@ What other designs have been considered? What is the impact of not doing this?
 
 * Type inference for casting
 
-  This can be useful with combination with prepering collection literals.
+  This can be useful with combination with already preparing collection literals.
 
   ```csharp
   var temp = (Span<_>)[1,2,3];

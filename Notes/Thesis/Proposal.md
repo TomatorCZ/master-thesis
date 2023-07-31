@@ -5,6 +5,8 @@
 * [ ] Implementation
 * [ ] Specification
 
+> Note: This proposal was created because of championed [Partial type inference](https://github.com/dotnet/csharplang/issues/1349). It is a continuation of the proposed first version published in [csharplang/discussions](https://github.com/dotnet/csharplang/discussions/7286)
+
 ## Summary
 [summary]: #summary
 
@@ -24,18 +26,18 @@ Besides the changes described above, the proposal mentions further interactions 
 
 - The current method type inference works as an "all or nothing" principle.
 If the compiler is not able to infer command call type arguments, the user has to specify all of them.
-This requirement can be verbose, noisy, and unnecessary in cases where the compiler is able to infer almost all type arguments and need just to specify ambiguous ones.
+This requirement can be verbose, noisy, and unnecessary in cases where the compiler can infer almost all type arguments and need just to specify ambiguous ones.
 - The need to hint types to the compiler is influenced by the strength of the type inference which is not as advanced as in other statically-typed languages like Rust or Haskell.
 However, we can't just change the current behavior of the type inference because it would introduce breaking changes.
 What we can do is to introduce improved type inference in places, where it was not before like *object_creation_expression*.
-It is a nice chance to push the type inference on the next level without introducing breaking changes.
+It is a nice chance to push the type inference to the next level without introducing breaking changes.
 And then wait for the time, when C# would be ready to introduce breaking changes without any major disadvantages.
 - Because there exist types containing many type parameters (especially in frameworks focusing on databases and web), it would be great to add type inference of constructors to save unnecessary specifying the type arguments.
 
 No matter how the partial type inference would work, we should be careful about the following things.
 
 - **Convenience** - We want an easy and intuitive syntax that we can skip the obvious type arguments.
-- **Performance** - Type inference is a compicated problem when we introduce subtyping and overloading in a type system.
+- **Performance** - Type inference is a complicated problem when we introduce subtyping and overloading in a type system.
 Although it can be done, the computation can take exponential time which we don't want.
 So it has to be restricted to cases, where the problem can be solved effectively but it still has practical usage.
 - **IDE** - Improvement of the type inference can complicate IDE hints during coding. 
@@ -50,10 +52,14 @@ So will want to look ahead to other potential directions, which can be done afte
 
 The following changes are made in [tokens](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/lexical-structure.md#64-tokens) located in the [grammar](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/lexical-structure.md#62-grammars) section.
 
+> [Identifiers](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/lexical-structure.md#643-identifiers)
+
 - The semantics of an identifier named `_` depends on the context in which it appears:
   - It can denote a named program element, such as a variable, class, or method, or
   - It can denote a discard ([§9.2.9.1](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/variables.md#9291-discards)).
   - **It can denote an inferred type argument avoiding specifying type arguments which can be inferred by the compiler.**
+
+> [Keywords](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/lexical-structure.md#644-keywords)
 
 * A ***contextual keyword*** is an identifier-like sequence of characters that has special meaning in certain contexts, but is not reserved, and can be used as an identifier outside of those contexts as well as when prefaced by the `@` character.
 
@@ -71,11 +77,11 @@ The following changes are made in [tokens](https://github.com/dotnet/csharpstand
 
 ### Type arguments
 
-* We change the content of *type_argument_list* in two contexts.
-  * Contructed [types](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/types.md#84-constructed-types) occuring in [*object_creation_expression*](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#128162-object-creation-expressions)
+* We change the meaning of the content of *type_argument_list* in two contexts.
+  * [Constructed types](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/types.md#84-constructed-types) occuring in [*object_creation_expression*](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#128162-object-creation-expressions)
   * Constructed types and type arguments occuring in method [invocation](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#12892-method-invocations)
 
-* **Inferred type argument** represents an unknown type, which will be resolved during type inference. 
+* ***inferred_type_argument*** represents an unknown type, which will be resolved during type inference. 
 
 * `_` identifier is considered to represent *inferred_type_argument* when:
   * It occurs in *type_argument_list* of a method group during method invocation.
@@ -84,19 +90,19 @@ The following changes are made in [tokens](https://github.com/dotnet/csharpstand
   > Example
   >
   > ```csharp
-  > F<_, int>(...); // _ represents inferred type argument.
-  > new C<_, int>(...); // _ represents inferred type argument.
-  > F<C<_>, int>(...); // _ represents inferred type argument.
-  > new C<C<_>, int>(...); // _ represents inferred type argument.
-  > C<_> temp = ...; // _ doesn't represent inferred type argument.
-  > new _() // _ doesn't represent inferred type argument.
+  > F<_, int>(...); // _ represents an inferred type argument.
+  > new C<_, int>(...); // _ represents an inferred type argument.
+  > F<C<_>, int>(...); // _ represents an inferred type argument.
+  > new C<C<_>, int>(...); // _ represents an inferred type argument.
+  > C<_> temp = ...; // _ doesn't represent an inferred type argument.
+  > new _() // _ doesn't represent an inferred type argument.
   > ```   
 
 * A method group and type are said to be *partial_inferred* if it contains at least one *inferred_type_argument*. 
 
-* A type is said to be *generic_inferred* when all the following are true:
-  * it has empty *type_argument_list*
-  * it occurs as a *type* of *object_creation_expression*.
+* A type is said to be *generic_inferred* when all the following hold:
+  * It has an empty *type_argument_list*.
+  * It occurs as a *type* of *object_creation_expression*.
   > Example
   >
   > ```csharp
@@ -109,7 +115,7 @@ The following changes are made in [tokens](https://github.com/dotnet/csharpstand
 
 Determining the [meaning](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/basic-concepts.md#781-general) of a *namespace_or_type_name* is changed as follow.
 
-* If type is a *generic_inferred*, then we resolves the identifier in the same manner except ignoring arity of type parameters (Type of arity 0 is ignored). 
+* If a type is a *generic_inferred*, then we resolve the identifier in the same manner except ignoring the arity of type parameters (Types of arity 0 is ignored). 
 If there is an ambiguity in the current scope, a compilation-time error occurs.
   > Example
   >
@@ -128,7 +134,7 @@ If there is an ambiguity in the current scope, a compilation-time error occurs.
   > {
   >     void M() 
   >     {
-  >         new C1<>(); // Compile-time error because of amiguity between C1<T> and C1<T1, T2>
+  >         new C1<>(); // Compile-time error occurs because of ambiguity between C1<T> and C1<T1, T2>
   >     }
   >     class C1<T> {}
   >     class C1<T1, T2> {}
@@ -156,24 +162,24 @@ The initial set of candidate methods for is changed by adding new condition.
 
 ### Object creation expressions
 
-The binding-time processing of an *object_creation_expression* of the form new `T(A)`, where `T` is a *class_type*, or a *value_type*, and `A` is an optional *argument_list*, is changed in the following way.
+The binding-time processing of an [*object_creation_expression*](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#128162-object-creation-expressions) of the form new `T(A)`, where `T` is a *class_type*, or a *value_type*, and `A` is an optional *argument_list*, is changed in the following way.
 
-Type inference of constructor is described later in the type inference section.
+> Note: Type inference of constructor is described later in the type inference section.
 
 The binding-time processing of an *object_creation_expression* of the form new `T(A)`, where `T` is a *class_type*, or a *value_type*, and `A` is an optional *argument_list*, consists of the following steps:
 
 - If `T` is a *value_type* and `A` is not present:
   - The *object_creation_expression* is a default constructor invocation. 
-    - If the type is *generic_inferred* or *partially_inferred*, type inference of default constructor occurs to determine the type arguments. If it suceeds, construct the type using inferred type arguments. If it failed and there is no chance to get target type now or later, binding-time error occurs. Otherwise, repeat the binding when the target type will be determined and add it to inputs of type inference.
-    - If the type inference above succeeded or the type is not inferred, the result of the *object_creation_expression* is a value of (constructed) type `T`, namely the default value for `T` as defined in [§8.3.3](types.md#833-default-constructors).
+    - If the type is *generic_inferred* or *partially_inferred*, type inference of the default constructor occurs to determine the type arguments. If it succeeded, construct the type using inferred type arguments. If it failed and there is no chance to get the target type now or later, the binding-time error occurs. Otherwise, repeat the binding when the target type will be determined and add it to the inputs of type inference.
+    - If the type inference above succeeded or the type is not inferred, the result of the *object_creation_expression* is a value of (constructed) type `T`, namely the default value for `T` as defined in §8.3.3.
 - Otherwise, if `T` is a *type_parameter* and `A` is not present:
-  - If no value type constraint or constructor constraint ([§15.2.5](classes.md#1525-type-parameter-constraints)) has been specified for `T`, a binding-time error occurs.
+  - If no value type constraint or constructor constraint (§15.2.5) has been specified for `T`, a binding-time error occurs.
   - The result of the *object_creation_expression* is a value of the run-time type that the type parameter has been bound to, namely the result of invoking the default constructor of that type. The run-time type may be a reference type or a value type.
 - Otherwise, if `T` is a *class_type* or a *struct_type*:
   - If `T` is an abstract or static *class_type*, a compile-time error occurs.
-  - The instance constructor to invoke is determined using the overload resolution rules of [§12.6.4](expressions.md#1264-overload-resolution). The set of candidate instance constructors is determined as follows:
-    - `T` is not inferrred (*generic_inferred* or *partially_inferred*), the constructor is accessible in `T`, and is applicable with respect to `A` ([§12.6.4.2](expressions.md#12642-applicable-function-member)). 
-    - If `T` is *generic_constructed* or *partially_constructed* and the constructor is accessible in `T`, type inference of constructor is performed. Once the *inferred_type_arguments* are inferred and together with remaining type arguments are substituted for the corresponding type parameters, all constructed types in the parameter list of the constructor satisfy their constraints, and the parameter list of the constructor is applicable with respect to `A` ([§12.6.4.2](expressions.md#12642-applicable-function-member)).
+  - The instance constructor to invoke is determined using the overload resolution rules of §12.6.4. The set of candidate instance constructors is determined as follows:
+    - `T` is not inferrred (*generic_inferred* or *partially_inferred*), the constructor is accessible in `T`, and is applicable with respect to `A` (§12.6.4.2). 
+    - If `T` is *generic_constructed* or *partially_constructed* and the constructor is accessible in `T`, type inference of the constructor is performed. Once the *inferred_type_arguments* are inferred and together with the remaining type arguments are substituted for the corresponding type parameters, all constructed types in the parameter list of the constructor satisfy their constraints, and the parameter list of the constructor is applicable with respect to `A` (§12.6.4.2).
   - A binding-time error occurs when:
     - The set of candidate instance constructors is empty, or if a single best instance constructor cannot be identified, and there is no chance to know the target type now or later.
   - If the set of candidate instance constructors is still empty, or if a single best instance constructor cannot be identified, repeat the binding of the *object_creation_expression* to the time, when target type will be known and add it to inputs of type inference.
@@ -184,8 +190,8 @@ The binding-time processing of an *object_creation_expression* of the form new `
 
 We change the [type inference](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#1263-type-inference) as follows.
 
-* Type inference of generic method invocation is performed when the invocation:
-  * Doesn't have type argument list.
+* Type inference for generic method invocation is performed when the invocation:
+  * Doesn't have a *type_argument_list*.
   * The type argument list contains at least one *inferred_type_argument*.
   > Example
   > 
@@ -195,9 +201,9 @@ We change the [type inference](https://github.com/dotnet/csharpstandard/blob/dra
   > M<List<_>, string>(...); // Type inference is invoked.
   > ```
 
-* Type inference for constructor is performed when the generic type of *object_creation_expression*:
-  * Has diamond operator.
-  * its *type_argument_list* contains at least on inferred_type_argument*.
+* **Type inference for constructors** is performed when the generic type of *object_creation_expression*:
+  * Has a diamond operator.
+  * Its *type_argument_list* contains at least one *inferred_type_argument*.
   > Example
   >
   > ```csharp
@@ -206,19 +212,24 @@ We change the [type inference](https://github.com/dotnet/csharpstandard/blob/dra
   > new C<List<_>, string>(...); // Type inference is invoked.
   > ```
 
-* When the method invocation contains type argument list containing inferred type argument, the input for type inference is extended as follows:
-  * We replace each `_` identifier by a new type variable `X`.
-  * We perform *shape type inference* from each type argument to corresponding type parameter.
+* When the method invocation contains a type argument list containing inferred type argument, the input for type inference is extended as follows:
+  * We replace each `_` identifier with a new type variable `X`.
+  * We perform *shape inference* from each type argument to the corresponding type parameter.
 
-* Inputs for constructor type inference is constructed as follows:
-  * If the inferred type contains nonempty *type_argument_list*, we process it in the same manner as in method invocation.
+* Inputs for **constructor type inference** are constructed as follows:
+  * If the inferred type contains a nonempty *type_argument_list*, we process it in the same manner as in the method invocation.
   * If the target type should be used based on the expression binding, perform *upper-bound inference* from it to the type containing the constructor
-  * If the expression contains object initializer list, for each element of the list perform *lower-bound inference* from the type of the element to the type of *initializer_target*. If the binding of the element fails, skip it.
-  * If the expression contains *where* clauses defining type constrains of type parameters of the type containing constructor, for each constrain not representing constructor constrain, reference type constrain, value type constraint and unmanaged type constraint perform *lowr-bound inference* from the constraint to the corresponding type parameter.
-  * If the expression contains a collection initializer list and the type doesn't have overloads of the `Add` method, for each *initializer_element* of the list perform *lower-bound inference* from the types of the elements contained in the *initializer_element* to the types of the method's parameters. If the binding of any element fails, skip it.  
-  * If the expression contains indicies in a collection initialozer list, use the indexer defined in the type and perform *lower_bound_inference* from the types in *initializer_element* to types of matching parameters of the indexer. 
+  * If the expression contains an *object_initializer_list*, for each *initializer_element* of the list perform *lower-bound inference* from the type of the element to the type of *initializer_target*. If the binding of the element fails, skip it.
+  * If the expression contains *where* clauses defining type constraints of type parameters of the type containing constructor, for each constraint not representing *constructor* constrain, *reference type constraint*, *value type constraint* and *unmanaged type constraint* perform *lower-bound inference* from the constraint to the corresponding type parameter.
+  * If the expression contains a *collection_initializer_list* and the type doesn't have overloads of the `Add` method, for each *initializer_element* of the list perform *lower-bound inference* from the types of the elements contained in the *initializer_element* to the types of the method's parameters. If the binding of any element fails, skip it.  
+  * If the expression contains a *collection_initializer_list* using an indexer, use the indexer defined in the type and perform *lower_bound_inference* from the types in *initializer_element* to types of matching parameters of the indexer. 
 
-#### Type inference algorith change
+* Arguments binding
+  * It can happen that an argument of an expression will be *object_creation_expression*, which needs a target type to be successful binded. 
+  * In these situations, we behave like the type of the argument is unknown and bind it when we will know the target type.
+  * We treat it in the same manner as an unconverted *new()* operator.
+
+#### Type inference algorithm change
 
 * Shape dependence
   * An *unfixed* type variable `Xᵢ` *shape-depends directly on* an *unfixed* type variable `Xₑ` if `Xₑ` represents *inferred_type_argument* and it is contained in *shape bound* of the type variable `Xᵢ`.

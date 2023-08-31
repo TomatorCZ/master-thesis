@@ -90,12 +90,12 @@ The following changes are made in [tokens](https://github.com/dotnet/csharpstand
   > Example
   >
   > ```csharp
-  > F<_, int>(...); // _ represents an inferred type argument.
-  > new C<_, int>(...); // _ represents an inferred type argument.
-  > F<C<_>, int>(...); // _ represents an inferred type argument.
-  > new C<C<_>, int>(...); // _ represents an inferred type argument.
+  > F<_, int>( ... ); // _ represents an inferred type argument.
+  > new C<_, int>( ... ); // _ represents an inferred type argument.
+  > F<C<_>, int>( ... ); // _ represents an inferred type argument.
+  > new C<C<_>, int>( ... ); // _ represents an inferred type argument.
   > C<_> temp = ...; // _ doesn't represent an inferred type argument.
-  > new _() // _ doesn't represent an inferred type argument.
+  > new _( ... ) // _ doesn't represent an inferred type argument.
   > ```   
 
 * A method group and type are said to be *partial_inferred* if it contains at least one *inferred_type_argument*. 
@@ -106,9 +106,9 @@ The following changes are made in [tokens](https://github.com/dotnet/csharpstand
   > Example
   >
   > ```csharp
-  > new C<>() // C is generic_inferred.
-  > new C<G<>>() // C nor G are generic_inferred.
-  > F<>() // F isn't generic_inferred.
+  > new C<>(...) // C is generic_inferred.
+  > new C<G<>>(...) // C nor G are generic_inferred.
+  > F<>(...) // F isn't generic_inferred.
   > ```
 
 ### Namespace and type names
@@ -124,20 +124,20 @@ If there is an ambiguity in the current scope, a compilation-time error occurs.
   > {
   >     void M() 
   >     {
-  >         new C1<>(); // Refers generic_inferred type C1<T>
-  >         new C2<>(); // Refers generic_inferred type C2<T1,T2>
+  >         new C1<>( ... ); // Refers generic_inferred type C1<T>
+  >         new C2<>( ... ); // Refers generic_inferred type C2<T1,T2>
   >     }
-  >     class C1<T> {}
-  >     class C2<T1, T2> {}
+  >     class C1<T> { ... }
+  >     class C2<T1, T2> { ... }
   > }
   > class P2
   > {
   >     void M() 
   >     {
-  >         new C1<>(); // Compile-time error occurs because of ambiguity between C1<T> and C1<T1, T2>
+  >         new C1<>( ... ); // Compile-time error occurs because of ambiguity between C1<T> and C1<T1, T2>
   >     }
-  >     class C1<T> {}
-  >     class C1<T1, T2> {}
+  >     class C1<T> { ... }
+  >     class C1<T1, T2> { ... }
   > }
   > ``` 
 
@@ -153,9 +153,9 @@ The initial set of candidate methods for is changed by adding new condition.
 - If `F` is generic and `M` has no type argument list, `F` is a candidate when:
   - Type inference ([§12.6.3](expressions.md#1263-type-inference)) succeeds, inferring a list of type arguments for the call, and
   - Once the inferred type arguments are substituted for the corresponding method type parameters, all constructed types in the parameter list of `F` satisfy their constraints ([§8.4.5](types.md#845-satisfying-constraints)), and the parameter list of `F` is applicable with respect to `A` ([§12.6.4.2](expressions.md#12642-applicable-function-member))
-- If `F` is generic and `M` has type argument list containing at least one *inferred_type_argument*, `F` is a candidate when:
-  - Type inference ([§12.6.3](expressions.md#1263-type-inference)) succeeds, inferring a list of *inferred_type_arguments* for the call, and
-  - Once the *inferred_type_arguments* are inferred and together with remaining type arguments are substituted for the corresponding method type parameters, all constructed types in the parameter list of `F` satisfy their constraints ([§8.4.5](types.md#845-satisfying-constraints)), and the parameter list of `F` is applicable with respect to `A` ([§12.6.4.2](expressions.md#12642-applicable-function-member))
+- **If `F` is generic and `M` has type argument list containing at least one *inferred_type_argument*, `F` is a candidate when:**
+  - **Type inference ([§12.6.3](expressions.md#1263-type-inference)) succeeds, inferring a list of *inferred_type_arguments* for the call, and**
+  - **Once the *inferred_type_arguments* are inferred and together with remaining type arguments are substituted for the corresponding method type parameters, all constructed types in the parameter list of `F` satisfy their constraints ([§8.4.5](types.md#845-satisfying-constraints)), and the parameter list of `F` is applicable with respect to `A` ([§12.6.4.2](expressions.md#12642-applicable-function-member))**
 - If `F` is generic and `M` includes a type argument list, `F` is a candidate when:
   - `F` has the same number of method type parameters as were supplied in the type argument list, and
   - Once the type arguments are substituted for the corresponding method type parameters, all constructed types in the parameter list of `F` satisfy their constraints ([§8.4.5](types.md#845-satisfying-constraints)), and the parameter list of `F` is applicable with respect to `A` ([§12.6.4.2](expressions.md#12642-applicable-function-member)).
@@ -169,20 +169,20 @@ The binding-time processing of an [*object_creation_expression*](https://github.
 The binding-time processing of an *object_creation_expression* of the form new `T(A)`, where `T` is a *class_type*, or a *value_type*, and `A` is an optional *argument_list*, consists of the following steps:
 
 - If `T` is a *value_type* and `A` is not present:
-  - The *object_creation_expression* is a default constructor invocation. 
-    - If the type is *generic_inferred* or *partially_inferred*, type inference of the default constructor occurs to determine the type arguments. If it succeeded, construct the type using inferred type arguments. If it failed and there is no chance to get the target type now or later, the binding-time error occurs. Otherwise, repeat the binding when the target type will be determined and add it to the inputs of type inference.
-    - If the type inference above succeeded or the type is not inferred, the result of the *object_creation_expression* is a value of (constructed) type `T`, namely the default value for `T` as defined in §8.3.3.
+  - **The *object_creation_expression* is a default constructor invocation.**
+    - **If the type is *generic_inferred* or *partially_inferred*, type inference of the default constructor occurs to determine the type arguments. If it succeeded, construct the type using inferred type arguments. If it failed and there is no chance to get the target type now or later, the binding-time error occurs. Otherwise, repeat the binding when the target type will be determined and add it to the inputs of type inference.**
+    - **If the type inference above succeeded or the type is not inferred, the result of the *object_creation_expression* is a value of (constructed) type `T`, namely the default value for `T` as defined in §8.3.3.**
 - Otherwise, if `T` is a *type_parameter* and `A` is not present:
   - If no value type constraint or constructor constraint (§15.2.5) has been specified for `T`, a binding-time error occurs.
   - The result of the *object_creation_expression* is a value of the run-time type that the type parameter has been bound to, namely the result of invoking the default constructor of that type. The run-time type may be a reference type or a value type.
 - Otherwise, if `T` is a *class_type* or a *struct_type*:
   - If `T` is an abstract or static *class_type*, a compile-time error occurs.
-  - The instance constructor to invoke is determined using the overload resolution rules of §12.6.4. The set of candidate instance constructors is determined as follows:
-    - `T` is not inferrred (*generic_inferred* or *partially_inferred*), the constructor is accessible in `T`, and is applicable with respect to `A` (§12.6.4.2). 
-    - If `T` is *generic_constructed* or *partially_constructed* and the constructor is accessible in `T`, type inference of the constructor is performed. Once the *inferred_type_arguments* are inferred and together with the remaining type arguments are substituted for the corresponding type parameters, all constructed types in the parameter list of the constructor satisfy their constraints, and the parameter list of the constructor is applicable with respect to `A` (§12.6.4.2).
-  - A binding-time error occurs when:
-    - The set of candidate instance constructors is empty, or if a single best instance constructor cannot be identified, and there is no chance to know the target type now or later.
-  - If the set of candidate instance constructors is still empty, or if a single best instance constructor cannot be identified, repeat the binding of the *object_creation_expression* to the time, when target type will be known and add it to inputs of type inference.
+  - **The instance constructor to invoke is determined using the overload resolution rules of §12.6.4. The set of candidate instance constructors is determined as follows:**
+    - **`T` is not inferrred (*generic_inferred* or *partially_inferred*), the constructor is accessible in `T`, and is applicable with respect to `A` (§12.6.4.2).**
+    - **If `T` is *generic_constructed* or *partially_constructed* and the constructor is accessible in `T`, type inference of the constructor is performed. Once the *inferred_type_arguments* are inferred and together with the remaining type arguments are substituted for the corresponding type parameters, all constructed types in the parameter list of the constructor satisfy their constraints, and the parameter list of the constructor is applicable with respect to `A` (§12.6.4.2).**
+  - **A binding-time error occurs when:**
+    - **The set of candidate instance constructors is empty, or if a single best instance constructor cannot be identified, and there is no chance to know the target type now or later.**
+  - **If the set of candidate instance constructors is still empty, or if a single best instance constructor cannot be identified, repeat the binding of the *object_creation_expression* to the time, when target type will be known and add it to inputs of type inference.**
   - The result of the *object_creation_expression* is a value of type `T`, namely the value produced by invoking the instance constructor determined in the two steps above.
   - Otherwise, the *object_creation_expression* is invalid, and a binding-time error occurs.
 
@@ -196,9 +196,9 @@ We change the [type inference](https://github.com/dotnet/csharpstandard/blob/dra
   > Example
   > 
   > ```csharp
-  > M(...); // Type inference is invoked.
-  > M<_, string>(...); // Type inference is invoked.
-  > M<List<_>, string>(...); // Type inference is invoked.
+  > M( ... ); // Type inference is invoked.
+  > M<_, string>( ... ); // Type inference is invoked.
+  > M<List<_>, string>( ... ); // Type inference is invoked.
   > ```
 
 * **Type inference for constructors** is performed when the generic type of *object_creation_expression*:
@@ -207,17 +207,23 @@ We change the [type inference](https://github.com/dotnet/csharpstandard/blob/dra
   > Example
   >
   > ```csharp
-  > new C<>(...); // Type inference is invoked.
-  > new C<_, string>(...); // Type inference is invoked.
-  > new C<List<_>, string>(...); // Type inference is invoked.
+  > new C<>( ... ); // Type inference is invoked.
+  > new C<_, string>( ... ); // Type inference is invoked.
+  > new C<List<_>, string>( ... ); // Type inference is invoked.
   > ```
+
+* In the case of *method type inference*, we infer method type parameters. 
+  In the case of *constructor type inference*, we infer type parameters of a type defining the constructors. 
+  The previous sentence prohibits inferring type parameters of an outside type that contains the inferred type. (e.g. inference of `new Containing<>.Nested<>(42)` is not allowed)
 
 * When the method invocation contains a type argument list containing inferred type argument, the input for type inference is extended as follows:
   * We replace each `_` identifier with a new type variable `X`.
   * We perform *shape inference* from each type argument to the corresponding type parameter.
 
 * Inputs for **constructor type inference** are constructed as follows:
-  * If the inferred type contains a nonempty *type_argument_list*, we process it in the same manner as in the method invocation.
+  * If the inferred type contains a nonempty *type_argument_list*.
+    * We replace each `_` identifier with a new type variable `X`.
+    * We perform *shape inference* from each type argument to the corresponding type parameter.
   * If the target type should be used based on the expression binding, perform *upper-bound inference* from it to the type containing the constructor
   * If the expression contains an *object_initializer_list*, for each *initializer_element* of the list perform *lower-bound inference* from the type of the element to the type of *initializer_target*. If the binding of the element fails, skip it.
   * If the expression contains *where* clauses defining type constraints of type parameters of the type containing constructor, for each constraint not representing *constructor* constrain, *reference type constraint*, *value type constraint* and *unmanaged type constraint* perform *lower-bound inference* from the constraint to the corresponding type parameter.
@@ -234,9 +240,11 @@ We change the [type inference](https://github.com/dotnet/csharpstandard/blob/dra
 * Shape dependence
   * An *unfixed* type variable `Xᵢ` *shape-depends directly on* an *unfixed* type variable `Xₑ` if `Xₑ` represents *inferred_type_argument* and it is contained in *shape bound* of the type variable `Xᵢ`.
   * `Xₑ` *shape-depends on* `Xᵢ` if `Xₑ` *shape-depends directly on* `Xᵢ` or if `Xᵢ` *shape-depends directly on* `Xᵥ` and `Xᵥ` *shape-depends on* `Xₑ`. Thus “*shape-depends on*” is the transitive but not reflexive closure of “*shape-depends directly on*”.
+
 * Type dependence
   * An *unfixed* type variable `Xᵢ` *type-depends directly on* an *unfixed* type variable `Xₑ` if `Xₑ` occurs in any bound of type variable `Xᵢ`.
   * `Xₑ` *type-depends on* `Xᵢ` if `Xₑ` *type-depends directly on* `Xᵢ` or if `Xᵢ` *type-depends directly on* `Xᵥ` and `Xᵥ` *type-depends on* `Xₑ`. Thus “*type-depends on*” is the transitive but not reflexive closure of “*type-depends directly on*”.
+
 * Shape inference
   * A *shape* inference from a type `U` to a type `V` is made as follows:
     * If `V` is one of the *unfixed* `Xᵢ` then `U` is a shape bound of `V`.
@@ -248,49 +256,100 @@ We change the [type inference](https://github.com/dotnet/csharpstandard/blob/dra
       *  We perform *exact* inference from all exact-bounds of `V` to `U` if `U` contains unfixed type variable.
       *  We perform *upper-type* inference from all upper-bounds of `V` to `U` if `U` contains an unfixed type variable.
     * Otherwise, on inferences are made
+
 * Lower-bound inference
   * When a new bound `U` is added to the set of lower-bounds of `V`:
-    *  We perform *lower-bound* inference from `U` to the shape of `V` , if it has any and the shape contains an unfixed type variable.
+    * We perform *lower-bound* inference from `U` to the shape of `V` , if it has any and the shape contains an unfixed type variable.
     * We perform *upper-bound* inference from the shape of `V` to `U`, if `V` has a shape and `U` contains an unfixed type variable.
-    * We perform *exact* inference from `U` to all lower-bounds of `V`, which contains an unfixed type variable
+    * We perform *exact* inference from `U` to all lower-bounds of `V`, which contains an unfixed type variable.
     * We perform *lower-bound* inference from `U` to all exact-bounds and upper-bounds of `V`, which contains an unfixed type variable.
-    *  We perform *exact* inference from all lower-bounds of `V` to `U` if `U` contains an unfixed type variable
-    *  We perform *upper-bound* type inference from all exact-bounds and upper-bounds of `V` to `U` if `U` contains unfixed type variable.
+    * We perform *exact* inference from all lower-bounds of `V` to `U` if `U` contains an unfixed type variable.
+    * We perform *upper-bound* type inference from all exact-bounds and upper-bounds of `V` to `U` if `U` contains unfixed type variable.
+
 * Upper-bound inference
   * When new bound `U` is added to the set of upper-bounds of `V`:
-    *  We perform *upper-bound* inference from `U` to the shape of `V` , if it has any and the shape contains an unfixed type variable.
+    * We perform *upper-bound* inference from `U` to the shape of `V` , if it has any and the shape contains an unfixed type variable.
     * We perform *lower-bound* inference from the shape of `V` to `U`, if `V` has a a shape and `U` contains an unfixed type variable.
-    * We perform *exact* inference from `U` to all upper-bounds of `V`, which contains an unfixed type variable
+    * We perform *exact* inference from `U` to all upper-bounds of `V`, which contains an unfixed type variable.
     * We perform *upper-bound* inference from `U` to all exact-bounds and lower-bounds of `V`, which contains an unfixed type variable.
-    *  We perform *exact* inference from all upper-bounds of `V` to `U` if `U` contains an unfixed type variable
-    *  We perform *lower-bound* type inference from all exact-bounds and lower-bounds of `V` to `U` if `U` contains unfixed type variable.
+    * We perform *exact* inference from all upper-bounds of `V` to `U` if `U` contains an unfixed type variable.
+    * We perform *lower-bound* type inference from all exact-bounds and lower-bounds of `V` to `U` if `U` contains unfixed type variable.
+
 * Exact inference
   * When new bound `U` is added to the set of lower-bounds of `V`:
     *  We perform *exact-bound* inference from `U` to the shape of `V` , if has any and the shape contains an unfixed type variable.
     * We perform *exact* inference from the shape of `V` to `U`, if `V` has a shape and `U` contains an unfixed type variable.
-    * We perform *exact* inference from `U` to all exact-bounds of `V`, which contains an unfixed type variable
-    * We perform *lower-bound* inference from `U` to all lower-bounds of `V`, which contains an unfixed type variable
-    * We perform *upper-bound* inference from `U` to all upper-bounds of `V`, which contains an unfixed type variable
-    * We perform *exact* inference from all exact-bounds of `V` to `U`, which contains an unfixed type variable
-    * We perform *upper-bound* inference from all lower-bounds of `V` to `U`, which contains an unfixed type variable
-    * We perform *lower-bound* inference from all upper-bounds of `V` to `U`, which contains an unfixed type variable
+    * We perform *exact* inference from `U` to all exact-bounds of `V`, which contains an unfixed type variable.
+    * We perform *lower-bound* inference from `U` to all lower-bounds of `V`, which contains an unfixed type variable.
+    * We perform *upper-bound* inference from `U` to all upper-bounds of `V`, which contains an unfixed type variable.
+    * We perform *exact* inference from all exact-bounds of `V` to `U`, which contains an unfixed type variable.
+    * We perform *upper-bound* inference from all lower-bounds of `V` to `U`, which contains an unfixed type variable.
+    * We perform *lower-bound* inference from all upper-bounds of `V` to `U`, which contains an unfixed type variable.
   
 * Second phase
-  * Firstly, all *unfixed* type variables `Xᵢ` which do not *depend on* ([§12.6.3.6](expressions.md#12636-dependence)), *shape-depend on*, and *type-depend on* any `Xₑ` are fixed ([§12.6.3.12](expressions.md#126312-fixing)).
-  * If no such type variables exist, all *unfixed* type variables `Xᵢ` are *fixed* for which all of the following hold:
-    * There is at least one type variable `Xₑ` that *depends on*, *shape-depends on*, or *type-depends on* `Xᵢ`
-    * There is no type variable `Xₑ` on which `Xᵢ` *shape-depends on*.
-    * `Xᵢ` has a non-empty set of bounds and has at least on bound which doesn't contain any *unfixed* type variable.
-  * Otherwise continue as the standard says.
+  * **Firstly, all *unfixed* type variables `Xᵢ` which do not *depend on* ([§12.6.3.6](expressions.md#12636-dependence)), *shape-depend on*, and *type-depend on* any `Xₑ` are fixed ([§12.6.3.12](expressions.md#126312-fixing)).**
+  * **If no such type variables exist, all *unfixed* type variables `Xᵢ` are *fixed* for which all of the following hold:**
+    * **There is at least one type variable `Xₑ` that *depends on*, *shape-depends on*, or *type-depends on* `Xᵢ`**
+    * **There is no type variable `Xₑ` on which `Xᵢ` *shape-depends on*.**
+    * **`Xᵢ` has a non-empty set of bounds and has at least on bound which doesn't contain any *unfixed* type variable.**
+  * If no such type variables exist and there are still unfixed type variables, type inference fails.
+  * [...]
     
 * Fixing
-  * An *unfixed* type variable `Xᵢ` with a set of bounds is *fixed* as follows:
-    * If the type variable has a shape bound, check the type has no conflicts with other bounds of that type variable in the same way as the standard says. It it has no conflicts, the type variable is *fixed* to that type. Otherwise type inference failed.
+  * **An *unfixed* type variable `Xᵢ` with a set of bounds is *fixed* as follows:**
+    * **If the type variable has a shape bound, check the type has no conflicts with other bounds of that type variable in the same way as the standard says. It it has no conflicts, the type variable is *fixed* to that type. Otherwise type inference failed.**
     * Otherwise, fix it as the standard says. 
 
-#### Type inference for constructor
+> Explanation of inference improvements
+>
+> Now, the inferred bounds can contain other unfixed type variables.
+> So we have to propagate the type info also through these bounds.
+> 
+> > Example
+> > 
+> >  ```csharp
+> >     void F<T1> (T1 p1) { ... }
+> >   ...
+> >    F<IList<_>>(new List<int>());
+> >  ```
+> >  We have now two type variables `T1` and `_`. From the first bound, we get that `IList<_>` is a shape bound of `T1`(Ignore now the type of bound, it would be the same in other types of bound).
+> >  When we investigate the second bound `List<int>`, we will figure out that it would be a lower bound of `T1`.
+> >  But now, we have to somehow propagate the int type to the `_` type variable, because it relates to it.
+> >  That means, in the process of adding new bounds, we have to also propagate this info through bounds, which contain unfixed type variables.
+> >  In this case, we do additional inference of `IList<_>` and `List<int>` yielding exact bound `int` of `_`.
 
-> Note: Complexity
+> Explanation of type-dependence
+> 
+> Type-dependence is required because, till this time when a type variable had any bounds, it didn't contain any unfixed type variable.
+> It was important because we could do the parameter fixation, where we work with exact types(not unfixed type variables).
+> However now, the type variable can contain bounds containing unfixed type variables.
+> We have to ensure that we will not start fixing the type variable till these unfixed type variables are unfixed(In some cases, we can be in a situation, where this dependency will form a cycle. In this case, we will allow the fixation earlier).
+>
+> >  Example
+> > 
+> >  We use the previous example.
+> >  After the first phase. `T1` has bounds `IList<_>` and `List<int>`. `_` has bound `int`.
+> >  In this situation, we can't start to fix `T1` because `_` is not fixed yet.
+> >  `T1` is type-dependent on `_`.
+> >  So, we will first fix `_`, which becomes `int`.
+> >  Then, `T1` is not type-dependent anymore, because all bounds don't contain any unfixed type variables.
+> >  `IList<_>` is now `IList<int>` after the `_` fixation.
+> >  We can fix `T1` now.
+
+> Explanation of shape-dependence
+>
+> A similar thing is for shape-dependence.
+> Although it cares about bounds received from the type argument list.
+> We want a shape bound to be exact (not containing any unfixed type variables) because it is later important for the fixation.
+> An intention is to keep the exact form of the given hint(`IList<_>`).
+>
+> >  Example
+> > 
+> >  Given `IList<_>` as a type argument, when we treat nullability, we want the hinted type parameter to be non-nullable(not `IList<_>?`).
+> >  It can happen, other bounds would infer the nullable version, and although `IList<_>` can be converted to `IList<_>?`, it is not the user's intention.
+
+
+> Explanation of inference restriction during constructor type inference
 >
 > Because performing type inference can even take exponential time when a type system contains overloading, the restriction was made above to avoid it. 
 > It regards to permit only one method `Add` in the collections and binding arguments before the overload resolution when we bind all *object_creation_expressions* without target info and then in case of overload resolution success and some of these arguments failed in the binding, we try to bind it again with already known target type information.
@@ -299,7 +358,7 @@ We change the [type inference](https://github.com/dotnet/csharpstandard/blob/dra
 
 We change the [compile-time checking](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#1265-compile-time-checking-of-dynamic-member-invocation) in order to be useful during partial type inferece.
 
-- First, if `F` is a generic method and type arguments were provided, then those, that aren't *inferred_type_argument* are substituted for the type parameters in the parameter list. However, if type arguments were not provided, no such substitution happens.
+- First, if `F` is a generic method and type arguments were provided, then those **, that aren't *inferred_type_argument*** are substituted for the type parameters in the parameter list. However, if type arguments were not provided, no such substitution happens.
 - Then, any parameter whose type is open (i.e., contains a type parameter; see §8.4.3) is elided, along with its corresponding parameter(s).
 
 ### Nullability
@@ -338,7 +397,7 @@ What other designs have been considered? What is the impact of not doing this?
 
   ```csharp
   Wrapper<_> wrapper = ... // I get an wrapper, which I'm interested in, but I don't care about the type arguments, because I don't need them in my code.
-  wrapper.DoSomething();
+  wrapper.DoSomething( ... );
   ```
 
 * Type inference for casting
@@ -348,6 +407,14 @@ What other designs have been considered? What is the impact of not doing this?
   ```csharp
   var temp = (Span<_>)[1,2,3];
   ```
+
+* Should we allow type inference of nested types like this `new Containing<>.Nested<>(42)` ?
+
+    Potentional resolution: In my opinion, it looks weird and I wouldn't allow it, because then it would be coherent with method type inference and I don't think it would be common usage.
+    I use nested type as a helper which contains logic of some part of the outside type.
+    That means it does not usually use all type parameters defined in the outside type.
+    Hence, there can be a lack of type info to infer type parameters of outside type when we try to use the constructor of nested type.
+    From the theoretical point of view, it can be done.
 
 * Is there a better choice for choosing the placeholder for inferred type argument ?
 
@@ -374,14 +441,14 @@ Foo<>(arg1, arg2, arg3); // Doesn't bring us any additional info
 2. There is an advantage. It can turn on the type inference. However, it would complicate overload resolution because we would have to search for every generic type of the same name no matter what arity. But could make a restriction. Usually, there is not more than one generic type with the same name. So when there will be just one type of that name, we can turn the inference on.
 
 ```csharp
-new Bar<>(); // Many constructors which we have to investigate for applicability
-new Baz<>(); // Its OK, we know what set of constructors to investigate.
+new Bar<>(...); // Many constructors which we have to investigate for applicability
+new Baz<>(...); // Its OK, we know what set of constructors to investigate.
 
 class Bar { ... }
 class Bar<T1> { ... }
 class Bar<T1, T2> { ... }
 
-class Baz<T1,T2> {...}
+class Baz<T1,T2> { ... }
 ```
 
 3. It could make sense to specify just a wrapper of some type that gives us general API that doesn't involve its type arguments. It would say that the part of the code just cares about the wrapper. However, we think that it doesn't give us much freedom because type arguments usually appear in public API and only a few of them are for internal use. 
@@ -407,26 +474,26 @@ Wrapper<> temp = ...
 1. It is able to specify the arity of the generic method. However, it seems to be messy when it is used in generic methods with many generic type parameters. Also, it already has its own meaning of expressing open generic type.
 
 ```csharp
-Foo<,string,List<>,>(arg1, arg2, arg3);
+Foo<, string, List<>, >(arg1, arg2, arg3);
 ```
 
 1. The same reasoning as above.
 
 ```csharp
-new Bar<,string,List<>,>(arg1, arg2) { arg3 };
+new Bar<, string, List<>, >(arg1, arg2) { arg3 };
 ```
 
 3. It doesn't work with array type.
 
 ```csharp
-Bar<,string,List<>,> temp = ...
+Bar<, string, List<>, > temp = ...
 ```
 
 4. It doesn't seems very well.
 
 ```csharp
 [] temp = ...
-Foo<,[],>(arg1, arg2)
+Foo<, [], >(arg1, arg2)
 ```
 
 5. It looks like CSharp would not be a statically-typed language, clashed with `var` and probably introduce many implementation problems in the parser.

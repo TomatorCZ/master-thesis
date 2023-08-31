@@ -1,0 +1,9 @@
+# Thesis
+Text/**/*.aux
+Text/**/*.lof
+Text/**/*.log
+Text/**/*.lot
+Text/**/*.out
+Text/**/*.xmpi
+Text/**/*.gz
+Text/**/*.toc

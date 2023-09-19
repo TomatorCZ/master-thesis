@@ -54,46 +54,46 @@
 %%% Basic information on the thesis
 
 % Thesis title in English (exactly as in the formal assignment)
-\def\ThesisTitle{Thesis title}
+\def\ThesisTitle{Improving Type Inference in the C\# Language}
 
 % Author of the thesis
-\def\ThesisAuthor{Name Surname}
+\def\ThesisAuthor{Tomáš Husák}
 
 % Year when the thesis is submitted
-\def\YearSubmitted{YEAR}
+\def\YearSubmitted{2024}
 
 % Name of the department or institute, where the work was officially assigned
 % (according to the Organizational Structure of MFF UK in English,
 % or a full name of a department outside MFF)
-\def\Department{Name of the department}
+\def\Department{Department of Distributed and Dependable Systems}
 
 % Is it a department (katedra), or an institute (ústav)?
 \def\DeptType{Department}
 
 % Thesis supervisor: name, surname and titles
-\def\Supervisor{Supervisor's Name}
+\def\Supervisor{Mgr. Pavel Ježek, Ph.D.}
 
 % Supervisor's department (again according to Organizational structure of MFF)
-\def\SupervisorsDepartment{department}
+\def\SupervisorsDepartment{Department of Distributed and Dependable Systems}
 
 % Study programme and specialization
-\def\StudyProgramme{study programme}
-\def\StudyBranch{study branch}
+\def\StudyProgramme{Computer Science}
+\def\StudyBranch{Software Systems}
 
 % An optional dedication: you can thank whomever you wish (your supervisor,
 % consultant, a person who lent the software, etc.)
 \def\Dedication{%
-Dedication.
+\change{Dedication.}
 }
 
 % Abstract (recommended length around 80-200 words; this is not a copy of your thesis assignment!)
 \def\Abstract{%
-Abstract.
+\change{Abstract.}
 }
 
 % 3 to 5 keywords (recommended), each enclosed in curly braces
 \def\Keywords{%
-{key} {words}
+{Type Inference} {C\#} {Roslyn} 
 }
 
 %% The hyperref package for clickable links in PDF and also for storing
@@ -115,8 +115,11 @@ Abstract.
 
 %%% Each chapter is kept in a separate file
 \include{preface}
-\include{chap01}
-\include{chap02}
+\include{chap01_related_work}
+\include{chap02_problem_analysis}
+\include{chap03_solution}
+\include{chap04_evaluation}
+\include{chap05_future_improvements}
 
 \include{epilog}
 
@@ -147,8 +150,6 @@ Abstract.
 %%% Allowed file formats are specified in provision of the rector no. 72/2017.
 \appendix
 \chapter{Attachments}
-
-\section{First Attachment}
 
 \openright
 \end{document}

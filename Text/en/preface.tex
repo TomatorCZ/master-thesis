@@ -1,8 +1,21 @@
 \chapter*{Introduction}
 \addcontentsline{toc}{chapter}{Introduction}
 
-\change{Describe what is type inference.}
+\info{Describe what is type inference.}
+Statically typed languages have many advantages like revealing bugs in compilation time or performance.
+To achieve these benefits, the languages demand type annotations from a programmer.
+These type annotations define an actual type of variable during runtime protecting to make operations on incompatible data.
+Because code usually contains a lot of variables whose type has to be known during compilation time, type inference was introduced to eliminate type annotations that can be deduced from a context.
+Type inference tries to deduce a type of a variable using a context, where the variable is used.
+That's used operations and interactions with other parts of the code.
+
+
 \change{Describe type inference in C\#.}
+C\# is a statically typed language whose type system ,besides common primitives and classes known from other languages, contains generics.
+Generics are used for parametrizing types in order to create reusable code(e.g. containers).
+C\# generics parametrizes types by other types.
+Main feature of the C\# type inference is getting rid of type arguments in cases, where the arguments can deduces from a context.
+
 \change{Compare it with type inference in Rust or Haskell as an example of Hindel-Millner type inference.}
 \change{Describe Roslyn.}
 \change{Mention CSharplang repo, community, and describe a process of accepting lang changes.}

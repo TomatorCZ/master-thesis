@@ -10,13 +10,49 @@ Type inference tries to deduce a type of a variable using a context, where the v
 That's used operations and interactions with other parts of the code.
 
 
-\change{Describe type inference in C\#.}
-C\# is a statically typed language whose type system ,besides common primitives and classes known from other languages, contains generics.
+\info{Describe type inference in C\#.}
+C\# is a statically typed language whose type system, besides common primitives and classes known from other languages, contains generics.
 Generics are used for parametrizing types in order to create reusable code(e.g. containers).
 C\# generics parametrizes types by other types.
 Main feature of the C\# type inference is getting rid of type arguments in cases, where the arguments can deduces from a context.
+Despite of type inference is a very useful feature, possible scenarios where it can be applied is restrictive in comparison with other languages.
 
-\change{Compare it with type inference in Rust or Haskell as an example of Hindel-Millner type inference.}
-\change{Describe Roslyn.}
-\change{Mention CSharplang repo, community, and describe a process of accepting lang changes.}
-\change{Give an overview of chapters.}
+\info{Compare it with type inference in Rust or Haskell as an example of Hindel-Millner type inference.}
+As an example of advanced type inference we can mention Rust language.
+Although the type system has differences with C\# type system, the type inference is done across multiple statements which is much more powerful than the former one.
+One of that reason regards specifics of type system, which enables to use Hindle-Millner type inference.
+Traditional Hindle-Milner type inference is defined in Hindle-Millner type system which has different characteristics from C\# or Rust.
+Although the most powerful is in that type system, it can be adjusted to work in type systems in already mentioned languages.
+
+\info{Describe C\# specification}
+C\# type inference is a variant of Hindle-Millner type inference and the algorithm can be found in the language specification.
+The specification consists of all language features described independently on the compiler.
+As the language evolves, the specification also changes.
+These changes are done publicly on a Github repository to offer participation of creating specification to wider community.
+
+\info{Describe Roslyn.}
+Current implementation of C\# type inference is contained in Roslyn.
+Roslyn is open source C\# and VB compiler developed by Microsoft and community.
+Since it is open source, it is possible to investigate and participate on implementing new features to C\# language.
+
+\info{Mention CSharplang repo, community, and describe a process of accepting lang changes.}
+A common process to make a new possible language feature to be merged into Roslyn is making a proposal and a prototype.
+A proposal is a description of the new feature consisting of motivation, detailed description, needed language specification changes and other possible alternatives.
+The proposal is published in discussions where community can share their opinion.
+If the proposal is promising enough, the language committee will choose it for further discussions.
+The feature is added to the language if LDM accepts the proposal.
+After that, the implementation of that feature can be merged into Roslyn.
+During the proposal, a prototype is usually done to demonstrate the feature in wider examples.
+
+\info{Goal of this thesis}
+Goal of this thesis is to create a proposal regarding to improve C\# type inference in order to offer more power as we can see in other similar languages.
+To make the proposal more likely to be accepted by LDM committee, a prototype is created to estimate level of implementation difficulty in production C\# compiler.
+
+\info{Give an overview of chapters.}
+The first chapter describes Roslyn compiler together with theoretical background of type inference.
+The second chapter describes the scope of the language improvements based on community preferences.
+Then, It describes difficulties regarding architecture of C\# language and the compiler implementation.
+At the end of this chapter, we describe goals of this work with given benefits.
+The third section consists of architecture design of implementation together with new type inference algorithm and changes made in the specification.
+The fourth chapter contains evaluation of the implemented feature.
+The last chapter discuss possible further features as a continuation and other possible interactions with already existing features.

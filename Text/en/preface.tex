@@ -9,32 +9,32 @@ Because code usually contains a lot of variables whose type has to be known duri
 Type inference tries to deduce a type of variables using a context, where the variables are used.
 As an example of the context, we can take a variable which is passed as an argument to a function. 
 The type of the parameter has to be compatible with the type of that variable.
-
+\par
 \info{Describe type inference in C\#.}
 C\# is a statically typed language whose type system, besides common primitives and classes known from other languages, contains generics.
 Generics are used for parametrizing types or methods in order to create reusable code(e.g. containers).
 C\# generics parametrizes types or methods by other types.
 The main feature of the C\# type inference is getting rid of type arguments of a generic method in cases, where the arguments can be deduced from a context.
 Despite type inference being a very useful feature, possible scenarios where it can be applied are restrictive in comparison with other languages.
-
+\par
 \info{Compare it with type inference in Rust or Haskell as an example of Hindley-Millner type inference.}
 As an example of advanced type inference, we can mention Rust language \cite{online:rustTypeInference}.
 Although the type system has differences from C\# type system, the type inference is done across multiple statements which is much more powerful than the former one.
 One of those reasons regards specifics of the type system, which enables to use Hindley-Millner type inference \cite{online:yHM}.
 Traditional Hindley-Milner type inference is defined in Hindley-Millner type system \cite{online:wikiHM} which has different characteristics from C\# or Rust.
 Although the most powerful is in that type system, it can be adjusted to work in type systems in already mentioned languages.
-
+\par
 \info{Describe C\# specification}
 C\# type inference is a variant of Hindley-Millner type inference and the algorithm can be found in the language specification \cite{online:langSpec}.
 The specification consists of all language features described independently on the compiler implementation.
 As the language evolves, the specification also changes.
 These changes are done publicly on a Github repository \cite{online:langRepo} to offer participation in creating the specification for the outside community.
-
+\par
 \info{Describe Roslyn.}
 The current implementation of C\# type inference is contained in Roslyn \cite{online:roslynRepo}.
 Roslyn is an open-source C\# and VB compiler developed by Microsoft and the community.
 Since it is open source, it is possible to investigate and participate in implementing new features to the C\# language.
-
+\par
 \info{Mention CSharplang repo, community, and describe a process of accepting lang changes.}
 A common process to make a new possible language feature to be merged into Roslyn is making a proposal and a prototype.
 A proposal is a description of the new feature consisting of motivation, detailed description, needed language specification changes, and other possible alternatives.
@@ -43,11 +43,11 @@ If the proposal is promising enough, the language committee will choose it for f
 The feature is added to the language if \ac{LDM} accepts the proposal.
 After that, the implementation of that feature can be merged into Roslyn.
 During the proposal, a prototype is usually done to demonstrate the feature in wider usage and to explore possible barriers in the implementation.
-
+\par
 \info{Goal of this thesis}
 The goal of this thesis is to create a proposal regarding improving C\# type inference in order to offer more power type deductions as we can see in other similar languages.
 To make the proposal more likely to be accepted by the \ac{LDM}, a prototype is created to estimate the level of implementation difficulty in the production C\# compiler.
-
+\par
 \info{Give an overview of chapters.}
 The first chapter describes the Roslyn compiler together with a theoretical background of type inference.
 The second chapter describes the scope of the language improvements based on community preferences.

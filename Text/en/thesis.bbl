@@ -1,43 +1,50 @@
-\begin{thebibliography}{6}
+\begin{thebibliography}{7}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
 
-\bibitem[onl({\natexlab{a}})]{online:langRepo}
-csharplang repository.
-\newblock \url{https://github.com/dotnet/csharplang}, {\natexlab{a}}.
+\bibitem[onl({\natexlab{a}})]{online:cSharpTypeSystem}
+{C}\# type system.
+\newblock
+  \url{https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/types/},
+  {\natexlab{a}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{b}})]{online:langSpec}
+\bibitem[onl({\natexlab{b}})]{online:langRepo}
+csharplang repository.
+\newblock \url{https://github.com/dotnet/csharplang}, {\natexlab{b}}.
+\newblock [Online; accessed 2023-09-22].
+
+\bibitem[onl({\natexlab{c}})]{online:langSpec}
 {C}\# specification.
 \newblock
   \url{https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/readme},
-  {\natexlab{b}}.
+  {\natexlab{c}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{c}})]{online:roslynRepo}
+\bibitem[onl({\natexlab{d}})]{online:roslynRepo}
 {R}oslyn repository.
-\newblock \url{https://github.com/dotnet/roslyn}, {\natexlab{c}}.
+\newblock \url{https://github.com/dotnet/roslyn}, {\natexlab{d}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{d}})]{online:rustTypeInference}
+\bibitem[onl({\natexlab{e}})]{online:rustTypeInference}
 {R}ust type inference.
 \newblock \url{https://doc.rust-lang.org/rust-by-example/types/inference.html},
-  {\natexlab{d}}.
-\newblock [Online; accessed 2023-09-22].
-
-\bibitem[onl({\natexlab{e}})]{online:wikiHM}
-Hidley-milner type system.
-\newblock
-  \url{https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system},
   {\natexlab{e}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{f}})]{online:yHM}
+\bibitem[onl({\natexlab{f}})]{online:wikiHM}
+Hidley-milner type system.
+\newblock
+  \url{https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system},
+  {\natexlab{f}}.
+\newblock [Online; accessed 2023-09-22].
+
+\bibitem[onl({\natexlab{g}})]{online:yHM}
 {H}idley-{M}ilner type inference.
-\newblock \url{https://www.youtube.com/watch?v=B39eBvapmHY}, {\natexlab{f}}.
+\newblock \url{https://www.youtube.com/watch?v=B39eBvapmHY}, {\natexlab{g}}.
 \newblock [Online; accessed 2023-09-22].
 
 \end{thebibliography}

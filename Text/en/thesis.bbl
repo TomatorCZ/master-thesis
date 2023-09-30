@@ -24,15 +24,16 @@ csharplang repository.
   {\natexlab{c}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{d}})]{online:roslynRepo}
-{R}oslyn repository.
-\newblock \url{https://github.com/dotnet/roslyn}, {\natexlab{d}}.
-\newblock [Online; accessed 2023-09-22].
+\bibitem[onl({\natexlab{d}})]{online:proposalTemplate}
+Proposal template.
+\newblock
+  \url{https://github.com/dotnet/csharplang/blob/main/proposals/proposal-template.md},
+  {\natexlab{d}}.
+\newblock [Online; accessed 2023-09-30].
 
-\bibitem[onl({\natexlab{e}})]{online:rustTypeInference}
-{R}ust type inference.
-\newblock \url{https://doc.rust-lang.org/rust-by-example/types/inference.html},
-  {\natexlab{e}}.
+\bibitem[onl({\natexlab{e}})]{online:roslynRepo}
+{R}oslyn repository.
+\newblock \url{https://github.com/dotnet/roslyn}, {\natexlab{e}}.
 \newblock [Online; accessed 2023-09-22].
 
 \bibitem[onl({\natexlab{f}})]{online:wikiHM}

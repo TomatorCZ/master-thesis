@@ -1,59 +1,101 @@
-\chapter*{Introduction}
-\addcontentsline{toc}{chapter}{Introduction}
+\chapter{Introduction}
 
-\info{Describe what is type inference.}
-Statically typed languages have many advantages like revealing bugs in compilation time or high performance.
-To achieve these benefits, the languages demand type annotations from a programmer.
-These type annotations define types of program data during runtime protecting operations on incompatible data.
-Because code usually contains a lot of variables whose type has to be known during compilation time, type inference was introduced to eliminate type annotations that can be deduced from a context.
-Type inference tries to deduce a type of variables using a context, where the variables are used.
-As an example of the context, we can take a variable which is passed as an argument to a function. 
-The type of the parameter has to be compatible with the type of that variable.
+\info{Tell what is C\# and a goal of the thesis}
+
+C\# is an object-oriented programming language developed by Microsoft. 
+It belongs to the strongly typed languages helping programmers to possibly reveal bugs at compile time. 
+The first part of this thesis focuses on exploring type systems of strongly typed languages and proposes an improvement to the C\# type system. 
+The second part concerns an implementation of the improvement in the current C\# compiler and creating a proposal that will be likely discussed by the Language Design Team (LDM) accepting new C\# language features.
+
+\section{Improving C\# type system}
+
+\info{What is type inference in context of strongly typed languages}
+A key feature of strongly typed languages is type safety prohibiting operations on incompatible data which is achieved by determining types of data at compile time.
+The easiest way how a compiler reasons about types of variables in the code is providing type annotations determining data type which these variables hold.
+We can see an example of a type annotation given by a programmer using an example \ref{img01:csharp_type_anot} written in the C\# programming language.
+The type declaration of \texttt{people} variable guarantees us that any possible chances to threat it in the different way from \texttt{List<T>} will be reported at compile time to save programmer time to debug it.
+On the other hand, the programmer has to write more code to annotate a variable declaration, whose type has long name as we can see in the listing.
+This disadvantage of strongly typed languages can be removed by {\it Type inference} when a missing type annotation can be deduced using the context.
+Taking our example, we can notice redundancy of type annotation \texttt{List<String>} in the code.
+Since we do the initialization and type declaration on the same place, the declared variable \texttt{people} has to have the same type as the initializing value.
+Use of type inference can be seen in the \texttt{myFriend} variable declaration where we used \texttt{var} keyword triggering C\# type inference to determine variable's type being the type of initializing value which is \texttt{System.String} in this case.
 \par
-\info{Describe type inference in C\#.}
-C\# is a statically typed language whose type system, besides common primitives and classes known from other languages, contains generics.
-Generics are used for parametrizing types or methods in order to create reusable code(e.g. containers).
-C\# generics parametrizes types or methods by other types.
-The main feature of the C\# type inference is getting rid of type arguments of a generic method in cases, where the arguments can be deduced from a context.
-Despite type inference being a very useful feature, possible scenarios where it can be applied are restrictive in comparison with other languages.
+\begin{figure}
+\begin{lstlisting}
+using System.Collections.Generic;
+
+List<string> people = new List<string>() {"Joe", "Nick", "Mike"};
+people += "Tom"; // Error reported during compilation
+var myFriend = "Tom";
+\end{lstlisting}
+\caption{Type annotations in the C\# programming language.}
+\label{img01:csharp_type_anot}
+\end{figure}
 \par
-\info{Compare it with type inference in Rust or Haskell as an example of Hindley-Millner type inference.}
-As an example of advanced type inference, we can mention Rust language \cite{online:rustTypeInference}.
-Although the type system has differences from C\# type system, the type inference is done across multiple statements which is much more powerful than the former one.
-One of those reasons regards specifics of the type system, which enables to use Hindley-Millner type inference \cite{online:yHM}.
-Traditional Hindley-Milner type inference is defined in Hindley-Millner type system \cite{online:wikiHM} which has different characteristics from C\# or Rust.
-Although the most powerful is in that type system, it can be adjusted to work in type systems in already mentioned languages.
+\info{Describe C\# and Rust type inference in context of generics}
+Scenarios where type inference is able to deduce a type vary in strongly typed languages.
+An example can be seen in type arguments deduction of generic methods.
+In the context of C\#, generic method is a method which is parametrized by types besides common parameters as you can find in the code \ref{img02:csharp_infer_meth}.
+Although the type inference deduces type arguments of the first generic method \texttt{Foo}, it fails to deduce type arguments of \texttt{Bar} even it could be possible in this case since we now the return type of the method.
 \par
-\info{Describe C\# specification}
-C\# type inference is a variant of Hindley-Millner type inference and the algorithm can be found in the language specification \cite{online:langSpec}.
-The specification consists of all language features described independently on the compiler implementation.
-As the language evolves, the specification also changes.
-These changes are done publicly on a Github repository \cite{online:langRepo} to offer participation in creating the specification for the outside community.
+\begin{figure}
+\begin{lstlisting}
+Foo("Tom");
+int temp = Bar(); // Error reported during compilation
+
+void Foo<T> (T arg) { ... }
+T Bar<T>() { ... }
+\end{lstlisting}
+\caption{C\# Type inference of generic methods.}
+\label{img02:csharp_infer_meth}
+\end{figure}
 \par
-\info{Describe Roslyn.}
-The current implementation of C\# type inference is contained in Roslyn \cite{online:roslynRepo}.
-Roslyn is an open-source C\# and VB compiler developed by Microsoft and the community.
-Since it is open source, it is possible to investigate and participate in implementing new features to the C\# language.
+When we compare it with an example \ref{img03:rust_infer_meth} demonstrating similar functionality written in Rust language which belongs to strongly type languages too, we can see that Rust's type inference uses the target type to deduce the type arguments.
+\begin{figure}
+\begin{lstlisting}
+fn main() {
+    let elem : Option<u8> = foo(); 
+}
+
+fn foo<T>() -> Option<T> { return None; }
+\end{lstlisting}
+\caption{Rust Type inference of generic methods.}
+\label{img03:rust_infer_meth}
+\end{figure}
 \par
-\info{Mention CSharplang repo, community, and describe a process of accepting lang changes.}
-A common process to make a new possible language feature to be merged into Roslyn is making a proposal and a prototype.
-A proposal is a description of the new feature consisting of motivation, detailed description, needed language specification changes, and other possible alternatives.
-The proposal is published in Github discussions of mentioned repositories where the community can share their opinion.
-If the proposal is promising enough, the language committee will choose it for further discussion.
-The feature is added to the language if \ac{LDM} accepts the proposal.
-After that, the implementation of that feature can be merged into Roslyn.
-During the proposal, a prototype is usually done to demonstrate the feature in wider usage and to explore possible barriers in the implementation.
+\info{Introduce Hindley-Millner type system and type inference as a formalization}
+Type inference capabilities of C\# and Rust can be formalized by Hindley-Millner type inference \cite{online:yHM} used by these languages in modified way.
+Traditional Hindley-Millner type inference is defined in Hindley-Millner type system \cite{online:wikiHM} where it is able to deduce types of all variables in an entirely untyped code.
+The power of type inference is caused by properties of the type system which in comparison with C\# type system doesn't use type inheritance or overloading.
+Despite of these barriers, Hindley-Millner type inference can be modified to work with other type systems like Rust of C\# causing limited use cases, where it can be applied.
 \par
-\info{Goal of this thesis}
-The goal of this thesis is to create a proposal regarding improving C\# type inference in order to offer more power type deductions as we can see in other similar languages.
-To make the proposal more likely to be accepted by the \ac{LDM}, a prototype is created to estimate the level of implementation difficulty in the production C\# compiler.
+\info{Present goal of this part of thesis}
+The first part of thesis aims to explore possible extension of C\# type inference based on Rust's type inference observation and theoretical background given by Hindley-Millner type inference which is used by these languages with modifications.
+
+\section{Implementation}
+
+\info{Describe proposing a new feature}
+C\# is an open-source project where community can contribute by fixing issues of the compiler, propose new language features and elaborate on implementing them.
+Proposing new C\# features is done in public discussions of C\# language repository \cite{online:langRepo} where everyone can add his idea, or comment others' ideas.
+Although there is no required structure how the idea should be described, \ac{LDM} created a template \cite{online:proposalTemplate} containing a base structure for proposing the feature in order to make the idea more likely to be discussed by the team.
+The template consists of motivation, detailed description, needed C\# language specification \citep{online:langSpec} changes, and other possible alternatives.
 \par
-\info{Give an overview of chapters.}
-The first chapter describes the Roslyn compiler together with a theoretical background of type inference.
-The second chapter describes the scope of the language improvements based on community preferences.
-Then, It describes difficulties regarding the architecture of C\# language and the compiler implementation.
-Based on this knowledge, we propose an improvement.
-At the end of this chapter, we propose the improvement and benefits which the improvement brings.
-The third section consists of the architecture design of implementation together with a new type inference algorithm and changes made in the specification.
-The fourth chapter contains an evaluation of the implemented improvement.
-The last chapter discusses possible future features as a continuation and other possible interactions with already existing language features.
+\info{Roslyn}
+Language feature prototypes are implemented in feature branches of Roslyn repository \cite{online:roslynRepo}, which contains an open-source C\# compiler developed by Microsoft and community.
+\par
+\info{Present goal of the second thesis part}
+The process of language proposal ends by \ac{LDM} accepting or declining it.
+The second part of this thesis regards to create the proposal describing our improvement using the prepared template and implement it in in the Roslyn's feature branch.
+\par
+
+\section{Summary}
+
+\info{Goals of this thesis}
+We summarized goals of this thesis in the following list:
+
+\begin{enumerate}
+  \item[G1.] Explore possibilities of type inference in strongly typed languages
+  \item[G2.] Improve C\# type inference based on previous analysis
+  \item[G3.] Create an proposal containing the improvement
+  \item[G4.] Implement the prototype in Roslyn
+\end{enumerate}

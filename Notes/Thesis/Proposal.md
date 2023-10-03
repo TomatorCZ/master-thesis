@@ -17,7 +17,21 @@ Partial type inference introduces a syntax skipping obvious type arguments in th
 
 and allowing to specify just ambiguous ones.
 
+> Example of skipping obvious type arguments
+>
+> ```csharp
+> M<_, object>(42, null); 
+> void M<T1, T2>(T1 t1, T2 t2) { ... }
+> ```
+
 It also improves the type inference in the case of *object_creation_expression* by leveraging type bounds obtained from the target, *object_or_collection_initializer*, and *type_parameter_constraints_clauses*. 
+
+> Example of inferring type arguments of type from the initializer list
+> 
+> ```csharp
+> using System.Collections.Generic;
+> var statistics = new Dictionary<,>(){{"Joe",20}};
+> ```
 
 Besides the changes described above, the proposal mentions further interactions and possibilities to extend the partial type inference.
 

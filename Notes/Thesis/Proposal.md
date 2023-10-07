@@ -30,7 +30,7 @@ It also improves the type inference in the case of *object_creation_expression* 
 > 
 > ```csharp
 > using System.Collections.Generic;
-> var statistics = new Dictionary<,>(){{"Joe",20}};
+> var statistics = new Dictionary<,>(){["Joe"] = 20};
 > ```
 
 Besides the changes described above, the proposal mentions further interactions and possibilities to extend the partial type inference.
@@ -38,15 +38,123 @@ Besides the changes described above, the proposal mentions further interactions 
 ## Motivation
 [motivation]: #motivation
 
-- The current method type inference works as an "all or nothing" principle.
-If the compiler is not able to infer command call type arguments, the user has to specify all of them.
-This requirement can be verbose, noisy, and unnecessary in cases where the compiler can infer almost all type arguments and need just to specify ambiguous ones.
-- The need to hint types to the compiler is influenced by the strength of the type inference which is not as advanced as in other statically-typed languages like Rust or Haskell.
-However, we can't just change the current behavior of the type inference because it would introduce breaking changes.
-What we can do is to introduce improved type inference in places, where it was not before like *object_creation_expression*.
-It is a nice chance to push the type inference to the next level without introducing breaking changes.
-And then wait for the time, when C# would be ready to introduce breaking changes without any major disadvantages.
-- Because there exist types containing many type parameters (especially in frameworks focusing on databases and web), it would be great to add type inference of constructors to save unnecessary specifying the type arguments.
+* The current method type inference has two possible areas for improvement.
+  The first improvement regards the strength of the method type inference, which uses only arguments' types to deduce the method's type arguments.
+  Concretely, we can see the weakness in cases where type arguments only depend on target type or type parameter restrictions.
+
+  > Example
+  >
+  > ```csharp
+  > object data = database.fetch();
+  > int count = data.Field("count"); // Error, method type inference can't infer the return type. We have to specify the type argument.
+  > 
+  > public static class Extensions
+  > {
+  >     public static TReturn Field<TReturn>(this object inst, string fieldName) { ... }
+  > }
+  > ```
+  >
+  > ```csharp
+  > test(new MyData()); // Error, method type inference can't infer T. We have to specify all type arguments.
+  >
+  > public void test<T, U>(U data) where T : TestCaseDefault<U> { ... }
+  > ```
+
+  The second improvement regards the "all or nothing" principle, where the method type inference infers either all of the type arguments or nothing.
+
+  > Example
+  > ```csharp
+  > log<, object>(new Message( ... ), null); // Error, impossible to specify just one type argument. We have to specify all of them. 
+  >
+  > public void log<T, U>(T message, U appendix) { ... }
+  > ```
+
+  The first improvement, which would improve the method type inference algorithm, has a significant disadvantage of the breaking change.
+  On the other hand, the second improvement, which would enable specifying some of the method's type arguments, does not influence old code, solves problems regarding the "all or nothing" principle, and reduces the first weakness.
+  
+  > Example
+  > 
+  > ```csharp
+  > test<TestCaseDefault<MyData>, _>(new MyData()); // We can use _ to mark type arguments which should be inferred by the compiler.
+  >
+  > public void test<T, U>(U data) where T : TestCaseDefault<U> { ... }
+  > ```
+  >
+  > ```csharp
+  > log<_, object>(new Message( ... ), null); // We can use _ to mark type arguments which should be inferred by the compiler.
+  >
+  > public void log<T, U>(T message, U appendix) { ... }
+  > ```
+
+* The next motivation is constructor type inference. 
+  Method type inference is not defined on *object_creation_expression*, prohibiting taking advantage of type inference.
+  We divide use cases into the following categories, where type inference would help the programmer. 
+
+  1. Cases where the method type inference would success.
+   
+  > Example
+  > 
+  > ```csharp
+  > var wrappedData = Create(new MyData());
+  > 
+  > public static Wrapper<T> Create<T>(T item) { return new Wrapper<T>(item); }
+  > 
+  > class Wrapper<T> { public Wrapper(T item) { ... } }
+  > ```
+  
+  2. Cases where the method type inference would be weak. (Using type info from target type, or type arguments' constrains)
+  
+  > Example
+  >
+  > ```csharp
+  > var alg = Create(new MyData()); // Method type inference can't infer TLogger because it doesn't use type constrains specified by `where` clauses
+  > 
+  > public static Algorithm<TData, TLogger> Create<TData, TLogger>(TData data) where TLogger : Logger<TData> { return new Algorithm<TData, TLogger>(data); } 
+  > class Algorithm<TData, TLogger> where TLogger : Logger<TData> { public Algorithm(TData data) { ... }}
+  > ```
+  
+  3. Cases where the method type inference is not defined. (Using type info from initializers)
+  
+  > Example
+  >
+  > ```csharp
+  > var numbers = new List<int>() {1,2,3,4}; // I would like to infer List<T> type argument based on the initializer.
+  > ```
+  
+  4. Other cases
+  
+  > Example
+  > 
+  > ```csharp
+  > new Dictionary<string,string>() {[""] = null}; // The first type argument is unnecessary since we can deduce it from the initializer.
+  > ```
+
+  An existing solution can be seen in `Create()` method wrappers of constructors enabling a type inference through method type inference as you can se in the examples above.
+  However, we can't use it with *object_or_collection_initializer*; we are limited by method type inference strength, and it adds unnecessary boiler code.
+
+  Adding constructor type inference as we will describe in the following section would solve above mentioned examples.
+
+  > Example
+  >
+  > ```csharp
+  > var wrappedData = new Wrapper<>(new MyData);
+  > class Wrapper<T> { public Wrapper(T item) { ... } }
+  > ```
+  > 
+  > ```csharp
+  > var alg = new Algorithm<,>(new MyData());
+  > var algWithSpecialLogger = new Algorithm<_ , SpecialLogger<_>>(new MyData());
+  > 
+  > class Algorithm<TData, TLogger> where TLogger : Logger<TData> { public Algorithm(TData data) { ... }}
+  > ```
+  > 
+  > ```csharp
+  > var numbers = new List<>() {1,2,3,4};
+  > ```
+  > 
+  > ```csharp
+  > new Dictionary<_, string>() {[""] = null};
+  > ```
 
 No matter how the partial type inference would work, we should be careful about the following things.
 
@@ -391,6 +499,10 @@ What other designs have been considered? What is the impact of not doing this?
 
 ## Unresolved questions
 [unresolved]: #unresolved-questions
+
+* Would it be confusing to have the constructor type inference to work differently in subtle ways than the method call type inference ?
+  
+  Potential resolution: We could restrict the power of constructor type inference to use just parameters and initializers which doesn't apear in method call expressions.
 
 * Type inference for arrays
 

@@ -78,44 +78,39 @@ We will see in the following chapters why this feature is one of the barriers to
 
 \subsection{Relevant constructs}
 
-\change{Dynamic}
-\change{Implicit typed lambdas}
-\change{Object creation expression and initializers}
-
-%\par
-%\info{Dynamic}
-%C\# language is one of the languages contained in the .NET ecosystem.
-%One of the goals of this ecosystem is to provide easy interaction with other .NET-compliant languages.
-%Although \ac{CIL} of .NET is strongly typed, there are projects enabling a compilation of dynamically typed language to the \ac{CIL}.
-%C\# \texttt{dynamic} keyword was introduced for interaction with these languages skipping type checking of values marked as \texttt{dynamic}.
-%These values have a type of \texttt{object} and its method or type references are resolved during runtime.
-%\par
-
-
-%\subsection{Other constructs}
-
-%\info{Implicitly typed lambdas}
-%Anonymous functions also known as Lambdas are frequently used language features.
-%Instead of declaring a dedicated method with a signature and a body, it allows to specify just the body with parameters on places, where a function delegate is required.
-%\par
-%\info{initializers}
-%Initializers are used as a shortcut during an object instantiation.
-%The most simple one is an object initializer that allows to assign values to the object's fields in a pleasant way instead of assigning them separately after the initialization.
-%Array initializers are used to create fixed arrays with predefined content.
-%Under the hood, each of the items in the initializer is assigned to the corresponding index of the array after the array creation.
-%Collection initializers are similar to an array initializer defined on collections.
-%Collections are types implementing \texttt{ICollection<T>} interface.
-%One of the interface's declaring methods is \texttt{void Add<T>(T)} with adding semantic.
-%Each type implementing this interface is allowed to use an initializer list in the same manner as an array initializer.
-%It's just a sugar code hiding to call the `Add` method for each item in the initializer list.
+\info{Dynamic}
+C\# type inference mostly happens at compile time, with one exception. 
+We previously mentioned that C\# requires knowing the types of all variables and expressions during compilation. 
+It turned out that the possibility of expressing type, which is unknown at compile time, became crucial for interoperability with other dynamic typed languages. 
+To make the interoperability easier, C\# introduced a dynamic keyword that can be used as an ordinary type, which causes late binding. 
+Internally, the type is \texttt{System.Object}, however, the compiler skips its binding and postpones it to the runtime. 
+This feature creates the exception when type inference happens at runtime, although the compiler still attempts to check expressions containing dynamic values to reveal possible errors. 
+This process will be explained in the following section.
+\unsure{Code example}
+\par
+\info{Implicit typed lambdas}
+The next language construct influencing type inference is an anonymous function, also known as Lambda, which, instead of declaring a dedicated method with a signature and a body, allows to specify only the body with untyped parameters on places where a function delegate is required. 
+Type inference infers its signature based on the surrounding context.
+\unsure{Code example}
+\par
+\info{Object creation expression and initializers}
+The last language feature which will take part in the improved type inference are initializers used as a shortcut during an object instantiation.
+The most simple one is an object initializer that allows to assign values to the object's fields in a pleasant way instead of assigning them separately after the initialization.
+The second type of initializers regard arrays and collections.
+Array initializers are used to create fixed arrays with predefined content.
+Under the hood, each of the items in the initializer is assigned to the corresponding index of the array after the array creation.
+Collection initializers are similar to an array initializer defined on collections which are determined by implementing \texttt{ICollection<T>} interface.
+One of the interface's declaring methods is \texttt{void Add<T>(T)} with adding semantic.
+Each type implementing this interface is allowed to use an initializer list in the same manner as an array initializer.
+It's just a sugar code hiding to call the `Add` method for each item in the initializer list.
+The last type of initializer uses indexer to store referred values on predefined positions.
+\unsure{Code example}
 
 \subsection{Type inference}
 
 \change{Method type inference}
 \change{Array type inference}
 \change{Target-typed inference}
-
-
 
 \section{Roslyn}
 

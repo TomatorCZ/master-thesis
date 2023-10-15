@@ -1,4 +1,4 @@
-\begin{thebibliography}{8}
+\begin{thebibliography}{9}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -19,40 +19,47 @@
   }, {\natexlab{b}}.
 \newblock [Online; accessed 2023-10-8].
 
-\bibitem[onl({\natexlab{c}})]{online:langRepo}
+\bibitem[onl({\natexlab{c}})]{online:csTypeInference}
+{C}\# type inference algorithm.
+\newblock
+  \url{https://github.com/dotnet/csharpstandard/blob/draft-v8/standard/expressions.md
+  }, {\natexlab{c}}.
+\newblock [Online; accessed 2023-10-14].
+
+\bibitem[onl({\natexlab{d}})]{online:langRepo}
 csharplang repository.
-\newblock \url{https://github.com/dotnet/csharplang}, {\natexlab{c}}.
+\newblock \url{https://github.com/dotnet/csharplang}, {\natexlab{d}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{d}})]{online:langSpec}
+\bibitem[onl({\natexlab{e}})]{online:langSpec}
 {C}\# specification.
 \newblock
   \url{https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/readme},
-  {\natexlab{d}}.
+  {\natexlab{e}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{e}})]{online:proposalTemplate}
+\bibitem[onl({\natexlab{f}})]{online:proposalTemplate}
 Proposal template.
 \newblock
   \url{https://github.com/dotnet/csharplang/blob/main/proposals/proposal-template.md},
-  {\natexlab{e}}.
+  {\natexlab{f}}.
 \newblock [Online; accessed 2023-09-30].
 
-\bibitem[onl({\natexlab{f}})]{online:roslynRepo}
+\bibitem[onl({\natexlab{g}})]{online:roslynRepo}
 {R}oslyn repository.
-\newblock \url{https://github.com/dotnet/roslyn}, {\natexlab{f}}.
+\newblock \url{https://github.com/dotnet/roslyn}, {\natexlab{g}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{g}})]{online:wikiHM}
+\bibitem[onl({\natexlab{h}})]{online:wikiHM}
 Hidley-milner type system.
 \newblock
   \url{https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system},
-  {\natexlab{g}}.
+  {\natexlab{h}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{h}})]{online:yHM}
+\bibitem[onl({\natexlab{i}})]{online:yHM}
 {H}idley-{M}ilner type inference.
-\newblock \url{https://www.youtube.com/watch?v=B39eBvapmHY}, {\natexlab{h}}.
+\newblock \url{https://www.youtube.com/watch?v=B39eBvapmHY}, {\natexlab{i}}.
 \newblock [Online; accessed 2023-09-22].
 
 \end{thebibliography}

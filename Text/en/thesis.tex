@@ -37,12 +37,11 @@
 %% Further useful packages (included in most LaTeX distributions)
 \usepackage[titletoc]{appendix}
 \usepackage{amsmath}        % extensions for typesetting of math
+\usepackage{amssymb}
 \usepackage{amsfonts}       % math fonts
 \usepackage{amsthm}         % theorems, definitions, etc.
-\usepackage{bbding}         % various symbols (squares, asterisks, scissors, ...)
 \usepackage{bm}             % boldface symbols (\bm)
 \usepackage{graphicx}       % embedding of pictures
-\usepackage{fancyvrb}       % improved verbatim environment
 \usepackage[numbers]{natbib}         % citation style AUTHOR (YEAR), or AUTHOR [NUMBER]
 \usepackage[nottoc]{tocbibind} % makes sure that bibliography and the lists
 			    % of figures/tables are included in the table
@@ -53,14 +52,9 @@
 \usepackage{xcolor}         % typesetting in color
 \usepackage{acronym}		% abbreviations
 \usepackage{listings}       % code examples
-\lstset
-{
-	frame=tlrb,
-	basicstyle=\ttfamily,
-  	columns=fullflexible,
-  	keepspaces=true,
-	tabsize=4,
-}
+\usepackage{algpseudocode}  % algorithms
+\usepackage{framed}			% algorithms
+\usepackage[font=small,skip=2pt]{caption}	% captions
 
 %%% Basic information on the thesis
 

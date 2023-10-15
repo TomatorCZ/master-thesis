@@ -19,7 +19,7 @@ Taking our example, we can notice redundancy of type annotation \texttt{List<Str
 The use of type inference can be seen in the \texttt{myFriend} variable declaration, where we used the \texttt{var} keyword triggering C\# type inference to determine the variable's type being the type of initializing value, \texttt{System.String} in this case.
 \par
 \begin{figure}
-\begin{lstlisting}
+\begin{lstlisting}[style=csharp]
 using System.Collections.Generic;
 
 List<string> people = new List<string>() {"Joe", "Nick", "Mike"};
@@ -37,7 +37,7 @@ In the context of C\#, a generic method is a method that is parametrized by type
 Although the type inference deduces type arguments of the first generic method \texttt{Foo}, it fails to deduce type arguments of \texttt{Bar} even though it could be possible in this case since we know the method's return type.
 \par
 \begin{figure}
-\begin{lstlisting}
+\begin{lstlisting}[style=csharp]
 Foo("Tom");
 int temp = Bar(); // Error reported during compilation
 
@@ -51,7 +51,7 @@ T Bar<T>() { ... }
 When we compare it with example \ref{img03:rust_infer_meth}, demonstrating similar functionality written in Rust language, which belongs to strongly type languages too, we can see that Rust's type inference uses the target type to deduce the type arguments.
 \par
 \begin{figure}
-\begin{lstlisting}
+\begin{lstlisting}[style=csharp]
 fn main() {
     let elem : Option<u8> = foo(); 
 }

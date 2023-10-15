@@ -34,59 +34,30 @@
 %%% Macros for definitions, theorems, claims, examples, ... (requires amsthm package)
 
 \theoremstyle{plain}
-\newtheorem{thm}{Theorem}
-\newtheorem{lemma}[thm]{Lemma}
-\newtheorem{claim}[thm]{Claim}
-
-\theoremstyle{plain}
 \newtheorem{defn}{Definition}
-
-\theoremstyle{remark}
-\newtheorem*{cor}{Corollary}
-\newtheorem*{rem}{Remark}
-\newtheorem*{example}{Example}
-
-%%% An environment for proofs
-
-\newenvironment{myproof}{
-  \par\medskip\noindent
-  \textit{Proof}.
-}{
-\newline
-\rightline{$\qedsymbol$}
-}
-
-%%% An environment for typesetting of program code and input/output
-%%% of programs. (Requires the fancyvrb package -- fancy verbatim.)
-
-\DefineVerbatimEnvironment{code}{Verbatim}{fontsize=\small, frame=single}
-
-%%% The field of all real and natural numbers
-\newcommand{\R}{\mathbb{R}}
-\newcommand{\N}{\mathbb{N}}
-
-%%% Useful operators for statistics and probability
-\DeclareMathOperator{\pr}{\textsf{P}}
-\DeclareMathOperator{\E}{\textsf{E}\,}
-\DeclareMathOperator{\var}{\textrm{var}}
-\DeclareMathOperator{\sd}{\textrm{sd}}
-
-%%% Transposition of a vector/matrix
-\newcommand{\T}[1]{#1^\top}
-
-%%% Various math goodies
-\newcommand{\goto}{\rightarrow}
-\newcommand{\gotop}{\stackrel{P}{\longrightarrow}}
-\newcommand{\maon}[1]{o(n^{#1})}
-\newcommand{\abs}[1]{\left|{#1}\right|}
-\newcommand{\dint}{\int_0^\tau\!\!\int_0^\tau}
-\newcommand{\isqr}[1]{\frac{1}{\sqrt{#1}}}
 
 %%% Various table goodies
 \newcommand{\pulrad}[1]{\raisebox{1.5ex}[0pt]{#1}}
 \newcommand{\mc}[1]{\multicolumn{1}{c}{#1}}
 
 %%% User defined macros
+
+%%% Code
+\lstset
+{
+	frame=tlrb,
+	basicstyle=\ttfamily,
+  	columns=fullflexible,
+  	keepspaces=true,
+	tabsize=4,
+	captionpos=b,
+}
+
+\lstdefinestyle{csharp}{language=[Sharp]C}
+
+%%% Algorithm
+
+\newcommand{\INDSTATE}[1]{\STATE\hspace{#1\algorithmicindent}}
 
 %%% Cite
 \newcommand{\squarecite}[1]{[\cite{#1}]}

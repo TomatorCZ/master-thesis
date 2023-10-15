@@ -149,103 +149,251 @@ We provide a description of the algorithm \cite{online:csTypeInference} in the f
 The algorithm runs in steps which are repeated until all of type arguments are deduced or fails when there are unsatisfied requirements or not enough information for determining all type arguments.
 Before we show the algorithm, we have to present definitions which are used by the algorithm.
 \par
-%\begin{defn}
-%Fixed/Unfixed, Type variable
-%\label{def01:a}
-%\end{defn}
-%\par
-%\begin{defn}
-%Input type
-%\label{def02:b}
-%\end{defn}
-%\par
-%\begin{defn}
-%Output type
-%\label{def03:c}
-%\end{defn}
-%\par
-%\begin{defn}
-%Dependence
-%\label{def04:d}
-%\end{defn}
-\par
-\begin{figure}
-\begin{framed}
-\textbf{Input:} a method call \texttt{M($\mathtt{E_1, ..., E_x}$)} and its signature\\
-\hspace*{\algorithmicindent} \texttt{$\mathtt{T_e}$ M<$\mathtt{X_1, ..., X_n}$>($\mathtt{T_1 p_1, ..., T_x p_x}$)}\\
-\textbf{Output:} $X_1, ..., X_n$
-\begin{algorithmic}
-\State $B_{lower}, B_{upper}, B_{exact}, F \gets []$
-\State \texttt{FirstPhase()}
-\State \texttt{SecondPhase()}
-\State \textbf{def} FirstPhase:
-\State \ \ \textbf{foreach} $E_i$:
-\State \ \ \ \ \textbf{if} $E_i \in AnonymousFunctions$:
-\State \ \ \ \ \ \ $InferExplicitParameterType(E_i, T_i)$
-\State \ \ \ \ \textbf{if} $E_i\ has\ a\ type\ U$:
-\State \ \ \ \ \ \ \textbf{if} $isValueParameter(p_i)$:
-\State \ \ \ \ \ \ \ \ $InferLowerBound(U, T_i)$
-\State \ \ \ \ \ \ \textbf{elif} $isReferenceParameter(p_i) \vee isOutputParameter(p_i)$:
-\State \ \ \ \ \ \ $InferExact(U, T_i)$
-\State \ \ \ \ \textbf{elif} $isInputParameter(p_i) \wedge isInputArgument(E_i)$:
-\State \ \ \ \ \ \ $InferExact(U, T_i)$
-\State \ \ \ \ \textbf{elif} $isInputParameter(p_i)$:
-\State \ \ \ \ \ \ $InferLowerBound(U, T_i)$
-\State \textbf{def} InferSecondPhase:
-\State \ \ $X_{independent} \gets \forall X_i : F[i] = null \wedge \nexists X_e : DependOn(X_i, X_e)$
-\State \ \ $X_{dependent} \gets \forall X_i\ :\ F[i] = null \wedge (\exists X_e : DependOn(X_e, X_i) \vee B_{lower}[i] \cup B_{exact}[i] \cup B_{upper}[i] \neq empty)$
-\State \ \ \textbf{if} $X_{independent} \neq empty$:
-\State \ \ \ \ \textbf{foreach} $X_s \in X_{independent}$ \textbf{do} $Fix(X_s)$  
-\State \ \ \textbf{elseif $X_{independent} = empty \wedge X_{dependent} \neq empty$}:
-\State \ \ \ \ \textbf{foreach} $X_s \in X_{dependent}$ \textbf{do} $Fix(X_s)$ 
-\State \ \ \textbf{elseif} $X_{independent} \cup X_{dependent} = empty$:
-\State \ \ \ \ $Failed()$
-\State \ \ \textbf{else}:
-\State \ \ \ \ \textbf{foreach} $E_i : \exists X_e : F[e] = null \wedge X_e \in outputTypes(T_i) \wedge X_e \notin inputTypes(T_i)$ \textbf{do} $InferOutputType(E_i, T_i)$ 
-\State \ \ \ \ $goto(17)$
-\end{algorithmic}
-\end{framed}
-\caption{Method type inference: Phases}
+\begin{algorithm}
+\SetKwFunction{FirstPhase}{FirstPhase}
+\SetKwFunction{SecondPhase}{SecondPhase}
+\SetKwFunction{InferExplicitParameterType}{InferExplicitParameterType}
+\SetKwFunction{InferExact}{InferExact}
+\SetKwFunction{InferLowerBound}{InferLowerBound}
+\SetKwFunction{isValueParameter}{isValParam}
+\SetKwFunction{isReferenceParameter}{isRefParam}
+\SetKwFunction{isInputParameter}{isInParam}
+\SetKwFunction{isInputArgument}{isInArg}
+\SetKwFunction{isOutputParameter}{isOutParam}
+\SetKwFunction{Fix}{Fix}
+\SetKwFunction{Failed}{Failed}
+\SetKwFunction{inputTypes}{inTypes}
+\SetKwFunction{outputTypes}{outTypes}
+\SetKwFunction{GoTo}{GoTo}
+\SetKwFunction{InferOutputType}{InferOutputType}
+\SetKwProg{Fn}{fn}{:}{}
+
+\KwIn{a method call \texttt{M($\mathtt{E_1, ..., E_x}$)} and its signature \texttt{$\mathtt{T_e}$ M<$\mathtt{X_1, ..., X_n}$>($\mathtt{T_1 p_1, ..., T_x p_x}$)}}
+\KwOut{$X_1, ..., X_n$}
+$B_{lower}, B_{upper}, B_{exact}, F \gets [\ ]$\;
+\FirstPhase{}\;
+\SecondPhase{}\;
+\Fn{\FirstPhase{}}{
+	\ForEach{$E_i$}{
+		\If{$E_i$ $\in$ AnonymousFuncs}{
+			\InferExplicitParameterType{$E_i, T_i$}
+		}
+		\ElseIf{$E_i$ has a type $U$}{
+			\Switch(\tcc*[h]{At most one case is executed}){$U$}{
+				\lCase{\isValueParameter{$p_i$}}{\InferLowerBound($U, T_i$)}
+				\Case{\isReferenceParameter{$p_i$} $\vee$ \isOutputParameter{$p_i$}}{\InferExact{$U, T_i$}}
+				\Case{\isInputParameter{$p_i$} $\wedge$ \isInputArgument{$E_i$}}{\InferExact{$U, T_i$}}
+				\lCase{\isInputParameter{$p_i$}}{\InferLowerBound{$U, T_i$}}
+			}
+		}
+	}
+}
+\Fn{\SecondPhase{}}{
+	$X_{indep} \gets \forall X_i : F[i] = null \wedge \nexists X_e : dependsOn(X_i, X_e)$\;
+	$X_{dep} \gets \forall X_i\ :\ F[i] = null\ \wedge (\exists X_e : dependsOn(X_e, X_i) \vee B_{lower}[i] \cup B_{exact}[i] \cup B_{upper}[i] \neq empty)$\;
+	\Switch{$X_{indep}$, $X_{dep}$}{
+		\Case{$X_{indep}$ $\neq$ empty}{
+			\lForEach{$X_s$ $\in$ $X_{indep}$}{\Fix{$X_s$}}		
+		}
+		\Case{$X_{indep}$ = empty $\wedge$ $X_{dependent}$ $\neq$ empty}{
+			\lForEach{$X_s$ $\in$ $X_{indep}$}{\Fix{$X_s$}}				
+		}
+		\lCase{$X_{indep}$ $\cup$ $X_{dep}$ = empty}{\Failed{}}
+		\Other{
+			\lForEach{$E_i$ : $\exists$ $X_e$ : F[e] = null $\wedge$ $X_e$ $\in$ \outputTypes{$T_i$} $\wedge$ $X_e$ $\notin$ \inputTypes{$T_i$}}{
+				\InferOutputType{$E_i, T_i$}			
+			}	
+			\GoTo{14}	
+		}
+	}
+}
+\caption{Method Type Inference: Phases}
 \label{img07:methodTypeInference}
-\end{figure}
+\end{algorithm}
 \par
-\begin{figure}
-\begin{framed}
-\begin{algorithmic}[1]
-\State \textbf{def} InferOutputType(E, T):
-\State \ \ \textbf{if} $isAnonymousFunction(E) \wedge (isDelegate(T) \vee isExpressionTree(T))$:
-\State \ \ \ \ $InferLowerBound(InferReturnType(E), getReturnType(T))$:
-\State \textbf{def} InferExplicitParameterType(E, T):
-\State \ \ \textbf{if} $isExplicitlyTypedAonymousFunction(E) \wedge (isDelegate(T) \vee isExpressionTree(T))$:
-\State \ \ \ \ $U_1, ..., U_v \gets getParameterTypes(E)$
-\State \ \ \ \ $V_1, ...,s V_v \gets getParameterTypes(T)$
-\State \ \ \ \ \textbf{foreach} $U_i, V_i$ \textbf{do} $InferExact(U_i, V_i)$ 
-\State \textbf{def} InferExact(U, V):
-\State \ \ \textbf{if} $\exists i : V = X_i \wedge F[i] = null$:
-\State \ \ \ \ $B_{exact}[i].Add(U)$
-\State \ \ \textbf{elif} $V\ is\ $\texttt{$V_1$[...]}$\ \wedge\ U\ is\ $\texttt{$U_1$[...]}$\ \wedge\ V.rank() = U.rank()$:
-\State \ \ \ \ $InferExact(U_1, V_1)$
-\State \ \ \textbf{elif} $V\ is\ $\texttt{$V_1$?}$\ \wedge\ U\ is\ $\texttt{$U_1$}:
-\State \ \ $InferExact(U_1, V_1)$:
-\State \ \ \textbf{elif} $V\ is\ $ \texttt{C<$V_1,...V_n$>}$\ \wedge\ U\ is\ $\texttt{C<$U_1,...U_n$>}:
-\State \ \ \ \ \textbf{foreach} $V_i, U_i$ \textbf{do} $InferExact(U_i, V_i)$
-\State \textbf{def} InferLowerBound(E, T):
-\State \ \ \textbf{if} $\exists i : V = X_i \wedge F[i] = null$:
-\State \ \ \ \ $B_{lower}[i].Add(U)$
-\State \ \ \textbf{elif} $V\ is\ $\texttt{$V_1$?}$\ \wedge\ U\ is\ $\texttt{$U_1$?}:
-\State \ \ \ \ $InferLowerBound(U_1, V_1)$
-\State \ \ \textbf{elif} $V\ is\ $\texttt{$V_1$[...]}$\ \wedge\ U\ is\ $\texttt{$U_1$[...]}$\ \wedge\ V.rank() = U.rank()$:
+\begin{algorithm}
+\SetKwFunction{OverloadResolution}{OverloadResolution}
+\SetKwFunction{InferOutputType}{InferOutputType}
+\SetKwFunction{InferExplicitParameterType}{InferExplicitParameterType}
+\SetKwFunction{InferReturnType}{InferReturnType}
+\SetKwFunction{InferExact}{InferExact}
+\SetKwFunction{InferLower}{InferLower}
+\SetKwFunction{Add}{Add}
+\SetKwProg{Fn}{fn}{:}{}
 
-
-
-
-\State \textbf{def} InferUpperBound(E, T):
-\State \textbf{def} InferReturnType(E, T):
-\end{algorithmic}
-\end{framed}
-\caption{Method type inference: Inferences}
-\end{figure}
+\Fn{\InferOutputType{E, T}}{
+	\Switch{E}{
+		\Case{E $\in$ AnonymousFuncs $\wedge$ T $\in$ DelegateTypes $\cup$ ExprTreeTypes}{
+			\InferLower{\InferReturnType{E}, T.ReturnType}		
+		}
+		\Case{E $\in$ MethGroups $\wedge$ T $\in$ DelegateTypes $\cup$ ExprTreeTypes}{
+			$T_{ret}, T_1,...T_n \gets T.ReturnType, T.ParamTypes$\; 
+			$E_{resolved}$ $\gets$ \OverloadResolution{$E, T_1,...T_n$}\;
+			\If{$\|E_{resolved}\|$ = 1}{
+				\InferLower{$E_{resolved}[1].ReturnType, _{ret}$}			
+			}
+		}
+		\lCase{E $\in$ Expressions $\wedge$ E has a type U}{
+			\InferLower{U, T}
+		}	
+	}
+}
+\Fn{\InferExplicitParameterType{E, T}}{
+	\If{E $\in$ ExplicitlyTypedAnonymousFuncs $\wedge$ T $\in$ DelegateTypes $\cup$ ExprTreeTypes $\wedge$ $\|E.ParamTypes\| = \|T.ParamTypes\|$}{
+		\ForEach{$U_i, V_i$ : $U_i$ $\in$ E.ParamTypes $\wedge$ $V_i$ $\in$ T.ParamTypes}{
+			\InferExact{$U_i, V_i$}		
+		}	
+	}
+}
+\Fn{\InferExact{U, V}}{
+	\lIf{$\exists$ i : V = $X_i$ $\wedge$ F[i] = null }{
+		$B_{exact}[i]$.\Add{U}	
+	}
+	\Switch{V}{
+		\Case{V = $V_1$[...] $\wedge$ U = $U_1$[...] $\wedge$ V.Rank = U.Rank}{
+			\InferExact{$U_1, V_1$}		
+		}
+		\lCase{V = \normalfont\texttt{$V_1$?} $\wedge$ U = $U_1$}{
+			\InferExact{$V_1, U_1$}		
+		}
+		\Case{V = \normalfont\texttt{C<$V_1,...V_e$>} $\wedge$ U = \normalfont\texttt{C<$U_1,...U_e$>}}{
+			\lForEach{$V_i, U_i$}{
+				\InferExact{$V_i, U_i$}
+			}		
+		}
+	}	
+}
+\caption{bla bla}
+\end{algorithm}
 \par
+\begin{algorithm}
+\SetKwFunction{InferExact}{InferExact}
+\SetKwFunction{InferLower}{InferLower}
+\SetKwFunction{InferUpper}{InferUpper}
+\SetKwFunction{isReferenceType}{isRefType}
+\SetKwFunction{Add}{Add}
+\SetKwFunction{IdenticalTo}{IdenticalTo}
+\SetKwFunction{Inherits}{Inherits}
+\SetKwFunction{Implements}{Implements}
+\SetKwFunction{isCovariant}{isCovariant}
+\SetKwFunction{isContravariant}{isContravariant}
+\SetKwFunction{isInvariant}{isInvariant}
+\SetKwProg{Fn}{fn}{:}{}
+
+
+\Fn{\InferLower{U, V}}{
+	\lIf{$\exists$ i : V = $X_i$ $\wedge$ F[i] = null }{
+		$B_{lower}[i]$.\Add{U}	
+	}
+	\Switch{V, U}{
+		\lCase{V = \normalfont\texttt{$V_1$?} $\wedge$ U = \normalfont\texttt{$U_1$?}}{
+			\InferLower{$V_1, U_1$}		
+		}
+		\Case{V = $V_1$[...] $\wedge$ U = $U_1$[...] $\wedge$ V.Rank = U.Rank}{
+			\lIf{\normalfont\texttt{!}\isReferenceType{$U_1$}}{
+				\InferExact{$U_1$, $V_1$}		
+			}
+			\lElse{
+				\InferLower($U_1$, $V_1$)			
+			}
+		}
+		\Case{V $\in$ \{\normalfont\texttt{IEnumerable<$V_1$>}, \normalfont\texttt{ICollection<$V_1$>}, \normalfont\texttt{IReadOnlyCollection<$V_1$>}, \normalfont\texttt{IReadOnlyCollection<$V_1$>}, \normalfont\texttt{IList<$V_1$>}\} $\wedge$ U = $U_1$[ ]}{
+			\lIf{\isReferenceType{$U_1$}}{
+				\InferExact{$U_1$, $V_1$}		
+			}
+			\lElse{
+				\InferLower($U_1$, $V_1$)			
+			}
+		}
+		\Case{V = \normalfont\texttt{C<$V_1, ..., V_e$>} $\wedge$ $\exists!$ \normalfont\texttt{C<$U_1, ..., U_e$>} : \IdenticalTo{U, \normalfont\texttt{C<$U_1, ..., U_e$>}} $\vee$ \Inherits{U, \normalfont\texttt{C<$U_1, ..., U_e$>}} $\vee$ \Implements{U, \normalfont\texttt{C<$U_1, ..., U_e$>}}}{
+			\Switch{${V_i}$}{
+				\lCase{\isCovariant{${V_i}$}}{
+					\InferLower{${U_i}$, ${V_i}$}
+				}
+				\lCase{\isContravariant{${V_i}$}}{
+					\InferUpper{${U_i}$, ${V_i}$}
+				}
+				\lCase{\isInvariant{${V_i}$}}{
+					\InferExact{${U_i}$, ${V_i}$}
+				}			
+			}
+		}
+	}
+}
+\Fn{\InferUpper{U, V}}{
+	\lIf{$\exists$ i : V = $X_i$ $\wedge$ F[i] = null }{
+		$B_{upper}[i]$.\Add{U}	
+	}
+	\Switch{V, U}{
+		\Case{V = \normalfont\texttt{$V_1$?} $\wedge$ U = \normalfont\texttt{$U_1$?}}{
+			\lIf{\normalfont\texttt{!}\isReferenceType{$U_1$}}{
+				\InferExact{$U_1$, $V_1$}		
+			}
+			\lElse{
+				\InferUpper($U_1$, $V_1$)			
+			}
+		}
+		\Case{V = $V_1$[...] $\wedge$ U = $U_1$[...] $\wedge$ V.Rank = U.Rank}{
+			\lIf{\normalfont\texttt{!}\isReferenceType{$U_1$}}{
+				\InferExact{$U_1$, $V_1$}		
+			}
+			\lElse{
+				\InferUpper($U_1$, $V_1$)			
+			}
+		}
+		\Case{U $\in$ \{\normalfont\texttt{IEnumerable<$U_1$>}, \normalfont\texttt{ICollection<$U_1$>}, \normalfont\texttt{IReadOnlyCollection<$U_1$>}, \normalfont\texttt{IReadOnlyCollection<$U_1$>}, \normalfont\texttt{IList<$U_1$>}\} $\wedge$ V = $V_1$[ ]}{
+			\lIf{\isReferenceType{$U_1$}}{
+				\InferExact{$U_1$, $V_1$}		
+			}
+			\lElse{
+				\InferLower($U_1$, $V_1$)			
+			}
+		}
+		\Case{U = \normalfont\texttt{C<$U_1, ..., U_e$>} $\wedge$ $\exists!$ \normalfont\texttt{C<$V_1, ..., V_e$>} : \IdenticalTo{V, \normalfont\texttt{C<$V_1, ..., V_e$>}} $\vee$ \Inherits{V, \normalfont\texttt{C<$V_1, ..., V_e$>}} $\vee$ \Implements{V, \normalfont\texttt{C<$V_1, ..., V_e$>}}}{
+			\Switch{${U_i}$}{
+				\lCase{\isCovariant{${U_i}$}}{
+					\InferUpper{${U_i}$, ${V_i}$}
+				}
+				\lCase{\isContravariant{${U_i}$}}{
+					\InferLower{${U_i}$, ${V_i}$}
+				}
+				\lCase{\isInvariant{${U_i}$}}{
+					\InferExact{${U_i}$, ${V_i}$}
+				}			
+			}
+		}
+	}
+}
+\caption{bla bla}
+\end{algorithm}
+\par
+\begin{algorithm}
+\SetKwFunction{IdenticalTo}{IdenticalTo}
+\SetKwFunction{hasImplicitConversion}{hasImplicitConversion}
+\SetKwFunction{Failed}{Failed}
+\SetKwFunction{Fix}{Fix}
+\SetKwProg{Fn}{fn}{:}{}
+
+\Fn{\Fix{$X_i$}}{
+	$U_{candidates} \gets B_{upper}[i] \cup B_{exact}[i] \cup B_{lower}[i]$\;
+	\ForEach{U ${\in}$ $B_{exact}[i]$}{
+		$U_{candidates}$ -= \{$U_r$ : $U_r$ $\in$ $U_{candidates}$ $\wedge$ \normalfont\texttt{!}\IdenticalTo{$U_r$, U}\}
+	}
+	\ForEach{U ${\in}$ $B_{lower}[i]$}{
+		$U_{candidates}$ -= \{$U_r$ : $U_r$ $\in$ $U_{candidates}$ $\wedge$ \normalfont\texttt{!}\hasImplicitConversion{U, $U_r$}\}
+	}
+	\ForEach{U ${\in}$ $B_{upper}[i]$}{
+		$U_{candidates}$ -= \{$U_r$ : $U_r$ $\in$ $U_{candidates}$ $\wedge$ \normalfont\texttt{!}\hasImplicitConversion{$U_r$, U}\}
+	}
+	\lIf{$\exists!$ V : V $\in$ $U_{candidates}$ $\wedge$ $\forall$ $U_e$ $\in$ $U_{candidates}$ : \hasImplicitConversion{$U_e, V$}}{
+		F[i] = V
+	}
+	\lElse{
+		Failed()
+	}
+}
+\caption{bla bla}
+\end{algorithm}
 \info{Array type inference}
 The third type inference happens in array initializers when the type of the array should be deduced from the initializer list.
 We can see an example of situation, when the type inference is used for determining \texttt{myArray} type in the following code \ref{img08:arrayTypeInference}.

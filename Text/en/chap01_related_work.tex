@@ -110,10 +110,9 @@ The last type of initializer uses indexer to store referred values on predefined
 
 \info{Introduce kinds of type inferences}
 \info{Method type inference}
-There are many contexts, where type inference occurs in C\#.
-We mention five contexts which will regard our improvement.
-The first one regards \texttt{var} keyword which is used in the variable declaration as we can see in the code \ref{img09:var}.
-It lets the compiler decide the type of variable based on type of initializing value which implicates that we can't use the keyword in declarations without initializing value.
+C\# type inference occurs in many contexts. 
+However, we mention only these related to our improvement described in the following sections. 
+One of the most simple occurrences regards the \texttt{var} keyword, which is used in the variable declaration, as we can see in code \ref{img09:var}. It lets the compiler decide the type of variable based on the type of initializing value, which implies that we can’t use the keyword in declarations without initializing the value.
 \par
 \begin{figure}
 \begin{lstlisting}[style=csharp]
@@ -123,12 +122,12 @@ var myVariable = "string";
 \label{img09:var}
 \end{figure}
 \par
-The second type inference and the most complex one is the method type inference used during generic method call binding when type arguments are not given.
-We can see a situation when the method type inference deduces \texttt{System.String}, \texttt{System.Int32} and \texttt{System.Int32} as type arguments of the \texttt{MyMethod} method in the following code \ref{img06:typeInference}.
-We can notice several tasks, which the type inference has to be capable of.
-Regarding \texttt{T1} type parameter, the type inference has to find common type between  the first and the second type parameter.
-Regarding \texttt{T2} type parameter, the type inference has go into type arguments of generic type of parameter and the argument, check if the type are compatible and then match the type parameter against type argument of the third parameter.
-The most challenging are lamdas, which it's return type has to be inferred after all arguments of that lambda are inferred. 
+The most interesting and complex context is the method type inference used during generic method call binding when type arguments are not given. 
+We can see a situation when the method type inference deduces \texttt{System.String}, \texttt{System.Int32} and \texttt{System.Int32} as type arguments of the \texttt{MyMethod} method in the following code \ref{img06:typeInference}. 
+We can notice several tasks that the type inference has to be capable of.
+Regarding the \texttt{T1} type parameter, the inference has to find a common type between the first and the second type parameters. 
+Regarding the \texttt{T2} type parameter, the type inference has to go into type arguments of the generic type of parameter and the argument, check if the types are compatible, and then match the type parameter against the type argument of the third parameter. 
+The most challenging is lamdas, whose return type has to be inferred after all lambda argument types are inferred.
 \par
 \begin{figure}
 \begin{lstlisting}[style=csharp]
@@ -144,10 +143,29 @@ class Helper {
 \label{img06:typeInference}
 \end{figure}
 \par
-As you can see, the method type inference is a complex process containing many several steps.
-We provide a description of the algorithm \cite{online:csTypeInference} in the following figure \ref{img07:methodTypeInference} with high-level explanation of its steps.
+As we can see, the method type inference is a complex process containing many steps.
+Since one of our improvement is adjusting the algorithm, we present its complete description.
+The algorithm is divided into four sections to better explain its functionality.
+Before we show schema, we have to present definitions which are used by the algorithm.
+\par
+\unsure{Create citations}
+\begin{defn}[Fixed type variables, bounds]
+We call inferred type parameters \emph{type variables} which are at the beginning of the algorithm unknown, \emph{unfixed}. 
+During the algorithm, they start to be restricted by sets of \emph{bounds}.
+The type variable becomes \emph{fixed} when the its actual type is determined using its \emph{bounds}.
+\end{defn}
+\begin{defn}[Input/Output types]
+If \texttt{E} is a method group or anonymous function and \texttt{T} is a delegate or expression tree type, then return type of \texttt{T} is an \emph{output type} of \texttt{E}.
+If \texttt{E} is a method group or implicitly typed anonymous function, then all the parameter types of \texttt{T} are \emph{input types} of \texttt{E}. 
+\end{defn}
+\par
+\begin{defn}[Dependence]
+An unfixed type variable \texttt{$X_i$} \emph{depends directly on} an unfixed type variable \texttt{$X_e$} if for some argument \texttt{E} \texttt{$X_e$} occurs in an input type of \texttt{E} and \texttt{$X_i$} occurs in an output type of \texttt{E}.
+\texttt{$X_i$} \emph{depends on} \texttt{$X_e$} is the transitive but not reflexive closure of \emph{depends directly on}.
+\end{defn}
+\par
+\info{Algorithm description}
 The algorithm runs in steps which are repeated until all of type arguments are deduced or fails when there are unsatisfied requirements or not enough information for determining all type arguments.
-Before we show the algorithm, we have to present definitions which are used by the algorithm.
 \par
 \begin{algorithm}
 \SetKwFunction{FirstPhase}{FirstPhase}
@@ -207,8 +225,8 @@ $B_{lower}, B_{upper}, B_{exact}, F \gets [\ ]$\;
 		}
 	}
 }
-\caption{Method Type Inference: Phases}
-\label{img07:methodTypeInference}
+\caption{Phases of Method Type Inference}
+\label{alg01:methodTypeInference1}
 \end{algorithm}
 \par
 \begin{algorithm}
@@ -263,7 +281,8 @@ $B_{lower}, B_{upper}, B_{exact}, F \gets [\ ]$\;
 		}
 	}	
 }
-\caption{bla bla}
+\caption{\textit{Output type inference}, \textit{Explicit parameter type inference}, \textit{Exact inference}}
+\label{alg02:methodTypeInference2}
 \end{algorithm}
 \par
 \begin{algorithm}
@@ -364,7 +383,8 @@ $B_{lower}, B_{upper}, B_{exact}, F \gets [\ ]$\;
 		}
 	}
 }
-\caption{bla bla}
+\caption{\textit{Upper-bound inference}, \textit{Lower-bound inference}}
+\label{alg02:methodTypeInference2}
 \end{algorithm}
 \par
 \begin{algorithm}
@@ -392,7 +412,8 @@ $B_{lower}, B_{upper}, B_{exact}, F \gets [\ ]$\;
 		Failed()
 	}
 }
-\caption{bla bla}
+\caption{Fixing of type variables}
+\label{alg03:methodTypeInference3}
 \end{algorithm}
 \info{Array type inference}
 The third type inference happens in array initializers when the type of the array should be deduced from the initializer list.

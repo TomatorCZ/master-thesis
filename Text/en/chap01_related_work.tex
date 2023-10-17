@@ -251,7 +251,21 @@ $B_{lower}, B_{upper}, B_{exact}, F \gets [\ ]$\;
 \label{alg01:methodTypeInference1}
 \end{algorithm}
 \par
-\change{Describe infer output type, infer explicit parameter type}
+\info{Describe infer output type}
+Algorithm \ref{alg02:methodTypeInference2} contains definitions of three inferences used in the first and second phase.
+\texttt{InferOutputType()} infers return types of parameter types which are delegates or expression trees.
+We can notice two situations where the first one takes care of arguments which are lambdas and the second one deals with method groups which represents a reference to a method by specifying its name, and possible type arguments without arguments.
+Because method name can refer to multiple methods, we call it a method group.
+We can see two undefined method used to achieve the inference above.
+\texttt{InferReturnType()} utilizes already known types of lambdas argument to infer its return type.
+\texttt{OverloadResolution} finds suitable method, which is referred to infer return type of that method. 
+\par
+\info{Describe infer explicit parameter type}
+\texttt{ExplicitParamterType()} method is used when an argument is explicitly typed anonymous function where we can used the given parameter types to get information about type variables contained in a parameter of delegate or expression tree type.
+\par
+\info{Describe infer exact}
+\texttt{InferExact()} is one of the three inferences which adds new bounds to type variables' bound sets.
+Basically it finds arguments types with corresponding parameter types and adds these types to the bounds when they matches type variables as we can see at line 16.
 \par
 \begin{algorithm}
 \SetKwFunction{OverloadResolution}{OverloadResolution}
@@ -309,7 +323,11 @@ $B_{lower}, B_{upper}, B_{exact}, F \gets [\ ]$\;
 \label{alg02:methodTypeInference2}
 \end{algorithm}
 \par
-\change{Describe infer exact, lower, upper}
+\info{Describe infer lower, upper}
+The algorithm \ref{alg03:methodTypeInference3} shows remaining two inferences adding types to lower, and upper bounds.
+We can see various conditions testing corresponding types between arguments and parameters.
+The interesting fact about adding new bounds is no need to check possible contradictions which are checked in type variable fixation.
+The second point which will be important for us in the following sections is absence of unfixed type variables in bound sets making the algorithm easier for implementation.
 \par
 \begin{algorithm}
 \SetKwFunction{InferExact}{InferExact}
@@ -410,7 +428,7 @@ $B_{lower}, B_{upper}, B_{exact}, F \gets [\ ]$\;
 	}
 }
 \caption{\textit{Upper-bound inference}, \textit{Lower-bound inference}}
-\label{alg02:methodTypeInference2}
+\label{alg03:methodTypeInference3}
 \end{algorithm}
 \par
 \change{Fix}
@@ -441,7 +459,7 @@ $B_{lower}, B_{upper}, B_{exact}, F \gets [\ ]$\;
 	}
 }
 \caption{Fixing of type variables}
-\label{alg03:methodTypeInference3}
+\label{alg04:methodTypeInference4}
 \end{algorithm}
 \info{Array type inference}
 The third type inference happens in array initializers when the type of the array should be deduced from the initializer list.

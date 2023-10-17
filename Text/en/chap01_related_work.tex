@@ -165,7 +165,25 @@ An unfixed type variable \texttt{$X_i$} \emph{depends directly on} an unfixed ty
 \end{defn}
 \par
 \info{Algorithm description}
-The algorithm runs in steps which are repeated until all of type arguments are deduced or fails when there are unsatisfied requirements or not enough information for determining all type arguments.
+Method type inference process starts with receiving arguments of a method call and the method's signature which type parameters has to deduce as we can see in the first schema \ref{alg01:methodTypeInference1}.
+The algorithm has two phases where the first phase initializes initial bounds' sets of type variables(inferred type arguments) and the second phase repeats until all type variables are fixed or fails if there is not enough information to deduce it.
+Each type variable has three type of bounds. 
+Exact bound consists of types which has to be identical to the type variable meaning that they can convert to each other.
+Lower bound contains types which has to be convertible to the type variable and Upper bound is opposite to it.
+\info{The first phase description}
+The first phase iterates over provided arguments and chooses the right set where to add the type of the argument by calling helper functions based on several conditions.
+We suppose the reader has knowledge of C\# language so we quickly mention used functions contained in the conditions for clarifying meant constructs of parameters and arguments.
+\texttt{isValParam()} and \texttt{isRefParam()} functions determine if the parameter is passed by value or by reference.
+There are also \texttt{isInParam()}, \texttt{isOutParam()}, \texttt{isInArg()} referring to use of \texttt{in} and \texttt{out} keyword in parameter declarations and \texttt{in} keyword in argument position.
+\info{The second phase description}
+The second phase happens iteratively respecting \textit{depends on} relation.
+Each iteration has two goals.
+The first one is fixation of at least one type variable.
+If there is no type variable to fix because either all type variables are fixed or there are no other type bounds which could be used for type variable deduction, the phases and algorithm ends.
+The sets \texttt{$X_{indep}$} and \texttt{$X_{dep}$} referring to type variables, which can be fix in the current iteration.
+Line 24 contains a case ending the algorithm when all type variables are fixed or there is no way how to infer next ones.
+The second goal checks for output types, which where dependent on input types where the last unfixed types were fixed in this iteration, and infers them.
+We can see respecting order of inferring return type of anonymous functions at line 29 where we are inferring return type of lambdas when all type variables contained in parameter list are fixed.
 \par
 \begin{algorithm}
 \SetKwFunction{FirstPhase}{FirstPhase}
@@ -180,6 +198,7 @@ The algorithm runs in steps which are repeated until all of type arguments are d
 \SetKwFunction{isOutputParameter}{isOutParam}
 \SetKwFunction{Fix}{Fix}
 \SetKwFunction{Failed}{Failed}
+\SetKwFunction{Return}{Return}
 \SetKwFunction{inputTypes}{inTypes}
 \SetKwFunction{outputTypes}{outTypes}
 \SetKwFunction{GoTo}{GoTo}
@@ -216,18 +235,23 @@ $B_{lower}, B_{upper}, B_{exact}, F \gets [\ ]$\;
 		\Case{$X_{indep}$ = empty $\wedge$ $X_{dependent}$ $\neq$ empty}{
 			\lForEach{$X_s$ $\in$ $X_{indep}$}{\Fix{$X_s$}}				
 		}
-		\lCase{$X_{indep}$ $\cup$ $X_{dep}$ = empty}{\Failed{}}
+		\Case{$X_{indep}$ $\cup$ $X_{dep}$ = empty}{
+		\lIf{$\exists X_k$ : F[k] = null}{\Failed{}}
+		\lElse{\Return{F[0], ..., F[n]}}
+		}
 		\Other{
-			\lForEach{$E_i$ : $\exists$ $X_e$ : F[e] = null $\wedge$ $X_e$ $\in$ \outputTypes{$T_i$} $\wedge$ $X_e$ $\notin$ \inputTypes{$T_i$}}{
+			\lForEach{$E_i$ : $\exists$ $X_e$ : F[e] = null $\wedge$ $X_e$ $\in$  \outputTypes{$T_i$} $\wedge$ $\nexists$ $X_k$ : F[k] = null $\wedge$ $X_k$ $\in$ \inputTypes{$T_i$}}{
 				\InferOutputType{$E_i, T_i$}			
 			}	
-			\GoTo{14}	
+			\GoTo{\normalfont\texttt{16}}	
 		}
 	}
 }
 \caption{Phases of Method Type Inference}
 \label{alg01:methodTypeInference1}
 \end{algorithm}
+\par
+\change{Describe infer output type, infer explicit parameter type}
 \par
 \begin{algorithm}
 \SetKwFunction{OverloadResolution}{OverloadResolution}
@@ -284,6 +308,8 @@ $B_{lower}, B_{upper}, B_{exact}, F \gets [\ ]$\;
 \caption{\textit{Output type inference}, \textit{Explicit parameter type inference}, \textit{Exact inference}}
 \label{alg02:methodTypeInference2}
 \end{algorithm}
+\par
+\change{Describe infer exact, lower, upper}
 \par
 \begin{algorithm}
 \SetKwFunction{InferExact}{InferExact}
@@ -386,6 +412,8 @@ $B_{lower}, B_{upper}, B_{exact}, F \gets [\ ]$\;
 \caption{\textit{Upper-bound inference}, \textit{Lower-bound inference}}
 \label{alg02:methodTypeInference2}
 \end{algorithm}
+\par
+\change{Fix}
 \par
 \begin{algorithm}
 \SetKwFunction{IdenticalTo}{IdenticalTo}

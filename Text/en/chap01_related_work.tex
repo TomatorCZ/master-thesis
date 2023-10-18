@@ -431,7 +431,12 @@ The second point which will be important for us in the following sections is abs
 \label{alg03:methodTypeInference3}
 \end{algorithm}
 \par
-\change{Fix}
+\info{Fix}
+The last part of this algorithm is type variable fixation shown in the algorithm \ref{alg04:methodTypeInference4}.
+At the beginning, we construct a set of candidates for the type variable by collecting all its bounds.
+Then, we go through each bounds and removes the candidates which don't satisfy the bound's restriction.
+If there are more than one candidates left, we try to find unique type, which is identical to all left candidates.
+The fixation is successful if get the candidate and type variable is fixed to that type.
 \par
 \begin{algorithm}
 \SetKwFunction{IdenticalTo}{IdenticalTo}
@@ -492,7 +497,6 @@ As we mentioned in the previous section, \texttt{dynamic} keyword is used to ena
 Because of late binding, the compiler can't check instance method calling at compile time to prevent type errors at runtime.
 However, there are situations, where the compiler can partial type check expressions like method calls.
 You can see a situation, where despite of late-binding there is an obvious error where we try to pass arguments with \texttt{System.Int32} and \texttt{System.String} types to parameters with the same type.
-Method type inference as we presented doesn't allow to infer \texttt{System.Object} when at least one bound doesn't contains that type causing type inference error at runtime.
 To prevent these situations, where error are not related to dynamic values, the compiler tries to infer the types ignoring the dynamic values.
 In case of type conflicts in the variable's bounds, the error is announced at compile time instead of runtime.
 \par

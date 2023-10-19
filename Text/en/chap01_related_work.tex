@@ -134,7 +134,7 @@ class Helper {
 \info{Method type inference}
 C\# type inference occurs in many contexts. 
 However, we mention only these related to our improvement described in the following sections. 
-One of the most simple occurrences regards the \texttt{var} keyword, which is used in the variable declaration, as we can see on the first line in code \ref{img55:typeConst}. It lets the compiler decide the type of variable based on the type of initializing value, which implies that we can’t use the keyword in declarations without initializing the value.
+One of the most simple occurrences regards the \texttt{var} keyword, used in the variable declaration, as seen on the first line in code \ref{img55:typeConst}. It lets the compiler decide the type of variable based on the type of initializing value, which implies that we can’t use the keyword in declarations without initializing the value.
 \par
 The most interesting and complex context is the method type inference used during generic method call binding when type arguments are not given. 
 We can see a situation when the method type inference deduces \texttt{System.String}, \texttt{System.Int32} and \texttt{System.Int32} as type arguments of the \texttt{MyMethod} method on line 4 in our code example \ref{img55:typeConst}. 
@@ -144,9 +144,9 @@ Regarding the \texttt{T2} type parameter, the type inference has to go into type
 The most challenging is Lamdas, whose return type has to be inferred after all lambda argument types are inferred.
 \par
 As we can see, the method type inference is a complex process containing many steps.
-Since one of our improvement is adjusting the algorithm, we present its complete description.
-The algorithm is divided into four sections to better explain its functionality.
-Before we show schema, we have to present definitions which are used by the algorithm.
+Since one of our improvements is adjusting the algorithm, we present its complete description.
+The algorithm is divided into four sections to explain its functionality better.
+Before we show schema, we have to present definitions that are used by the algorithm.
 \par
 \unsure{Create citations}
 \begin{defn}[Fixed type variables, bounds]
@@ -168,11 +168,11 @@ An unfixed type variable \texttt{$X_i$} \emph{depends directly on} an unfixed ty
 \end{defn}
 \par
 \info{Algorithm description}
-Method type inference process starts with receiving arguments of a method call and the method's signature which type parameters has to deduce as we can see in the first schema \ref{alg01:methodTypeInference1}.
-The algorithm has two phases where the first phase initializes initial bounds' sets of type variables(inferred type arguments) and the second phase repeats until all type variables are fixed or fails if there is not enough information to deduce it.
-Each type variable has three type of bounds. 
-Exact bound consists of types which has to be identical to the type variable meaning that they can convert to each other.
-Lower bound contains types which has to be convertible to the type variable and Upper bound is opposite to it.
+The method type inference process starts with receiving arguments of a method call and the method's signature, which type parameters have to be deduced, as we can see in the first schema \ref{alg01:methodTypeInference1}.
+The algorithm has two phases where the first phase initializes initial bounds' sets of type variables(inferred type arguments), and the second phase repeats until all type variables are fixed or fails if there is insufficient information to deduce it.
+Each type variable has three types of bounds. 
+The exact bound consists of types, which have to be identical to the type variable, meaning that they can be converted to each other.
+The lower bound contains types that have to be convertible to the type variable, and the upper bound is opposite to it. 
 \par
 \begin{algorithm}
 \SetKwFunction{FirstPhase}{FirstPhase}
@@ -242,34 +242,33 @@ $B_{lower}, B_{upper}, B_{exact}, F \gets [\ ]$\;
 \par
 \info{The first phase description}
 The first phase iterates over provided arguments and chooses the right set where to add the type of the argument by calling helper functions based on several conditions.
-We suppose the reader has knowledge of C\# language so we quickly mention used functions contained in the conditions for clarifying meant constructs of parameters and arguments.
+We suppose the reader has knowledge of C\# language, so we quickly mention used functions contained in the conditions for clarifying meant constructs of parameters and arguments.
 \texttt{isValParam()} and \texttt{isRefParam()} functions determine if the parameter is passed by value or by reference.
-There are also \texttt{isInParam()}, \texttt{isOutParam()}, \texttt{isInArg()} referring to use of \texttt{in} and \texttt{out} keyword in parameter declarations and \texttt{in} keyword in argument position.
+There are also \texttt{isInParam()}, \texttt{isOutParam()}, \texttt{isInArg()} referring to the use of \texttt{in} and \texttt{out} keywords in parameter declarations and \texttt{in} keyword in the argument position.
 \info{The second phase description}
-The second phase happens iteratively respecting \textit{depends on} relation.
+The second phase happens iteratively, respecting \textit{depends on} relation.
 Each iteration has two goals.
-The first one is fixation of at least one type variable.
+The first one is the fixation of at least one type variable.
 If there is no type variable to fix because either all type variables are fixed or there are no other type bounds which could be used for type variable deduction, the phases and algorithm ends.
-The sets \texttt{$X_{indep}$} and \texttt{$X_{dep}$} referring to type variables, which can be fix in the current iteration.
-Line 24 contains a case ending the algorithm when all type variables are fixed or there is no way how to infer next ones.
-The second goal checks for output types, which where dependent on input types where the last unfixed types were fixed in this iteration, and infers them.
-We can see respecting order of inferring return type of anonymous functions at line 29 where we are inferring return type of lambdas when all type variables contained in parameter list are fixed.
+The sets \texttt{$X_{indep}$} and \texttt{$X_{dep}$} refer to type variables, which can be fixed in the current iteration.
+Line 24 contains a case ending the algorithm when all type variables are fixed, or there is no way to infer the next ones.
+The second goal checks for output types, dependent on input types where the last unfixed types were fixed in this iteration, and infers them.
+We can see respecting the order of inferring the return type of anonymous functions at line 29, where the return type of lambdas is inferred if all type variables contained in the parameter list are fixed.
 \par
 \info{Describe infer output type}
-Algorithm \ref{alg02:methodTypeInference2} contains definitions of three inferences used in the first and second phase.
-\texttt{InferOutputType()} infers return types of parameter types which are delegates or expression trees.
-We can notice two situations where the first one takes care of arguments which are lambdas and the second one deals with method groups which represents a reference to a method by specifying its name, and possible type arguments without arguments.
-Because method name can refer to multiple methods, we call it a method group.
-We can see two undefined method used to achieve the inference above.
+Algorithm \ref{alg02:methodTypeInference2} contains definitions of three inferences used in the first and second phases.
+\texttt{InferOutputType()} infers return types of parameter types, which are delegates or expression trees.
+We can notice two situations where the first one takes care of arguments, which are Lambdas, and the second deals with method groups with possible type arguments. 
+We can see two undefined methods used to achieve the inference above.
 \texttt{InferReturnType()} utilizes already known types of lambdas argument to infer its return type.
-\texttt{OverloadResolution} finds suitable method, which is referred to infer return type of that method. 
+\texttt{OverloadResolution} tries resolving a method group to one method in order to infer the return type of that method.
 \par
 \info{Describe infer explicit parameter type}
-\texttt{ExplicitParamterType()} method is used when an argument is explicitly typed anonymous function where we can used the given parameter types to get information about type variables contained in a parameter of delegate or expression tree type.
+\texttt{ExplicitParamterType()} method is used when an argument is explicitly typed anonymous function where the given parameter types are used to get information about type variables contained in a parameter of delegate or expression tree type.
 \par
 \info{Describe infer exact}
 \texttt{InferExact()} is one of the three inferences which adds new bounds to type variables' bound sets.
-Basically it finds arguments types with corresponding parameter types and adds these types to the bounds when they matches type variables as we can see at line 16.
+Basically, it finds arguments' types with corresponding parameter types and adds these types to the bounds when they match type variables as we can see at line 16.
 \par
 \begin{algorithm}
 \SetKwFunction{OverloadResolution}{OverloadResolution}
@@ -328,10 +327,10 @@ Basically it finds arguments types with corresponding parameter types and adds t
 \end{algorithm}
 \par
 \info{Describe infer lower, upper}
-The algorithm \ref{alg03:methodTypeInference3} shows remaining two inferences adding types to lower, and upper bounds.
-We can see various conditions testing corresponding types between arguments and parameters.
-The interesting fact about adding new bounds is no need to check possible contradictions which are checked in type variable fixation.
-The second point which will be important for us in the following sections is absence of unfixed type variables in bound sets making the algorithm easier for implementation.
+Algorithm \ref{alg03:methodTypeInference3} shows remaining two inferences, adding types to lower and upper bounds.
+We can see various conditions testing corresponding types between arguments and parameters. 
+An interesting fact about adding new bounds is that there is no need to check possible contradictions, which are checked in type variable fixation. 
+The second point that will be important for us in the following sections is the absence of unfixed type variables in bound sets, making the algorithm easier for implementation.
 \par
 \begin{algorithm}
 \SetKwFunction{InferExact}{InferExact}
@@ -436,11 +435,12 @@ The second point which will be important for us in the following sections is abs
 \end{algorithm}
 \par
 \info{Fix}
-The last part of this algorithm is type variable fixation shown in the algorithm \ref{alg04:methodTypeInference4}.
-At the beginning, we construct a set of candidates for the type variable by collecting all its bounds.
-Then, we go through each bounds and removes the candidates which don't satisfy the bound's restriction.
-If there are more than one candidates left, we try to find unique type, which is identical to all left candidates.
-The fixation is successful if get the candidate and type variable is fixed to that type.
+The last part of this algorithm is type variable fixation, shown in algorithm  \ref{alg04:methodTypeInference4}.
+At the beginning, a set of candidates for the type variable is constructed by collecting all its bounds. 
+Then, we go through each bounds and remove the candidates which do not satisfy the bound’s restriction. 
+If there is more than one candidate left, we try to find a unique type that is identical to all left candidates.
+The fixation is successful if the candidate is found.
+The type variable is fixed to that type.
 \par
 \begin{algorithm}
 \SetKwFunction{IdenticalTo}{IdenticalTo}
@@ -472,12 +472,12 @@ The fixation is successful if get the candidate and type variable is fixed to th
 \end{algorithm}
 \info{Array type inference}
 The third type inference happens in array initializers when the type of the array should be deduced from the initializer list.
-We can see an example of situation, when the type inference is used for determining \texttt{myArray} type on the first line in our code example \ref{img55:typeConst}.
-The most specialized common type is just adjusted already mentioned type inference algorithm where is just one type parameter and all initializer items are lower bounds of that type variable.
+We can see an example of a situation when the type inference is used for determining \texttt{myArray} type on the first line in our code example \ref{img55:typeConst}.
+The most specialized common type is just adjusted already mentioned type inference algorithm where there is just one type parameter, and all initializer items are lower bounds of that type variable.
 \par
 \info{Target-typed inference}
 The last kind of type inference, which we mention, regards inference based on target type.
-The example of these situations can be seen on the second line of our example \ref{img55:typeConst} where we use target-typed \texttt{new()} operator allowing to skipping creating type which is provided by the target type, variable type in this case.
+An example of these situations can be seen on the second line of our example \ref{img55:typeConst} where we use target-typed \texttt{new()} operator, allowing us to skip creating type, which is provided by the target type, variable type, in this case.
 
 \section{Roslyn}
 

@@ -78,33 +78,55 @@ We will see in the following chapters why this feature is one of the barriers to
 
 \subsection{Relevant constructs}
 
+For this and the following section, we use the code example \ref{img55:typeConst} to better demonstrate the constructs and type inference.
+\par
 \info{Dynamic}
 C\# type inference mostly happens at compile time, with one exception. 
 We previously mentioned that C\# requires knowing the types of all variables and expressions during compilation. 
 It turned out that the possibility of expressing type, which is unknown at compile time, became crucial for interoperability with other dynamic typed languages. 
-To make the interoperability easier, C\# introduced a dynamic keyword that can be used as an ordinary type, which causes late binding. 
-Internally, the type is \texttt{System.Object}, however, the compiler skips its binding and postpones it to the runtime. 
-This feature creates the exception when type inference happens at runtime, although the compiler still attempts to check expressions containing dynamic values to reveal possible errors. 
-This process will be explained in the following section.
-\unsure{Code example}
+To make the interoperability easier, C\# introduced a dynamic keyword that can be used as an ordinary type, which causes late binding of all expressions containing the dynamic value.
+We can see an usage of the \texttt{dynamic} keyword on line 6 in the figure \ref{img55:typeConst} where we can notice the late binding on line 7 which doesn't cause a compile time error even the referring value doesn't define any method with the name \texttt{Foo}.
+Internally, the type is \texttt{System.Object}, however, the compiler skips its binding and postpones it to the runtime.
+Although the mentioned error on line 7 occurs at runtime, the compiler still attempts to check certain expressions containing dynamic values to reveal possible errors at compile time as we can see on line 8 where an error regarding of passing \texttt{System.String} to \texttt{System.Int} occurs during compilation.
 \par
 \info{Implicit typed lambdas}
-The next language construct influencing type inference is an anonymous function, also known as Lambda, which, instead of declaring a dedicated method with a signature and a body, allows to specify only the body with untyped parameters on places where a function delegate is required. 
+The next language construct influencing type inference is an anonymous function, also known as Lambda, which, instead of declaring a dedicated method with a signature and a body, allows to specify only the body with untyped parameters on places where a function delegate is required.
+We can see an example of Lambda expression on line 4 in the figure \ref{img55:typeConst} where we pass it as the fourth argument. 
 Type inference infers its signature based on the surrounding context.
-\unsure{Code example}
 \par
 \info{Object creation expression and initializers}
 The last language feature which will take part in the improved type inference are initializers used as a shortcut during an object instantiation.
 The most simple one is an object initializer that allows to assign values to the object's fields in a pleasant way instead of assigning them separately after the initialization.
 The second type of initializers regard arrays and collections.
-Array initializers are used to create fixed arrays with predefined content.
+Array initializers are used to create fixed arrays with predefined content as we can see on the first line of our example \ref{img55:typeConst} where we create an array of \texttt{System.Object} with two items.
 Under the hood, each of the items in the initializer is assigned to the corresponding index of the array after the array creation.
 Collection initializers are similar to an array initializer defined on collections which are determined by implementing \texttt{ICollection<T>} interface.
 One of the interface's declaring methods is \texttt{void Add<T>(T)} with adding semantic.
 Each type implementing this interface is allowed to use an initializer list in the same manner as an array initializer.
 It's just a sugar code hiding to call the `Add` method for each item in the initializer list.
 The last type of initializer uses indexer to store referred values on predefined positions.
-\unsure{Code example}
+\par
+\begin{figure}
+\begin{lstlisting}[style=csharpN]
+var myArray = new [] {new object(), "string"};
+List<int> myList = new();
+
+Helper.Method2((long)1, (int)1, myList, (p1) => p1 + 1);
+
+dynamic dynamicValue = "string";
+dynamicValue.Foo();
+Helper.Method1("string", myArray, dynamicValue);
+
+class Helper {
+ static void Method1<T>(int p1, IList<T> p3) {...}
+ static void
+ Method2<T1, T2, T3>(T1 p1, T1 p2, IList<T2> p3, Func<T2, T3> p4)
+ {...}
+}
+\end{lstlisting}
+\caption{C\# code example.}
+\label{img55:typeConst}
+\end{figure}
 
 \subsection{Type inference}
 
@@ -112,36 +134,14 @@ The last type of initializer uses indexer to store referred values on predefined
 \info{Method type inference}
 C\# type inference occurs in many contexts. 
 However, we mention only these related to our improvement described in the following sections. 
-One of the most simple occurrences regards the \texttt{var} keyword, which is used in the variable declaration, as we can see in code \ref{img09:var}. It lets the compiler decide the type of variable based on the type of initializing value, which implies that we can’t use the keyword in declarations without initializing the value.
-\par
-\begin{figure}
-\begin{lstlisting}[style=csharp]
-var myVariable = "string";
-\end{lstlisting}
-\caption{\texttt{var} keyword}
-\label{img09:var}
-\end{figure}
+One of the most simple occurrences regards the \texttt{var} keyword, which is used in the variable declaration, as we can see on the first line in code \ref{img55:typeConst}. It lets the compiler decide the type of variable based on the type of initializing value, which implies that we can’t use the keyword in declarations without initializing the value.
 \par
 The most interesting and complex context is the method type inference used during generic method call binding when type arguments are not given. 
-We can see a situation when the method type inference deduces \texttt{System.String}, \texttt{System.Int32} and \texttt{System.Int32} as type arguments of the \texttt{MyMethod} method in the following code \ref{img06:typeInference}. 
+We can see a situation when the method type inference deduces \texttt{System.String}, \texttt{System.Int32} and \texttt{System.Int32} as type arguments of the \texttt{MyMethod} method on line 4 in our code example \ref{img55:typeConst}. 
 We can notice several tasks that the type inference has to be capable of.
 Regarding the \texttt{T1} type parameter, the inference has to find a common type between the first and the second type parameters. 
 Regarding the \texttt{T2} type parameter, the type inference has to go into type arguments of the generic type of parameter and the argument, check if the types are compatible, and then match the type parameter against the type argument of the third parameter. 
-The most challenging is lamdas, whose return type has to be inferred after all lambda argument types are inferred.
-\par
-\begin{figure}
-\begin{lstlisting}[style=csharp]
-Helper.MyMethod((long)1, 1, new List<int>(), (p1) => p1 + 1);
-
-class Helper {
-  static void 
-  MyMethod<T1, T2, T3>(T1 p1, T1 p2, IList<T2> p3, Func<T2,T3> p4) 
-  { ... }
-}
-\end{lstlisting}
-\caption{C\# Method type inference deduces the method type arguments.}
-\label{img06:typeInference}
-\end{figure}
+The most challenging is Lamdas, whose return type has to be inferred after all lambda argument types are inferred.
 \par
 As we can see, the method type inference is a complex process containing many steps.
 Since one of our improvement is adjusting the algorithm, we present its complete description.
@@ -151,8 +151,11 @@ Before we show schema, we have to present definitions which are used by the algo
 \unsure{Create citations}
 \begin{defn}[Fixed type variables, bounds]
 We call inferred type parameters \emph{type variables} which are at the beginning of the algorithm unknown, \emph{unfixed}. 
-During the algorithm, they start to be restricted by sets of \emph{bounds}.
+During the algorithm, they start to be restricted by sets of type \emph{bounds}.
 The type variable becomes \emph{fixed} when the its actual type is determined using its \emph{bounds}.
+\end{defn}
+\begin{defn}[Method group]
+A \emph{method group} is a set of overloaded methods resulting from a member lookup.
 \end{defn}
 \begin{defn}[Input/Output types]
 If \texttt{E} is a method group or anonymous function and \texttt{T} is a delegate or expression tree type, then return type of \texttt{T} is an \emph{output type} of \texttt{E}.
@@ -170,20 +173,6 @@ The algorithm has two phases where the first phase initializes initial bounds' s
 Each type variable has three type of bounds. 
 Exact bound consists of types which has to be identical to the type variable meaning that they can convert to each other.
 Lower bound contains types which has to be convertible to the type variable and Upper bound is opposite to it.
-\info{The first phase description}
-The first phase iterates over provided arguments and chooses the right set where to add the type of the argument by calling helper functions based on several conditions.
-We suppose the reader has knowledge of C\# language so we quickly mention used functions contained in the conditions for clarifying meant constructs of parameters and arguments.
-\texttt{isValParam()} and \texttt{isRefParam()} functions determine if the parameter is passed by value or by reference.
-There are also \texttt{isInParam()}, \texttt{isOutParam()}, \texttt{isInArg()} referring to use of \texttt{in} and \texttt{out} keyword in parameter declarations and \texttt{in} keyword in argument position.
-\info{The second phase description}
-The second phase happens iteratively respecting \textit{depends on} relation.
-Each iteration has two goals.
-The first one is fixation of at least one type variable.
-If there is no type variable to fix because either all type variables are fixed or there are no other type bounds which could be used for type variable deduction, the phases and algorithm ends.
-The sets \texttt{$X_{indep}$} and \texttt{$X_{dep}$} referring to type variables, which can be fix in the current iteration.
-Line 24 contains a case ending the algorithm when all type variables are fixed or there is no way how to infer next ones.
-The second goal checks for output types, which where dependent on input types where the last unfixed types were fixed in this iteration, and infers them.
-We can see respecting order of inferring return type of anonymous functions at line 29 where we are inferring return type of lambdas when all type variables contained in parameter list are fixed.
 \par
 \begin{algorithm}
 \SetKwFunction{FirstPhase}{FirstPhase}
@@ -250,6 +239,21 @@ $B_{lower}, B_{upper}, B_{exact}, F \gets [\ ]$\;
 \caption{Phases of Method Type Inference}
 \label{alg01:methodTypeInference1}
 \end{algorithm}
+\par
+\info{The first phase description}
+The first phase iterates over provided arguments and chooses the right set where to add the type of the argument by calling helper functions based on several conditions.
+We suppose the reader has knowledge of C\# language so we quickly mention used functions contained in the conditions for clarifying meant constructs of parameters and arguments.
+\texttt{isValParam()} and \texttt{isRefParam()} functions determine if the parameter is passed by value or by reference.
+There are also \texttt{isInParam()}, \texttt{isOutParam()}, \texttt{isInArg()} referring to use of \texttt{in} and \texttt{out} keyword in parameter declarations and \texttt{in} keyword in argument position.
+\info{The second phase description}
+The second phase happens iteratively respecting \textit{depends on} relation.
+Each iteration has two goals.
+The first one is fixation of at least one type variable.
+If there is no type variable to fix because either all type variables are fixed or there are no other type bounds which could be used for type variable deduction, the phases and algorithm ends.
+The sets \texttt{$X_{indep}$} and \texttt{$X_{dep}$} referring to type variables, which can be fix in the current iteration.
+Line 24 contains a case ending the algorithm when all type variables are fixed or there is no way how to infer next ones.
+The second goal checks for output types, which where dependent on input types where the last unfixed types were fixed in this iteration, and infers them.
+We can see respecting order of inferring return type of anonymous functions at line 29 where we are inferring return type of lambdas when all type variables contained in parameter list are fixed.
 \par
 \info{Describe infer output type}
 Algorithm \ref{alg02:methodTypeInference2} contains definitions of three inferences used in the first and second phase.
@@ -468,52 +472,12 @@ The fixation is successful if get the candidate and type variable is fixed to th
 \end{algorithm}
 \info{Array type inference}
 The third type inference happens in array initializers when the type of the array should be deduced from the initializer list.
-We can see an example of situation, when the type inference is used for determining \texttt{myArray} type in the following code \ref{img08:arrayTypeInference}.
+We can see an example of situation, when the type inference is used for determining \texttt{myArray} type on the first line in our code example \ref{img55:typeConst}.
 The most specialized common type is just adjusted already mentioned type inference algorithm where is just one type parameter and all initializer items are lower bounds of that type variable.
 \par
-\begin{figure}
-\begin{lstlisting}[style=csharp]
-var myArray = new[] {new object(), "string"};
-\end{lstlisting}
-\caption{C\# Method type inference algorithm.}
-\label{img08:arrayTypeInference}
-\end{figure}
-\par
 \info{Target-typed inference}
-The fourth type inference regards inference based on target type.
-The example of these situations can be seen in the following example where we use target-typed \texttt{new()} operator allowing to skipping creating type which is provided by the target type, variable type in this case.
-\par
-\begin{figure}
-\begin{lstlisting}[style=csharp]
-List<int> myList = new();
-\end{lstlisting}
-\caption{Target-typed \texttt{new()} operator.}
-\label{img09:targetTypeInference}
-\end{figure}
-\par
-\info{Dynamic checking}
-The last group what we have to mention is rather type checking than type inference.
-As we mentioned in the previous section, \texttt{dynamic} keyword is used to enable late binding on the expression containing dynamic expression.
-Because of late binding, the compiler can't check instance method calling at compile time to prevent type errors at runtime.
-However, there are situations, where the compiler can partial type check expressions like method calls.
-You can see a situation, where despite of late-binding there is an obvious error where we try to pass arguments with \texttt{System.Int32} and \texttt{System.String} types to parameters with the same type.
-To prevent these situations, where error are not related to dynamic values, the compiler tries to infer the types ignoring the dynamic values.
-In case of type conflicts in the variable's bounds, the error is announced at compile time instead of runtime.
-\par
-\begin{figure}
-\begin{lstlisting}[style=csharp]
-dynamic dynamicValue = null;
-Helper.MyMethod(1, "string", dynamicValue);
-
-class Helper {
- static
- void MyMethod<T1, T2>(T1 p1, T1 p2, T2 p3) 
-  { ... }
-}
-\end{lstlisting}
-\caption{Type inference with dynamic argument.}
-\label{img010:dynamicChecking}
-\end{figure}
+The last kind of type inference, which we mention, regards inference based on target type.
+The example of these situations can be seen on the second line of our example \ref{img55:typeConst} where we use target-typed \texttt{new()} operator allowing to skipping creating type which is provided by the target type, variable type in this case.
 
 \section{Roslyn}
 

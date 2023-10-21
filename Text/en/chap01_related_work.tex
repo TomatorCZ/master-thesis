@@ -146,9 +146,8 @@ The most challenging is Lamdas, whose return type has to be inferred after all l
 As we can see, the method type inference is a complex process containing many steps.
 Since one of our improvements is adjusting the algorithm, we present its complete description.
 The algorithm is divided into four sections to explain its functionality better.
-Before we show schema, we have to present definitions that are used by the algorithm.
+Before we show schema, we have to present definitions that are used by the algorithm referred in \cite{online:csTypeInference}.
 \par
-\unsure{Create citations}
 \begin{defn}[Fixed type variables, bounds]
 We call inferred type parameters \emph{type variables} which are at the beginning of the algorithm unknown, \emph{unfixed}. 
 During the algorithm, they start to be restricted by sets of type \emph{bounds}.
@@ -485,12 +484,54 @@ An example of these situations can be seen on the second line of our example \re
 The implementation of C\# type inference can be found in the Roslyn compiler, as open-source compiler of C\# and VisualBasic developed at GitHub repository.
 In this section we present Roslyn's architecture to better understand the context and restrictions which we have to consider to be able to plug the improved type inference into the compiler.
 \par
-\change{Overview of compilation pipeline}
-\change{Binder}
-\change{OverloadResolution}
-\change{MethodTypeInferrer}
-\change{NullableWalker}
-\change{Dynamic biding vs. runtime binding}
+\begin{figure}
+\centering
+\includegraphics[width=120mm, height=70mm]{../img/Roslyn_Arch.png}
+\caption{Roslyn architecture}
+\label{img56:roslynPip}
+\end{figure}
+\par
+\info{Overview of compilation pipeline, the first phase}
+The compilation pipeline, described in \cite{online:roslynArchitecture}, starts with loading \texttt{.csproj} file with related C\# sources (\texttt{.cs}) and referenced libraries (\texttt{.dll}) as we can see in the figure \ref{img56:roslynPip}.
+C\# sources are passed to the lexer creating tokens used by the parser forming \ac{AST}.
+Constructing \ac{AST} is the first phase (green color boxes of the figure \ref{img56:roslynPip}) of the compiler checking syntax of C\# sources.
+\par
+\info{Describe the second phase}
+The second phase, marked by orange color, forms Named symbols exposed by public API representing defined namespaces, classes, methods and etc. in the C\# project.
+The declarations are received from C\# sources by traversing \ac{AST} and seeking for the particular syntax.
+Libraries are stored in \texttt{.dll} format which are parsed by \texttt{MetadataLoader} creating the same Named symbols as that received from C\# sources.
+\par
+\info{Describe the third phase}
+The third, binding, phase matches identifiers in the code with received Named symbols from the previous phase.
+Because processing of method body is not dependent on other method bodies since the code only using already known declarations, Roslyn makes this phase concurrent.
+The result of the phase is \emph{BoundTree} where all identifiers refer to the Named symbols.
+A method binding itself is a complicated procedure consisting of many subtasks as overload resolution or mentioned method type inference which algorithm we described in detail in the previous section.
+\par
+\info{Binder}
+The binding is divided into chain of binders taking care of smaller code scopes.
+One purpose of the binders is ability to resolve an identifier to the Named symbol, if the referred symbol lies in their scope.
+If they can't find the symbol, they ask to the preceding binder.
+This process is called \emph{LookUp} determining which Named symbols are accessible in the current position.
+Examples of binder are \texttt{NamespaceBinder} resolving defined top level entities in the namespace scope, \texttt{ClassBinder} resolving defined class members, or \texttt{MethodBinder} binding method bodies.
+The last mentioned binder sequentially iterates body statements and matches identifiers with their declarations.
+Statement and expression binding are an important steps which are related to type inference.
+The first observation is that statement binding doesn't involve binding of following statements which can be referred as a backward binding.
+The consequence is that C\# is not able to infer types in backward direction.
+As an example can be usage of \texttt{var} keyword in variable declarations which has to be used always with initializing value.
+If C\# would allow backward binding, we could initialize the variable later in one of the following statements. 
+\par
+\info{OverloadResolution, MethodTypeInferrer}
+The preceding step before Method Type Inference is Overload resolution being a part of \texttt{MethodCallExpression} binding.
+As we mentioned previously, method overloading allows to define multiple methods with the same name differing in parameters.
+So, at time of deciding which method should be called, we have to resolve right version of the methods following language rules for method resolution.
+This step involves binding the method call arguments firstly and then deciding which parameter list of the method group fits the argument list the best.
+If the method group is generic and the expression doesn't specify any type arguments, Method Type Inference is invoked to determine type arguments of the method before the selection of the best candidate for the call.
+\par
+\info{NullableWalker}
+Method type inference can occur for the second time if we turned on nullability analysis mentioned previously.
+Nullability analysis is a kind of Flow analysis which uses Bound tree to check and rewrite already created bound nodes accordingly to nullability.
+Because overloading and method type inference is nullable-sensitive the whole binding process is repeated respecting the nullability and reusing results from the previous binding.
+The required changes are stored during the analysis and the bound tree is rewrited by the changes at the end of the analysis.
 
 \section{Hindley-Millner type inference}
 

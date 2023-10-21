@@ -1,4 +1,4 @@
-\begin{thebibliography}{9}
+\begin{thebibliography}{10}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -45,21 +45,28 @@ Proposal template.
   {\natexlab{f}}.
 \newblock [Online; accessed 2023-09-30].
 
-\bibitem[onl({\natexlab{g}})]{online:roslynRepo}
+\bibitem[onl({\natexlab{g}})]{online:roslynArchitecture}
+Roslyn architecture.
+\newblock
+  \url{https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/compiler-api-model
+  }, {\natexlab{g}}.
+\newblock [Online; accessed 2023-10-21].
+
+\bibitem[onl({\natexlab{h}})]{online:roslynRepo}
 {R}oslyn repository.
-\newblock \url{https://github.com/dotnet/roslyn}, {\natexlab{g}}.
+\newblock \url{https://github.com/dotnet/roslyn}, {\natexlab{h}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{h}})]{online:wikiHM}
+\bibitem[onl({\natexlab{i}})]{online:wikiHM}
 Hidley-milner type system.
 \newblock
   \url{https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system},
-  {\natexlab{h}}.
+  {\natexlab{i}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{i}})]{online:yHM}
+\bibitem[onl({\natexlab{j}})]{online:yHM}
 {H}idley-{M}ilner type inference.
-\newblock \url{https://www.youtube.com/watch?v=B39eBvapmHY}, {\natexlab{i}}.
+\newblock \url{https://www.youtube.com/watch?v=B39eBvapmHY}, {\natexlab{j}}.
 \newblock [Online; accessed 2023-09-22].
 
 \end{thebibliography}

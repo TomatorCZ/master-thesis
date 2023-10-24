@@ -33,6 +33,8 @@ Warning--to sort, need author or key in online:cSharpTypeSystem
 Warning--to sort, need author or key in online:csHist
 Warning--to sort, need author or key in online:csTypeInference
 Warning--to sort, need author or key in online:roslynArchitecture
+Warning--to sort, need author or key in online:HMVideos
+Warning--empty year in online:HMVideos
 Warning--empty year in online:cSharpTypeSystem
 Warning--empty year in online:csHist
 Warning--empty year in online:csTypeInference
@@ -43,45 +45,45 @@ Warning--empty year in online:roslynArchitecture
 Warning--empty year in online:roslynRepo
 Warning--empty year in online:wikiHM
 Warning--empty year in online:yHM
-You've used 10 entries,
+You've used 11 entries,
             2773 wiz_defined-function locations,
-            646 strings with 6431 characters,
-and the built_in function-call counts, 2553 in all, are:
-= -- 260
+            650 strings with 6558 characters,
+and the built_in function-call counts, 2805 in all, are:
+= -- 286
 > -- 0
 < -- 0
-+ -- 19
++ -- 21
 - -- 0
-* -- 172
-:= -- 222
-add.period$ -- 30
-call.type$ -- 10
-change.case$ -- 30
+* -- 189
+:= -- 243
+add.period$ -- 33
+call.type$ -- 11
+change.case$ -- 33
 chr.to.int$ -- 1
-cite$ -- 50
-duplicate$ -- 150
-empty$ -- 351
+cite$ -- 55
+duplicate$ -- 165
+empty$ -- 386
 format.name$ -- 0
-if$ -- 621
-int.to.chr$ -- 10
+if$ -- 683
+int.to.chr$ -- 11
 int.to.str$ -- 1
 missing$ -- 0
-newline$ -- 58
+newline$ -- 63
 num.names$ -- 0
-pop$ -- 160
+pop$ -- 176
 preamble$ -- 1
-purify$ -- 20
+purify$ -- 22
 quote$ -- 0
-skip$ -- 80
+skip$ -- 88
 stack$ -- 0
-substring$ -- 30
-swap$ -- 20
+substring$ -- 33
+swap$ -- 22
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 110
-warning$ -- 20
+type$ -- 121
+warning$ -- 22
 while$ -- 0
 width$ -- 0
-write$ -- 127
-(There were 20 warnings)
+write$ -- 139
+(There were 22 warnings)

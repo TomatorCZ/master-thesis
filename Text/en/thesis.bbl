@@ -1,72 +1,77 @@
-\begin{thebibliography}{10}
+\begin{thebibliography}{11}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
 
-\bibitem[onl({\natexlab{a}})]{online:cSharpTypeSystem}
+\bibitem[onl({\natexlab{a}})]{online:HMVideos}
+Video series about hindley-millner type inference.
+\newblock \url{https://www.youtube.com/@adam-jones/videos}, {\natexlab{a}}.
+\newblock [Online; accessed 2023-10-21].
+
+\bibitem[onl({\natexlab{b}})]{online:cSharpTypeSystem}
 {C}\# type system.
 \newblock
   \url{https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/types/},
-  {\natexlab{a}}.
+  {\natexlab{b}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{b}})]{online:csHist}
+\bibitem[onl({\natexlab{c}})]{online:csHist}
 {C}\# version history.
 \newblock
   \url{https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-version-history
-  }, {\natexlab{b}}.
+  }, {\natexlab{c}}.
 \newblock [Online; accessed 2023-10-8].
 
-\bibitem[onl({\natexlab{c}})]{online:csTypeInference}
+\bibitem[onl({\natexlab{d}})]{online:csTypeInference}
 {C}\# type inference algorithm.
 \newblock
   \url{https://github.com/dotnet/csharpstandard/blob/draft-v8/standard/expressions.md
-  }, {\natexlab{c}}.
+  }, {\natexlab{d}}.
 \newblock [Online; accessed 2023-10-14].
 
-\bibitem[onl({\natexlab{d}})]{online:langRepo}
+\bibitem[onl({\natexlab{e}})]{online:langRepo}
 csharplang repository.
-\newblock \url{https://github.com/dotnet/csharplang}, {\natexlab{d}}.
+\newblock \url{https://github.com/dotnet/csharplang}, {\natexlab{e}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{e}})]{online:langSpec}
+\bibitem[onl({\natexlab{f}})]{online:langSpec}
 {C}\# specification.
 \newblock
   \url{https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/readme},
-  {\natexlab{e}}.
+  {\natexlab{f}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{f}})]{online:proposalTemplate}
+\bibitem[onl({\natexlab{g}})]{online:proposalTemplate}
 Proposal template.
 \newblock
   \url{https://github.com/dotnet/csharplang/blob/main/proposals/proposal-template.md},
-  {\natexlab{f}}.
+  {\natexlab{g}}.
 \newblock [Online; accessed 2023-09-30].
 
-\bibitem[onl({\natexlab{g}})]{online:roslynArchitecture}
+\bibitem[onl({\natexlab{h}})]{online:roslynArchitecture}
 Roslyn architecture.
 \newblock
   \url{https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/compiler-api-model
-  }, {\natexlab{g}}.
+  }, {\natexlab{h}}.
 \newblock [Online; accessed 2023-10-21].
 
-\bibitem[onl({\natexlab{h}})]{online:roslynRepo}
+\bibitem[onl({\natexlab{i}})]{online:roslynRepo}
 {R}oslyn repository.
-\newblock \url{https://github.com/dotnet/roslyn}, {\natexlab{h}}.
+\newblock \url{https://github.com/dotnet/roslyn}, {\natexlab{i}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{i}})]{online:wikiHM}
+\bibitem[onl({\natexlab{j}})]{online:wikiHM}
 Hidley-milner type system.
 \newblock
   \url{https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system},
-  {\natexlab{i}}.
+  {\natexlab{j}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{j}})]{online:yHM}
+\bibitem[onl({\natexlab{k}})]{online:yHM}
 {H}idley-{M}ilner type inference.
-\newblock \url{https://www.youtube.com/watch?v=B39eBvapmHY}, {\natexlab{j}}.
+\newblock \url{https://www.youtube.com/watch?v=B39eBvapmHY}, {\natexlab{k}}.
 \newblock [Online; accessed 2023-09-22].
 
 \end{thebibliography}

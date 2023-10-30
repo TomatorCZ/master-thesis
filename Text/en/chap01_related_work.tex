@@ -627,8 +627,22 @@ Outputs of this algorithm is the inferred type with a substitution used for algo
 \info{Mention relation to Method type inference}
 Relations between this algorithm and C\#, Rust type inference will be discussed in detail later, although we can notice that the unification part of this algorithm is the same as Method type inference mentioned in C\# section where the substitution represents inferred type arguments of the method which parameters were unified with matching arguments.
 \par
-\change{Restriction and possible extensions, subtyping, overloading, recursive definition}
-H-M type system, as we presented, doesn't allow recursive definitions, subtyping known from Rust or overloading known from C\#.  
+\info{Restriction and possible extensions - subtyping, overloading}
+H-M type system, as we presented, doesn't allow subtyping known from Rust or overloading known from C\#.  
+\par
+Basic principle of extending H-M type inference by subtyping is described in Parreaux work \cite{paper:Parreaux}, where instead of accumulating type equivalent constrains, we accumulate and propagate subtyping constrains.
+These subtyping constrains assemble a set of types, which have to be inherited by the constrained type variable or the variable has to inherit them.
+\par
+\info{Restriction and possible extensions - overloading}
+Extending H-M type inference by supporting overloading mentions Andreas Stadelmeier and Martin Plumicke work \cite{paper:Overloading}.
+An important thought behind this paper is to accumulate two types of type variable constraint sets.
+Constraints observed from a method call is added into one \textit{AND-set}.
+When the method call has multiple overloads the AND-sets are added into \textit{OR-set}.
+After accumulating these sets, all combinations of items in OR-sets are generated and solved by type inference.
+As we can see, for each method overload participating in type inference, we have to do an alternative type inference containing constrains obtained only from the overloaded method excluding other overloads.
+This algorithm can be improved by excluding overloads which can't be used in the method call to save the branching.
+However, in the worst case, it still takes exponential-time to infer types.
+
 
 \section{Rust type inference}
 

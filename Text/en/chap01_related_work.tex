@@ -580,7 +580,7 @@ The two last rules allow us to specify Poly types to Mono types and vice-versa.
 \info{Describe type inference}
 With the definitions given above, we can start to talk about H-M type inference, which is able to find the type of every expression of a completely untyped program.
 There exist several algorithms for inferring most general type of the expression.
-There exist several algorithms for inferring the most general type of expression. We show the W algorithm in schema \ref{alg05:w} since it is closely related to C\# and Rust type inference.
+We show the W algorithm in schema \ref{alg05:w} since it is closely related to C\# and Rust type inference.
 Inputs are the context $\Gamma$ and an expression which type we want to infer.
 The process consists of systematic traversing the expression from bottom to top and deducing the type of sub-expressions following the mentioned rules.
 The algorithm uses the \texttt{Instantiate} method to replace quantified type variables in the expression with new type variables, the \texttt{Generelize} method to replace free type variables in the expression with quantified type variables, and the \texttt{Unify} method, also known as \textit{Unification} in Logic.

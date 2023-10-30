@@ -535,12 +535,12 @@ The required changes are stored during the analysis, and the Bound tree is rewri
 \section{Hindley-Millner type inference}
 
 \info{Intro}
-C\# method type inference is a restricted Hindley-Millner type inference to able to applied in its C\# type system.
-Since type inferences in other languages like Rust or Haskell are based on the same principle, we present high-level overview of Hindley-Millner type inference and it's type system to reason about possible extensions of current C\# type inference.
+C\# method type inference is a restricted Hindley-Millner type inference in order to work in its C\# type system.
+Since type inferences in other languages like Rust or Haskell are based on the same principle, we present a high-level overview of Hindley-Millner type inference and its type system to reason about possible extensions of current C\# type inference.
 \info{Hindley-Millner type system}
 Hindley-Millner type system \cite{online:wikiHM} is a type system for Lambda calculus capable of generic functions and types.
-We start with describing set of expressions, which will be a target of type inference described in video series \cite{online:HMVideos}.
-Expression is either a variable (\ref{expr01}), a function application (\ref{expr02}), a lambda function (\ref{expr03}), or let-in clause (\ref{expr04}).
+We start with describing a set of expressions, which will be a target of type inference described in the video series \cite{online:HMVideos}.
+Expression is either a variable (\ref{expr01}), a function application (\ref{expr02}), a lambda function (\ref{expr03}), or a \textit{let-in} clause (\ref{expr04}).
 \par
 \begin{align}
 e =&\ x\label{expr01}\\
@@ -549,9 +549,9 @@ e =&\ x\label{expr01}\\
 |&\ \text{\textbf{let}}\ x = e_1\ \text{\textbf{in}}\ e_2\label{expr04} 
 \end{align}
 \par
-Above mentioned expressions have one of two different types.
-\textit{Mono} type is presented either as a type variable(\ref{type01}), or as a function application(\ref{type02}) where \textit{C} is an item from an arbitrary set of functions containing at least \texttt{$\rightarrow$} symbol taking two type parameters which represents a lambda function type.
-The second group is \textit{poly} types which assembles from a type possible preceding $\forall$ operator \ref{type04} bounding its type variables.
+The above-mentioned expressions have one of two different types.
+\textit{Mono} type is presented either as a type variable(\ref{type01}) or as a function application(\ref{type02}) where \textit{C} is an item from an arbitrary set of functions containing at least \texttt{$\rightarrow$} symbol taking two type parameters which represents a lambda function type.
+The second group is \textit{Poly} types, which assemble from a type possible preceding $\forall$ operator \ref{type04}, bounding its type variables.
 \par
 \begin{align}
 mono\ \tau =&\ \alpha\label{type01}\\
@@ -559,15 +559,15 @@ mono\ \tau =&\ \alpha\label{type01}\\
 poly\ \sigma =&\ \tau\label{type03}\\
 |&\ \forall \alpha\ .\ \sigma\label{type04}
 \end{align}
-To be able to reason about more complex type expression, a context(\texttt{$\Gamma$}) give us assumptions of a current scope where we evaluates the type of expression.
-It contains of pairs of expression and its type from which we can make typing judgements (using \texttt{$\vdash$} operator). 
+To be able to reason about more complex type expressions, a context(\texttt{$\Gamma$}) gives us assumptions of a current scope where we evaluate the type of expression.
+It contains pairs of expressions and their types from which we can make typing judgments (using \texttt{$\vdash$} operator). 
 \par
 \info{Set of rules}
-H-M deduction system gives us the following inference rules allowing to deduce type of an expression based on assumption given in the context.
-The syntax of rule corresponds with what we can judge (the right side of $\vdash$) from the left side of $\vdash$ below the line based on assumptions given above the line.
+The H-M deduction system gives us the following inference rules, allowing us to deduce the type of an expression based on the assumption given in the context. 
+The syntax of the rule corresponds with what we can judge (the right side of $\vdash$) from the left side of $\vdash$ below the line based on assumptions given above the line.
 The rules can be divided into two kinds.
-The first four rules give us a manual what types can we expect applying the mention expressions of Lambda calculus.
-The two last rules allowing us to specify poly types to mono types and vice-versa.
+The first four rules give us a manual on what types we can expect by applying the mentioned expressions of Lambda calculus. 
+The two last rules allow us to specify Poly types to Mono types and vice-versa.
 \begin{align*}
 \frac{x : \sigma \in \Gamma}{\Gamma \vdash x : \sigma}&[Var]\\
 \frac{\Gamma \vdash e_0 : \tau_a \rightarrow \tau_b\ \ \ \Gamma \vdash e_1 : \tau_a}{\Gamma \vdash e_0 e_1 : \tau_b}&[App]\\
@@ -578,14 +578,14 @@ The two last rules allowing us to specify poly types to mono types and vice-vers
 \end{align*}
 \par
 \info{Describe type inference}
-With definitions given above, we can start to talk about H-M type inference which is able to find type of every expression of completely untyped program.
+With the definitions given above, we can start to talk about H-M type inference, which is able to find the type of every expression of a completely untyped program.
 There exist several algorithms for inferring most general type of the expression.
-We show \textit{W} algorithm in schema \ref{alg05:w} since it is closely related to C\# and Rust type inference.
+There exist several algorithms for inferring the most general type of expression. We show the W algorithm in schema \ref{alg05:w} since it is closely related to C\# and Rust type inference.
 Inputs are the context $\Gamma$ and an expression which type we want to infer.
-The process consists of systematic traversing the expression from bottom to up and deducing type of sub-expressions following the mentioned rules.
-The algorithm uses the \texttt{Instantiate} method replacing quantified type variables in the expression to new type variables, the \texttt{Generelize} method to replace free type variables in the expression to quantified type variables, and the \texttt{Unify} method also known as \textit{Unification} in Logic.
-Unification is a algorithm finding a substitution which application on the unifying types make them identical.
-Outputs of this algorithm is the inferred type with a substitution used for algorithm internal state.
+The process consists of systematic traversing the expression from bottom to top and deducing the type of sub-expressions following the mentioned rules.
+The algorithm uses the \texttt{Instantiate} method to replace quantified type variables in the expression with new type variables, the \texttt{Generelize} method to replace free type variables in the expression with quantified type variables, and the \texttt{Unify} method, also known as \textit{Unification} in Logic.
+Unification is an algorithm finding a substitution whose application on the unifying types makes them identical. 
+Outputs of this algorithm are the inferred type with a substitution used for the algorithm's internal state. 
 \par
 \begin{algorithm}
 \SetKwProg{Fn}{fn}{:}{}
@@ -625,23 +625,23 @@ Outputs of this algorithm is the inferred type with a substitution used for algo
 \end{algorithm}
 \par
 \info{Mention relation to Method type inference}
-Relations between this algorithm and C\#, Rust type inference will be discussed in detail later, although we can notice that the unification part of this algorithm is the same as Method type inference mentioned in C\# section where the substitution represents inferred type arguments of the method which parameters were unified with matching arguments.
+Relations between this algorithm and C\#, Rust type inference will be discussed in detail later, although we can notice that the unification part of this algorithm is the same as Method type inference mentioned in the C\# section where the substitution represents inferred type arguments of the method which parameters were unified with matching arguments.
 \par
 \info{Restriction and possible extensions - subtyping, overloading}
 H-M type system, as we presented, doesn't allow subtyping known from Rust or overloading known from C\#.  
 \par
-Basic principle of extending H-M type inference by subtyping is described in Parreaux work \cite{paper:Parreaux}, where instead of accumulating type equivalent constrains, we accumulate and propagate subtyping constrains.
-These subtyping constrains assemble a set of types, which have to be inherited by the constrained type variable or the variable has to inherit them.
+A basic principle of extending H-M type inference by subtyping is described in Parreaux's work \cite{paper:Parreaux}, where instead of accumulating type equivalent constraints, we accumulate and propagate subtyping constraints.
+These subtyping constraints assemble a set of types, which have to be inherited by the constrained type variable, or the variable has to inherit them.
 \par
 \info{Restriction and possible extensions - overloading}
-Extending H-M type inference by supporting overloading mentions Andreas Stadelmeier and Martin Plumicke work \cite{paper:Overloading}.
+Extending H-M type inference by supporting overloading mentions Andreas Stadelmeier and Martin Plumicke's work \cite{paper:Overloading}.
 An important thought behind this paper is to accumulate two types of type variable constraint sets.
-Constraints observed from a method call is added into one \textit{AND-set}.
-When the method call has multiple overloads the AND-sets are added into \textit{OR-set}.
+Constraints observed from a method call are added into one \textit{AND-set}.
+When the method call has multiple overloads, the AND-sets are added to the \textit{OR-set}.
 After accumulating these sets, all combinations of items in OR-sets are generated and solved by type inference.
-As we can see, for each method overload participating in type inference, we have to do an alternative type inference containing constrains obtained only from the overloaded method excluding other overloads.
-This algorithm can be improved by excluding overloads which can't be used in the method call to save the branching.
-However, in the worst case, it still takes exponential-time to infer types.
+As we can see, for each method overload participating in type inference, we have to make an alternative type inference containing constraints obtained only from the overloaded method, excluding other overloads.
+This algorithm can be improved by excluding overloads that can't be used in the method call to save the branching.
+However, in the worst case, it still takes exponential time to infer types.
 
 
 \section{Rust type inference}

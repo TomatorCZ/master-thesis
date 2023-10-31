@@ -1,4 +1,4 @@
-\begin{thebibliography}{13}
+\begin{thebibliography}{14}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -62,16 +62,22 @@ Roslyn architecture.
 \newblock \url{https://github.com/dotnet/roslyn}, {\natexlab{i}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{j}})]{online:wikiHM}
-Hidley-milner type system.
-\newblock
-  \url{https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system},
+\bibitem[onl({\natexlab{j}})]{online:rustTypeInference}
+{R}ust type inference.
+\newblock \url{https://doc.rust-lang.org/rust-by-example/types/inference.html},
   {\natexlab{j}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{k}})]{online:yHM}
+\bibitem[onl({\natexlab{k}})]{online:wikiHM}
+Hidley-milner type system.
+\newblock
+  \url{https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system},
+  {\natexlab{k}}.
+\newblock [Online; accessed 2023-09-22].
+
+\bibitem[onl({\natexlab{l}})]{online:yHM}
 {H}idley-{M}ilner type inference.
-\newblock \url{https://www.youtube.com/watch?v=B39eBvapmHY}, {\natexlab{k}}.
+\newblock \url{https://www.youtube.com/watch?v=B39eBvapmHY}, {\natexlab{l}}.
 \newblock [Online; accessed 2023-09-22].
 
 \bibitem[Parreaux(2020)]{paper:Parreaux}

@@ -35,10 +35,14 @@ Warning--to sort, need author or key in online:csTypeInference
 Warning--to sort, need author or key in online:roslynArchitecture
 Warning--to sort, need author or key in online:HMVideos
 Warning--to sort, need author or key in online:rustTypeInference
+Warning--to sort, need author or key in online:discussions
+Warning--to sort, need author or key in online:champion
 Warning--empty year in online:HMVideos
 Warning--empty year in online:cSharpTypeSystem
+Warning--empty year in online:champion
 Warning--empty year in online:csHist
 Warning--empty year in online:csTypeInference
+Warning--empty year in online:discussions
 Warning--empty year in online:langRepo
 Warning--empty year in online:langSpec
 Warning--empty year in online:proposalTemplate
@@ -48,45 +52,45 @@ Warning--empty year in online:rustTypeInference
 Warning--empty year in online:wikiHM
 Warning--empty year in online:yHM
 Warning--empty year in paper:Overloading
-You've used 14 entries,
+You've used 16 entries,
             2773 wiz_defined-function locations,
-            664 strings with 7030 characters,
-and the built_in function-call counts, 3696 in all, are:
-= -- 365
+            672 strings with 7295 characters,
+and the built_in function-call counts, 4200 in all, are:
+= -- 417
 > -- 31
 < -- 2
-+ -- 34
++ -- 38
 - -- 9
-* -- 240
-:= -- 358
-add.period$ -- 41
-call.type$ -- 14
-change.case$ -- 45
+* -- 274
+:= -- 400
+add.period$ -- 47
+call.type$ -- 16
+change.case$ -- 51
 chr.to.int$ -- 3
-cite$ -- 65
-duplicate$ -- 210
-empty$ -- 485
+cite$ -- 75
+duplicate$ -- 240
+empty$ -- 555
 format.name$ -- 13
-if$ -- 882
-int.to.chr$ -- 12
+if$ -- 1006
+int.to.chr$ -- 14
 int.to.str$ -- 1
 missing$ -- 0
-newline$ -- 77
+newline$ -- 87
 num.names$ -- 8
-pop$ -- 220
+pop$ -- 252
 preamble$ -- 1
-purify$ -- 31
+purify$ -- 35
 quote$ -- 0
-skip$ -- 126
+skip$ -- 142
 stack$ -- 0
-substring$ -- 40
-swap$ -- 26
+substring$ -- 46
+swap$ -- 30
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 154
-warning$ -- 25
+type$ -- 176
+warning$ -- 29
 while$ -- 6
 width$ -- 0
-write$ -- 172
-(There were 25 warnings)
+write$ -- 196
+(There were 29 warnings)

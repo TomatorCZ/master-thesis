@@ -1,95 +1,141 @@
-\begin{thebibliography}{16}
+\begin{thebibliography}{24}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
 
-\bibitem[onl({\natexlab{a}})]{online:HMVideos}
+\bibitem[onl({\natexlab{a}})]{online:CtorTInf}
+Constructor type inference.
+\newblock \url{https://github.com/dotnet/csharplang/discussions/281},
+  {\natexlab{a}}.
+\newblock [Online; accessed 2023-11-4].
+
+\bibitem[onl({\natexlab{b}})]{online:DefTypeParam}
+Default type parameters.
+\newblock \url{https://github.com/dotnet/csharplang/discussions/278},
+  {\natexlab{b}}.
+\newblock [Online; accessed 2023-11-4].
+
+\bibitem[onl({\natexlab{c}})]{online:GenAlias}
+Generic aliases.
+\newblock \url{https://github.com/dotnet/csharplang/issues/1239},
+  {\natexlab{c}}.
+\newblock [Online; accessed 2023-11-4].
+
+\bibitem[onl({\natexlab{d}})]{online:HMVideos}
 Video series about {H}indley-{M}illner type inference.
-\newblock \url{https://www.youtube.com/@adam-jones/videos}, {\natexlab{a}}.
+\newblock \url{https://www.youtube.com/@adam-jones/videos}, {\natexlab{d}}.
 \newblock [Online; accessed 2023-10-21].
 
-\bibitem[onl({\natexlab{b}})]{online:cSharpTypeSystem}
+\bibitem[onl({\natexlab{e}})]{online:NamedTypeParam}
+Named type parameters.
+\newblock \url{https://github.com/dotnet/csharplang/discussions/280},
+  {\natexlab{e}}.
+\newblock [Online; accessed 2023-11-4].
+
+\bibitem[onl({\natexlab{f}})]{online:Realloc}
+Specifying type arguments in method calls (reallocation).
+\newblock \url{https://github.com/dotnet/roslyn/issues/8214}, {\natexlab{f}}.
+\newblock [Online; accessed 2023-11-4].
+
+\bibitem[onl({\natexlab{g}})]{online:RetTInference}
+Return type inference.
+\newblock \url{https://github.com/dotnet/csharplang/discussions/92},
+  {\natexlab{g}}.
+\newblock [Online; accessed 2023-11-4].
+
+\bibitem[onl({\natexlab{h}})]{online:TInfConst}
+Type inference based on type constraints.
+\newblock \url{https://github.com/dotnet/roslyn/issues/5023}, {\natexlab{h}}.
+\newblock [Online; accessed 2023-11-4].
+
+\bibitem[onl({\natexlab{i}})]{online:TMRetInf}
+Type inference of method return type.
+\newblock \url{https://github.com/dotnet/csharplang/discussions/6452},
+  {\natexlab{i}}.
+\newblock [Online; accessed 2023-11-4].
+
+\bibitem[onl({\natexlab{j}})]{online:cSharpTypeSystem}
 {C}\# type system.
 \newblock
   \url{https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/types/},
-  {\natexlab{b}}.
+  {\natexlab{j}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{c}})]{online:champion}
+\bibitem[onl({\natexlab{k}})]{online:champion}
 {C}\# proposed champion.
 \newblock \url{https://github.com/dotnet/csharplang/issues/1349},
-  {\natexlab{c}}.
+  {\natexlab{k}}.
 \newblock [Online; accessed 2023-11-2].
 
-\bibitem[onl({\natexlab{d}})]{online:csHist}
+\bibitem[onl({\natexlab{l}})]{online:csHist}
 {C}\# version history.
 \newblock
   \url{https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-version-history
-  }, {\natexlab{d}}.
+  }, {\natexlab{l}}.
 \newblock [Online; accessed 2023-10-8].
 
-\bibitem[onl({\natexlab{e}})]{online:csTypeInference}
+\bibitem[onl({\natexlab{m}})]{online:csTypeInference}
 {C}\# type inference algorithm.
 \newblock
   \url{https://github.com/dotnet/csharpstandard/blob/draft-v8/standard/expressions.md
-  }, {\natexlab{e}}.
+  }, {\natexlab{m}}.
 \newblock [Online; accessed 2023-10-14].
 
-\bibitem[onl({\natexlab{f}})]{online:discussions}
+\bibitem[onl({\natexlab{n}})]{online:discussions}
 {C}\# language discussions.
 \newblock \url{https://github.com/dotnet/csharplang/discussions},
-  {\natexlab{f}}.
+  {\natexlab{n}}.
 \newblock [Online; accessed 2023-11-14].
 
-\bibitem[onl({\natexlab{g}})]{online:langRepo}
+\bibitem[onl({\natexlab{o}})]{online:langRepo}
 csharplang repository.
-\newblock \url{https://github.com/dotnet/csharplang}, {\natexlab{g}}.
+\newblock \url{https://github.com/dotnet/csharplang}, {\natexlab{o}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{h}})]{online:langSpec}
+\bibitem[onl({\natexlab{p}})]{online:langSpec}
 {C}\# specification.
 \newblock
   \url{https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/readme},
-  {\natexlab{h}}.
+  {\natexlab{p}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{i}})]{online:proposalTemplate}
+\bibitem[onl({\natexlab{q}})]{online:proposalTemplate}
 Proposal template.
 \newblock
   \url{https://github.com/dotnet/csharplang/blob/main/proposals/proposal-template.md},
-  {\natexlab{i}}.
+  {\natexlab{q}}.
 \newblock [Online; accessed 2023-09-30].
 
-\bibitem[onl({\natexlab{j}})]{online:roslynArchitecture}
+\bibitem[onl({\natexlab{r}})]{online:roslynArchitecture}
 {R}oslyn architecture.
 \newblock
   \url{https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/compiler-api-model
-  }, {\natexlab{j}}.
+  }, {\natexlab{r}}.
 \newblock [Online; accessed 2023-10-21].
 
-\bibitem[onl({\natexlab{k}})]{online:roslynRepo}
+\bibitem[onl({\natexlab{s}})]{online:roslynRepo}
 {R}oslyn repository.
-\newblock \url{https://github.com/dotnet/roslyn}, {\natexlab{k}}.
+\newblock \url{https://github.com/dotnet/roslyn}, {\natexlab{s}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{l}})]{online:rustTypeInference}
+\bibitem[onl({\natexlab{t}})]{online:rustTypeInference}
 {R}ust type inference.
 \newblock \url{https://doc.rust-lang.org/rust-by-example/types/inference.html},
-  {\natexlab{l}}.
+  {\natexlab{t}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{m}})]{online:wikiHM}
+\bibitem[onl({\natexlab{u}})]{online:wikiHM}
 Hidley-milner type system.
 \newblock
   \url{https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system},
-  {\natexlab{m}}.
+  {\natexlab{u}}.
 \newblock [Online; accessed 2023-09-22].
 
-\bibitem[onl({\natexlab{n}})]{online:yHM}
+\bibitem[onl({\natexlab{v}})]{online:yHM}
 {H}idley-{M}ilner type inference.
-\newblock \url{https://www.youtube.com/watch?v=B39eBvapmHY}, {\natexlab{n}}.
+\newblock \url{https://www.youtube.com/watch?v=B39eBvapmHY}, {\natexlab{v}}.
 \newblock [Online; accessed 2023-09-22].
 
 \bibitem[{A}ndreas {S}tadelmeier and {M}artin {P}lumicke()]{paper:Overloading}

@@ -37,7 +37,23 @@ Warning--to sort, need author or key in online:HMVideos
 Warning--to sort, need author or key in online:rustTypeInference
 Warning--to sort, need author or key in online:discussions
 Warning--to sort, need author or key in online:champion
+Warning--to sort, need author or key in online:DefTypeParam
+Warning--to sort, need author or key in online:GenAlias
+Warning--to sort, need author or key in online:NamedTypeParam
+Warning--to sort, need author or key in online:RetTInference
+Warning--to sort, need author or key in online:TInfConst
+Warning--to sort, need author or key in online:TMRetInf
+Warning--to sort, need author or key in online:Realloc
+Warning--to sort, need author or key in online:CtorTInf
+Warning--empty year in online:CtorTInf
+Warning--empty year in online:DefTypeParam
+Warning--empty year in online:GenAlias
 Warning--empty year in online:HMVideos
+Warning--empty year in online:NamedTypeParam
+Warning--empty year in online:Realloc
+Warning--empty year in online:RetTInference
+Warning--empty year in online:TInfConst
+Warning--empty year in online:TMRetInf
 Warning--empty year in online:cSharpTypeSystem
 Warning--empty year in online:champion
 Warning--empty year in online:csHist
@@ -52,45 +68,45 @@ Warning--empty year in online:rustTypeInference
 Warning--empty year in online:wikiHM
 Warning--empty year in online:yHM
 Warning--empty year in paper:Overloading
-You've used 16 entries,
+You've used 24 entries,
             2773 wiz_defined-function locations,
-            672 strings with 7295 characters,
-and the built_in function-call counts, 4200 in all, are:
-= -- 417
+            705 strings with 8275 characters,
+and the built_in function-call counts, 6216 in all, are:
+= -- 625
 > -- 31
 < -- 2
-+ -- 38
++ -- 54
 - -- 9
-* -- 274
-:= -- 400
-add.period$ -- 47
-call.type$ -- 16
-change.case$ -- 51
+* -- 410
+:= -- 568
+add.period$ -- 71
+call.type$ -- 24
+change.case$ -- 75
 chr.to.int$ -- 3
-cite$ -- 75
-duplicate$ -- 240
-empty$ -- 555
+cite$ -- 115
+duplicate$ -- 360
+empty$ -- 835
 format.name$ -- 13
-if$ -- 1006
-int.to.chr$ -- 14
+if$ -- 1502
+int.to.chr$ -- 22
 int.to.str$ -- 1
 missing$ -- 0
-newline$ -- 87
+newline$ -- 127
 num.names$ -- 8
-pop$ -- 252
+pop$ -- 380
 preamble$ -- 1
-purify$ -- 35
+purify$ -- 51
 quote$ -- 0
-skip$ -- 142
+skip$ -- 206
 stack$ -- 0
-substring$ -- 46
-swap$ -- 30
+substring$ -- 70
+swap$ -- 46
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 176
-warning$ -- 29
+type$ -- 264
+warning$ -- 45
 while$ -- 6
 width$ -- 0
-write$ -- 196
-(There were 29 warnings)
+write$ -- 292
+(There were 45 warnings)

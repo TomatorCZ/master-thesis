@@ -693,26 +693,26 @@ Since Rust doesn't have overloading, the type inference can be more powerful wit
 \section{Github issues}
 
 \info{Intro}
-The last subsection mentions C\# developer's environment, where everybody is free to share his/her thoughts about possible improvement or issues with C\# language or Roslyn compiler.
-We base our solution on issues mentioned in this section and recommended future possible features by C\# developers in already mentioned C\# language and Roslyn repository.
+The last subsection mentions the C\# developer's environment, where everybody is free to share his/her thoughts about possible improvements or issues with C\# language or Roslyn compiler.
+We base our solution on issues mentioned in this section and recommended future possible features by C\# developers in the already mentioned the C\# language and Roslyn repository.
 \par
 \info{Proposal}
-The process of designing a new language feature starts with publishing an idea into discussions \cite{online:discussions} where is commented by other C\# community.
-The idea contains a brief description of the feature, motivation and design.
-Besides the idea, a new language feature requires a proposal, initially published as an issue, describing the feature in the way which can be later reviewed by \ac{LDM} committee.
-If the proposal sufficiently merits the discussions, it can be mark as a \textit{champion} by a member of \ac{LDM} marking it for being discussed further by the team.
-There are several state which the proposal can have.
-The most important for us is \textit{AnyTime} meaning that the proposal is not actively worked on and are open to community.
-At the time of writing, a member of \ac{LDM} recommended championed issue \cite{online:champion} for being investigated since it contains many related discussions with proposed changes but still doesn't have a required proposal.
-When a proposal has sufficient quality to be discussed by \ac{LDM}, a member invites the proposer to make a \textit{Pull Request} where the further collaboration continue.
-If \ac{LDM} accepts the proposal, it is added into the \textit{proposals} folder in the repository for being shipped with the next C\# versions and implemented in Roslyn.  
+The process of designing a new language feature starts with publishing an idea into discussions \cite{online:discussions}, where the C\# community can comment on it. 
+The idea contains a brief description of the feature, motivation, and design. 
+Besides the idea, a new language feature requires a proposal, initially published as an issue, describing the feature in a way that can be later reviewed by the \ac{LDM} committee.
+If the proposal sufficiently merits the discussions, it can be marked as a \textit{champion} by a member of \ac{LDM} for being discussed further by the team. 
+There are several milestones in which the proposal can be. 
+The most important for us is \textit{AnyTime}, meaning that the proposal is not actively worked on and is open to the community to collaborate on it. 
+At the time of writing, a member of \ac{LDM} recommended championed issue \cite{online:champion} to be investigated since it contains many related discussions with proposed changes but still doesn’t have a required proposal. 
+When a proposal has sufficient quality to be discussed by \ac{LDM}, a member invites the proposer to make a \textit{Pull Request} where further collaboration continues. 
+If \ac{LDM} accepts the proposal, it is added to the \textit{proposals} folder in the repository for being added into the C\# specification, and its future implementation (in Roslyn) will be shipped with the next C\# version. 
 \par
 \info{Discussions}
-Regarding mentioned issue, we present related discussions directly or indirectly referred from it.
+Regarding the mentioned issue, we present related discussions directly or indirectly referred from it.
 \par
 \info{Discussion - Default type parameters}
-The first discussion \cite{online:DefTypeParam} mentions \textit{Default type parameters} introducing default type arguments which are used when a explicit type arguments are not used.
-Figure \ref{img59:defTypeParam} shows a potential design of this feature where construing generic type \texttt{A} doesn't need a type argument since is used \texttt{int} type as a default value.
+The first discussion \cite{online:DefTypeParam} mentions \textit{Default type parameters} introducing default type arguments, which are used when explicit type arguments are not used. 
+Figure \ref{img59:defTypeParam} shows a potential design of this feature where construing generic type \texttt{A} doesn’t need a type argument since it uses \texttt{int} type as a default value. 
 \par
 \begin{figure}
 \begin{lstlisting}[style=csharp]
@@ -725,8 +725,8 @@ class A<T = int> {}
 \end{figure}
 \par
 \info{Discussion - Generic aliases}
-The next discussion \cite{online:GenAlias} mentions \textit{Generic aliases} allowing to specify default values similar to the goal of previous discussion by defining an alias to that type with option generic parameters.
-We can see an example of usage in Figure \ref{img60:genAlias} where we predefine the first type argument of \texttt{Dictionary} class to be the \texttt{string} type which simplifies usage of that type in scenarios where we find values in dictionary often by string keys.
+The next discussion \cite{online:GenAlias} mentions \textit{Generic aliases} allowing to specify default values similar to the goal of the previous discussion by defining an alias to that type with option generic parameters. 
+We can see an example of usage in Figure\ref{img60:genAlias}, where we predefine the first type argument of the \texttt{Dictionary} class to be the \texttt{string} type, which simplifies the usage of that type in scenarios where we often use dictionaries with keys of the \texttt{string} type.
 \par
 \begin{figure}
 \begin{lstlisting}[style=csharp]
@@ -739,11 +739,11 @@ using StringDictionary<TValue> = Dictionary<String, TValue>;
 \end{figure}
 \par
 \info{Discussion - Named type arguments}
-Discussion \cite{online:NamedTypeParam} mentions \textit{Named type parameters} which are similar to named parameters of methods.
-Basic thought of this idea is be able to specify a type parameter for which we provide a type argument by name.
-In Figure \ref{img61:NamedTParam}, we can see a generic method \texttt{F} with two type parameters.
-With the current type inference, we have to always specify type arguments in method calls of \texttt{F}.
-Using the named type arguments, we can just tell the compiler specific type parameters for which we provide type arguments, \texttt{U} in this case, and let the compiler infer the rest of the type parameters.
+Discussion \cite{online:NamedTypeParam} mentions \textit{Named type parameters}, which are similar to named parameters of methods. 
+The basic thought of this idea is being able to specify a type parameter for which we provide a type argument by name. 
+In Figure \ref{img61:NamedTParam}, we can see a generic method \texttt{F} with two type parameters. 
+With the current type inference, we have to always specify type arguments in method calls of \texttt{F}. 
+We can tell the compiler specific type parameters for which we provide type arguments, \texttt{U} in this case,  using the named type arguments and letting the compiler infer the rest of the type parameters.
 \par
 \begin{figure}
 \begin{lstlisting}[style=csharp]
@@ -756,9 +756,9 @@ U F<T, U>(T t) { ... }
 \end{figure}
 \par
 \info{Discussion - Using char as inferred type argument}
-Comments of mentioned championed issue \cite{online:champion} proposes several keywords which can be used in a type argument list for skipping type arguments which can be inferred by the compiler and just providing the remaining ones.
-In example \ref{img62:CharITArg}, we can see the \texttt{var} keyword for skipping the first type argument since it can be inferred from the argument list and we just specify the second type argument which can't be inferred by the compiler.
-The comments propose other options for keywords like an underscore or whitespaces. 
+Comments of the mentioned championed issue \cite{online:champion} propose several keywords that can be used in a type argument list for skipping type arguments, which can be inferred by the compiler and just providing the remaining ones. 
+In example \ref{img62:CharITArg}, we can see the \texttt{var} keyword for skipping the first type argument since it can be inferred from the argument list, and we just specify the second type argument, which can’t be inferred by the compiler. 
+The comments propose other options for keywords like underscore or whitespaces.
 \par
 \begin{figure}
 \begin{lstlisting}[style=csharp]
@@ -771,8 +771,8 @@ TResult Foo<T, TResult>(T p1){ ... }
 \end{figure}
 \par
 \info{Discussion - Inference based on target}
-Discussion \cite{online:RetTInference} proposes \textit{Target-typed inference} where type inference uses type information of target where return value is assigned.
-We can see the usage in Figure \ref{img62:RetTInf} where type inference determines that return type has to be \texttt{int} type and use that to deduce the type argument \texttt{T}.
+Discussion \cite{online:RetTInference} proposes \textit{Target-typed inference}, where type inference uses type information of the target assigned by the return value. 
+We can see the usage in Figure \ref{img62:RetTInf}, where type inference determines that the return type has to be \texttt{int} type and uses that to deduce the type argument \texttt{T}.
 \par
 \begin{figure}
 \begin{lstlisting}[style=csharp]
@@ -789,8 +789,8 @@ static class ObjectEx {
 \end{figure}
 \par
 \info{Discussion - Type inference based on type constraints}
-The next idea of improving type inference is given by discussion \cite{online:TInfConst} where type inference utilizes type information obtained from type constraints.
-A simple example of that can be seen in Figure \ref{img63:TInfConst} where \texttt{T1} can be deduced by using \texttt{T1}'s constraint and inferred type of \texttt{T2} forming inferred type \texttt{List<int>}.
+The next idea of improving type inference is given by discussion \cite{online:TInfConst} , where type inference utilizes type information obtained from type constraints.
+A simple example of that can be seen in Figure \ref{img63:TInfConst}, where \texttt{T1} can be deduced by using \texttt{T1}'s constraint and inferred type of \texttt{T2} forming inferred type \texttt{List<int>}.
 \par
 \begin{figure}
 \begin{lstlisting}[style=csharp]
@@ -804,7 +804,7 @@ T1 Foo<T1,T2>(T2 item) where T1 : List<T2> {}
 \par
 \info{Discussion - Type inference of method return type}
 Discussion \cite{online:TMRetInf} mentions type inference of method return type known from Kotlin language.
-We can see the usage in following Figure \ref{img64:TMRetInf} where return type of method \texttt{Add} is inferred to be \texttt{int} based on type of the return expression.
+We can see the usage in the following Figure \ref{img64:TMRetInf}, where the return type of method \texttt{Add} is inferred to be \texttt{int} based on the type of the return expression.
 \par
 \begin{figure}
 \begin{lstlisting}[style=csharp]
@@ -815,8 +815,8 @@ public static Add(int x, int y ) => x + y;
 \end{figure}
 \par
 \info{Discussion - Specifying type arguments in method calls (Realocation)}
-Issue \cite{online:Realloc} proposes a way how to compact type argument lists of identifier containing sub identifiers with argument lists.
-We can see an idea demonstrated in example \ref{img65:Realloc} where the argument list of \texttt{A<T1>} type and the \texttt{Foo<T2>} method are merged and the type arguments split by semicolon. 
+Issue \cite{online:Realloc} proposes a way to compact type argument lists of identifiers containing inner identifiers with argument lists. 
+We can see an idea demonstrated in example \ref{img65:Realloc}, where the argument list of \texttt{A<T1>} type and the \texttt{Foo<T2>} method are merged, and the type arguments are split by a semicolon.
 \par
 \begin{figure}
 \begin{lstlisting}[style=csharp]
@@ -831,8 +831,8 @@ static class A<T1> {
 \end{figure}
 \par
 \info{Discussion - Constructor type inference}
-The last discussion \cite{online:CtorTInf} which we mention here regards \textit{Constructor type inference} enabling type inference for object creation expressions.
-The type inference can be seen in Figure \ref{img66:CtorTInf} where \texttt{T} type parameter of \texttt{C<T>} generic type can be deduced by using type information from its constructor.
+The last discussion \cite{online:CtorTInf}, which we mention here, regards \textit{Constructor type inference} enabling type inference for object creation expressions. 
+The type inference can be seen in Figure \ref{img66:CtorTInf}, where the \texttt{T} type parameter of the \texttt{C<T>} generic type can be deduced by using type information from its constructor.
 \par
 \begin{figure}
 \begin{lstlisting}[style=csharp]

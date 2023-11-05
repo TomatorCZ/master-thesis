@@ -1,23 +1,18 @@
 # Partial type inference
 
-* [x] Proposed
-* [ ] Prototype
-* [ ] Implementation
-* [ ] Specification
-
 > Note: This proposal was created because of championed [Partial type inference](https://github.com/dotnet/csharplang/issues/1349). It is a continuation of the proposed second version published in [csharplang/discussions/7467](https://github.com/dotnet/csharplang/discussions/7467) and the first version published in [csharplang/discussions/7286](https://github.com/dotnet/csharplang/discussions/7286)
 
 ## Summary
 [summary]: #summary
 
-Partial type inference introduces a syntax skipping obvious type arguments in the argument list of
+Partial type inference introduces a syntax skipping inferrable type arguments in the argument list of
 
 1. *invocation_expression*
 2. *object_creation_expresssion*
 
 and allowing to specify just ambiguous ones.
 
-> Example of skipping obvious type arguments
+> Example of skipping inferrable type arguments
 >
 > ```csharp
 > M<_, object>(42, null); 
@@ -69,7 +64,7 @@ Besides the changes described above, the proposal mentions further interactions 
   > public void log<T, U>(T message, U appendix) { ... }
   > ```
 
-  The first improvement, which would improve the method type inference algorithm, has a significant disadvantage of the breaking change.
+  The first improvement, which would improve the method type inference algorithm, has a significant disadvantage of introducing a breaking change.
   On the other hand, the second improvement, which would enable specifying some of the method's type arguments, does not influence old code, solves problems regarding the "all or nothing" principle, and reduces the first weakness.
   
   > Example
@@ -90,24 +85,22 @@ Besides the changes described above, the proposal mentions further interactions 
   Method type inference is not defined on *object_creation_expression*, prohibiting taking advantage of type inference.
   We divide use cases into the following categories, where type inference would help the programmer. 
 
-  1. Cases where the method type inference would success.
+  1. Cases where the method type inference would succeed.
    
   > Example
   > 
   > ```csharp
-  > var wrappedData = Create(new MyData());
-  > 
   > public static Wrapper<T> Create<T>(T item) { return new Wrapper<T>(item); }
   > 
   > class Wrapper<T> { public Wrapper(T item) { ... } }
   > ```
   
-  2. Cases where the method type inference would be weak. (Using type info from target type, or type arguments' constrains)
+  2. Cases where the method type inference would be weak. (Using type info from target type, or type arguments' constraints)
   
   > Example
   >
   > ```csharp
-  > var alg = Create(new MyData()); // Method type inference can't infer TLogger because it doesn't use type constrains specified by `where` clauses
+  > var alg = Create(new MyData()); // Method type inference can't infer TLogger because it doesn't use type constraints specified by `where` clauses
   > 
   > public static Algorithm<TData, TLogger> Create<TData, TLogger>(TData data) where TLogger : Logger<TData> { return new Algorithm<TData, TLogger>(data); } 
   > class Algorithm<TData, TLogger> where TLogger : Logger<TData> { public Algorithm(TData data) { ... }}
@@ -158,7 +151,7 @@ Besides the changes described above, the proposal mentions further interactions 
 
 No matter how the partial type inference would work, we should be careful about the following things.
 
-- **Convenience** - We want an easy and intuitive syntax that we can skip the obvious type arguments.
+- **Convenience** - We want an easy and intuitive syntax that we can skip the inferrable type arguments.
 - **Performance** - Type inference is a complicated problem when we introduce subtyping and overloading in a type system.
 Although it can be done, the computation can take exponential time which we don't want.
 So it has to be restricted to cases, where the problem can be solved effectively but it still has practical usage.
@@ -174,16 +167,14 @@ So will want to look ahead to other potential directions, which can be done afte
 
 > Specification: Original section changed in the following way
 
-The following changes are made in [tokens](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/lexical-structure.md#64-tokens) located in the [grammar](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/lexical-structure.md#62-grammars) section.
-
-> [Identifiers](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/lexical-structure.md#643-identifiers)
+> We modify [Identifiers](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/lexical-structure.md#643-identifiers) as follows:
 
 - The semantics of an identifier named `_` depends on the context in which it appears:
   - It can denote a named program element, such as a variable, class, or method, or
-  - It can denote a discard ([§9.2.9.1](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/variables.md#9291-discards)).
-  - **It can denote an inferred type argument avoiding specifying type arguments which can be inferred by the compiler.**
+  - It can denote a discard (§9.2.9.1).
+  - **It will denote a type argument to be inferred.**
 
-> [Keywords](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/lexical-structure.md#644-keywords)
+> We modify [Keywords](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/lexical-structure.md#644-keywords) as follows:
 
 * A ***contextual keyword*** is an identifier-like sequence of characters that has special meaning in certain contexts, but is not reserved, and can be used as an identifier outside of those contexts as well as when prefaced by the `@` character.
 
@@ -203,11 +194,33 @@ The following changes are made in [tokens](https://github.com/dotnet/csharpstand
 
 > Specification: Original section changed in the following way
 
-* We change the meaning of the content of *type_argument_list* in two contexts.
-  * [Constructed types](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/types.md#84-constructed-types) occuring in [*object_creation_expression*](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#128162-object-creation-expressions)
-  * Constructed types and type arguments occuring in method [invocation](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#12892-method-invocations)
+> We change [type arguments](https://github.com/dotnet/csharpstandard/blob/standard-v7/standard/types.md#842-type-arguments) section as follows:
 
 * ***inferred_type_argument*** represents an unknown type, which will be resolved during type inference. 
+
+* Each argument in a type argument list is ~~simply a type~~ **a type or an inferred type**.
+
+```diff
+type_argument_list
+  : '<' type_arguments '>'
+  ;
+  
+type_arguments
+-  : type_argument (',' type_argument)*
++  : type_argument (',' type_arguments)
++  | inferred_type_argument (',' type_arguments)
+  ;   
+
+type_argument
+  : type
+  ;
+
++inferred_type_argument
++  : '_'
++  ;
+```
+
+* When a type with `_` identifier is presented in the scope where **inferred_type_argument** is used, a warning should appear since the **inferred_type_argument** hides the type's name causing a breaking change.
 
 * `_` identifier is considered to represent *inferred_type_argument* when:
   * It occurs in *type_argument_list* of a method group during method invocation.
@@ -253,8 +266,8 @@ If there is an ambiguity in the current scope, a compilation-time error occurs.
   > {
   >     void M() 
   >     {
-  >         new C1<>( ... ); // Refers generic_inferred type C1<T>
-  >         new C2<>( ... ); // Refers generic_inferred type C2<T1,T2>
+  >         new C1<>( ... ); // generic_inferred type C1<> refers to generic type C<T> where the type argument will be inferred from inspecting candidate constructors of C<T> 
+  >         new C2<>( ... ); // generic_inferred type C1<> refers to generic type C<T1, T2> where the type arguments will be inferred from inspecting candidate constructors of C<T1, T2> 
   >     }
   >     class C1<T> { ... }
   >     class C2<T1, T2> { ... }
@@ -280,16 +293,16 @@ The initial set of candidate methods for is changed by adding new condition.
 
 - If `F` is non-generic, `F` is a candidate when:
   - `M` has no type argument list, and
-  - `F` is applicable with respect to `A` ([§12.6.4.2](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#12642-applicable-function-member)).
+  - `F` is applicable with respect to `A` (§12.6.4.2).
 - If `F` is generic and `M` has no type argument list, `F` is a candidate when:
-  - Type inference ([§12.6.3](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#1263-type-inference)) succeeds, inferring a list of type arguments for the call, and
-  - Once the inferred type arguments are substituted for the corresponding method type parameters, all constructed types in the parameter list of `F` satisfy their constraints ([§8.4.5](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/types.md#845-satisfying-constraints)), and the parameter list of `F` is applicable with respect to `A` ([§12.6.4.2](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#12642-applicable-function-member))
-- **If `F` is generic and `M` has type argument list containing at least one *inferred_type_argument*, `F` is a candidate when:**
+  - Type inference (§12.6.3) succeeds, inferring a list of type arguments for the call, and
+  - Once the inferred type arguments are substituted for the corresponding method type parameters, all constructed types in the parameter list of `F` satisfy their constraints ([§8.4.5](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/types.md#845-satisfying-constraints)), and the parameter list of `F` is applicable with respect to `A` (§12.6.4.2)
+- \***If `F` is generic and `M` has type argument list containing at least one *inferred_type_argument*, `F` is a candidate when:**
   - **Type inference ([§12.6.3](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#1263-type-inference)) succeeds, inferring a list of *inferred_type_arguments* for the call, and**
   - **Once the *inferred_type_arguments* are inferred and together with remaining type arguments are substituted for the corresponding method type parameters, all constructed types in the parameter list of `F` satisfy their constraints ([§8.4.5](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/types.md#845-satisfying-constraints)), and the parameter list of `F` is applicable with respect to `A` ([§12.6.4.2](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#12642-applicable-function-member))**
 - If `F` is generic and `M` includes a type argument list, `F` is a candidate when:
   - `F` has the same number of method type parameters as were supplied in the type argument list, and
-  - Once the type arguments are substituted for the corresponding method type parameters, all constructed types in the parameter list of `F` satisfy their constraints ([§8.4.5](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/types.md#845-satisfying-constraints)), and the parameter list of `F` is applicable with respect to `A` ([§12.6.4.2](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#12642-applicable-function-member)).
+  - Once the type arguments are substituted for the corresponding method type parameters, all constructed types in the parameter list of `F` satisfy their constraints (§8.4.5), and the parameter list of `F` is applicable with respect to `A` (§12.6.4.2).
 
 ### Object creation expressions
 
@@ -302,20 +315,20 @@ The binding-time processing of an [*object_creation_expression*](https://github.
 The binding-time processing of an *object_creation_expression* of the form new `T(A)`, where `T` is a *class_type*, or a *value_type*, and `A` is an optional *argument_list*, consists of the following steps:
 
 - If `T` is a *value_type* and `A` is not present:
-  - **The *object_creation_expression* is a default constructor invocation.**
+  - \***The *object_creation_expression* is a default constructor invocation.**
     - **If the type is *generic_inferred* or *partially_inferred*, type inference of the default constructor occurs to determine the type arguments. If it succeeded, construct the type using inferred type arguments. If it failed and there is no chance to get the target type now or later, the binding-time error occurs. Otherwise, repeat the binding when the target type will be determined and add it to the inputs of type inference.**
     - **If the type inference above succeeded or the type is not inferred, the result of the *object_creation_expression* is a value of (constructed) type `T`, namely the default value for `T` as defined in [§8.3.3](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/types.md#833-default-constructors).**
 - Otherwise, if `T` is a *type_parameter* and `A` is not present:
-  - If no value type constraint or constructor constraint ([§15.2.5](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/classes.md#1525-type-parameter-constraints)) has been specified for `T`, a binding-time error occurs.
+  - If no value type constraint or constructor constraint (§15.2.5) has been specified for `T`, a binding-time error occurs.
   - The result of the *object_creation_expression* is a value of the run-time type that the type parameter has been bound to, namely the result of invoking the default constructor of that type. The run-time type may be a reference type or a value type.
 - Otherwise, if `T` is a *class_type* or a *struct_type*:
   - If `T` is an abstract or static *class_type*, a compile-time error occurs.
-  - **The instance constructor to invoke is determined using the overload resolution rules of [§12.6.4](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#1264-overload-resolution). The set of candidate instance constructors is determined as follows:**
+  - \***The instance constructor to invoke is determined using the overload resolution rules of [§12.6.4](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#1264-overload-resolution). The set of candidate instance constructors is determined as follows:**
     - **`T` is not inferrred (*generic_inferred* or *partially_inferred*), the constructor is accessible in `T`, and is applicable with respect to `A` ([§12.6.4.2](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#12642-applicable-function-member)).**
     - **If `T` is *generic_constructed* or *partially_constructed* and the constructor is accessible in `T`, type inference of the constructor is performed. Once the *inferred_type_arguments* are inferred and together with the remaining type arguments are substituted for the corresponding type parameters, all constructed types in the parameter list of the constructor satisfy their constraints, and the parameter list of the constructor is applicable with respect to `A` ([§12.6.4.2](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#12642-applicable-function-member)).**
-  - **A binding-time error occurs when:**
+  - \***A binding-time error occurs when:**
     - **The set of candidate instance constructors is empty, or if a single best instance constructor cannot be identified, and there is no chance to know the target type now or later.**
-  - **If the set of candidate instance constructors is still empty, or if a single best instance constructor cannot be identified, repeat the binding of the *object_creation_expression* to the time, when target type will be known and add it to inputs of type inference.**
+  - \***If the set of candidate instance constructors is still empty, or if a single best instance constructor cannot be identified, repeat the binding of the *object_creation_expression* to the time, when target type will be known and add it to inputs of type inference.**
   - The result of the *object_creation_expression* is a value of type `T`, namely the value produced by invoking the instance constructor determined in the two steps above.
   - Otherwise, the *object_creation_expression* is invalid, and a binding-time error occurs.
 
@@ -361,7 +374,7 @@ We change the [type inference](https://github.com/dotnet/csharpstandard/blob/dra
     * We perform *shape inference* from each type argument to the corresponding type parameter.
   * If the target type should be used based on the expression binding, perform *upper-bound inference* from it to the type containing the constructor
   * If the expression contains an *object_initializer_list*, for each *initializer_element* of the list perform *lower-bound inference* from the type of the element to the type of *initializer_target*. If the binding of the element fails, skip it.
-  * If the expression contains *where* clauses defining type constraints of type parameters of the type containing constructor, for each constraint not representing *constructor* constrain, *reference type constraint*, *value type constraint* and *unmanaged type constraint* perform *lower-bound inference* from the constraint to the corresponding type parameter.
+  * If the expression contains *where* clauses defining type constraints of type parameters of the type containing constructor, for each constraint not representing *constructor* constraint, *reference type constraint*, *value type constraint* and *unmanaged type constraint* perform *lower-bound inference* from the constraint to the corresponding type parameter.
   * If the expression contains a *collection_initializer_list* and the type doesn't have overloads of the `Add` method, for each *initializer_element* of the list perform *lower-bound inference* from the types of the elements contained in the *initializer_element* to the types of the method's parameters. If the binding of any element fails, skip it.  
   * If the expression contains a *collection_initializer_list* using an indexer, use the indexer defined in the type and perform *lower_bound_inference* from the types in *initializer_element* to types of matching parameters of the indexer. 
 
@@ -424,8 +437,8 @@ We change the [type inference](https://github.com/dotnet/csharpstandard/blob/dra
     * We perform *lower-bound* inference from all upper-bounds of `V` to `U`, which contains an unfixed type variable.
   
 * Second phase
-  * **Firstly, all *unfixed* type variables `Xᵢ` which do not *depend on* ([§12.6.3.6](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#12636-dependence)), *shape-depend on*, and *type-depend on* any `Xₑ` are fixed ([§12.6.3.12](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#126312-fixing)).**
-  * **If no such type variables exist, all *unfixed* type variables `Xᵢ` are *fixed* for which all of the following hold:**
+  * \***Firstly, all *unfixed* type variables `Xᵢ` which do not *depend on* ([§12.6.3.6](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#12636-dependence)), *shape-depend on*, and *type-depend on* any `Xₑ` are fixed ([§12.6.3.12](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#126312-fixing)).**
+  * \***If no such type variables exist, all *unfixed* type variables `Xᵢ` are *fixed* for which all of the following hold:**
     * **There is at least one type variable `Xₑ` that *depends on*, *shape-depends on*, or *type-depends on* `Xᵢ`**
     * **There is no type variable `Xₑ` on which `Xᵢ` *shape-depends on*.**
     * **`Xᵢ` has a non-empty set of bounds and has at least on bound which doesn't contain any *unfixed* type variable.**
@@ -433,7 +446,7 @@ We change the [type inference](https://github.com/dotnet/csharpstandard/blob/dra
   * [...]
     
 * Fixing
-  * **An *unfixed* type variable `Xᵢ` with a set of bounds is *fixed* as follows:**
+  * \***An *unfixed* type variable `Xᵢ` with a set of bounds is *fixed* as follows:**
     * **If the type variable has a shape bound, check the type has no conflicts with other bounds of that type variable in the same way as the standard says. It it has no conflicts, the type variable is *fixed* to that type. Otherwise type inference failed.**
     * Otherwise, fix it as the standard says. 
 
@@ -497,8 +510,8 @@ We change the [type inference](https://github.com/dotnet/csharpstandard/blob/dra
 
 We change the [compile-time checking](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/expressions.md#1265-compile-time-checking-of-dynamic-member-invocation) in order to be useful during partial type inferece.
 
-- First, if `F` is a generic method and type arguments were provided, then those **, that aren't *inferred_type_argument*** are substituted for the type parameters in the parameter list. However, if type arguments were not provided, no such substitution happens.
-- Then, any parameter whose type is open (i.e., contains a type parameter; see [§8.4.3](https://github.com/dotnet/csharpstandard/blob/draft-v7/standard/types.md#843-open-and-closed-types)) is elided, along with its corresponding parameter(s).
+- First, if `F` is a generic method and type arguments were provided, then those \***, that aren't *inferred_type_argument*** are substituted for the type parameters in the parameter list. However, if type arguments were not provided, no such substitution happens.
+- Then, any parameter whose type is open (i.e., contains a type parameter; see §8.4.3) is elided, along with its corresponding parameter(s).
 
 ### Nullability
 

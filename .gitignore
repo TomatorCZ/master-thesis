@@ -7,3 +7,7 @@ Text/**/*.out
 Text/**/*.xmpi
 Text/**/*.gz
 Text/**/*.toc
+Text/cs/**
+Text/**/*.bbl
+Text/**/*.blg
+Text/**/*.lol

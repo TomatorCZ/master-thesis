@@ -525,6 +525,7 @@ As we mentioned previously, method overloading allows to define multiple methods
 So, when deciding which method should be called, we have to resolve the right version of the method by following language rules for method resolution. 
 This step involves binding the method call arguments first and then deciding which parameter list of the method group fits the argument list the best. 
 If the method group is generic and the expression doesn’t specify any type arguments, Method type inference is invoked to determine the type arguments of the method before the selection of the best candidate for the call.
+When the right overload with inferred type arguments is chosen, unbinded method arguments requiring target type (for example already mentioned target-typed \texttt{new()} operator) are binded using corresponding parameter type.
 \par
 \info{NullableWalker}
 Method type inference can occur for the second time if we turn on the nullability analysis mentioned previously. 
@@ -774,7 +775,7 @@ TResult Foo<T, TResult>(T p1){ ... }
 Discussion \cite{online:RetTInference} proposes \textit{Target-typed inference}, where type inference uses type information of the target assigned by the return value. 
 We can see the usage in Figure \ref{img62:RetTInf}, where type inference determines that the return type has to be \texttt{int} type and uses that to deduce the type argument \texttt{T}.
 \par
-\begin{figure}[p]
+\begin{figure}
 \begin{lstlisting}[style=csharp]
 object row = ...
 int id = row.Field("id")
@@ -792,7 +793,7 @@ static class ObjectEx {
 The next idea of improving type inference is given by discussion \cite{online:TInfConst} , where type inference utilizes type information obtained from type constraints.
 A simple example of that can be seen in Figure \ref{img63:TInfConst}, where \texttt{T1} can be deduced by using \texttt{T1}'s constraint and inferred type of \texttt{T2} forming inferred type \texttt{List<int>}.
 \par
-\begin{figure}[p]
+\begin{figure}[t]
 \begin{lstlisting}[style=csharp]
 var temp = Foo(1);
 
@@ -806,7 +807,7 @@ T1 Foo<T1,T2>(T2 item) where T1 : List<T2> {}
 Discussion \cite{online:TMRetInf} mentions type inference of method return type known from Kotlin language.
 We can see the usage in the following Figure \ref{img64:TMRetInf}, where the return type of method \texttt{Add} is inferred to be \texttt{int} based on the type of the return expression.
 \par
-\begin{figure}[p]
+\begin{figure}[t]
 \begin{lstlisting}[style=csharp]
 public static Add(int x, int y ) => x + y;
 \end{lstlisting}
@@ -818,7 +819,7 @@ public static Add(int x, int y ) => x + y;
 Issue \cite{online:Realloc} proposes a way to compact type argument lists of identifiers containing inner identifiers with argument lists. 
 We can see an idea demonstrated in example \ref{img65:Realloc}, where the argument list of \texttt{A<T1>} type and the \texttt{Foo<T2>} method are merged, and the type arguments are split by a semicolon.
 \par
-\begin{figure}[p]
+\begin{figure}[b]
 \begin{lstlisting}[style=csharp]
 A.Foo<int;string>();
 
@@ -834,7 +835,7 @@ static class A<T1> {
 The last discussion \cite{online:CtorTInf}, which we mention here, regards \textit{Constructor type inference} enabling type inference for object creation expressions. 
 The type inference can be seen in Figure \ref{img66:CtorTInf}, where the \texttt{T} type parameter of the \texttt{C<T>} generic type can be deduced by using type information from its constructor.
 \par
-\begin{figure}[p]
+\begin{figure}[b!]
 \begin{lstlisting}[style=csharp]
 var temp = new C<_>(1); // T = int
 

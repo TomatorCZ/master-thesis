@@ -173,6 +173,34 @@ Each type variable has three types of bounds.
 The exact bound consists of types, which have to be identical to the type variable, meaning that they can be converted to each other.
 The lower bound contains types that have to be convertible to the type variable, and the upper bound is opposite to it.
 \par
+\begin{table}
+\begin{center}
+\resizebox{\textwidth}{!}{\begin{tabular}{ | l | l | } 
+  \hline
+  \texttt{\{Parameter\}.isValParam} & Checks if the parameter is passed by value. \\ 
+  \hline
+  \texttt{\{Parameter\}.isRefParam} & Checks if the parameter is passed by reference. \\ 
+  \hline
+  \texttt{\{Parameter\}.isOutParam} & Checks if the parameter has \texttt{out} modifier. \\ 
+  \hline
+  \texttt{\{Parameter\}.isInParam} & Checks if the parameter has \texttt{in} modifier. \\ 
+  \hline
+  \texttt{\{Argument\}.isInArg} & Checks if the argument has \texttt{in} modifier. \\ 
+  \hline
+  \texttt{\{Type\}.outTypes} & Returns \textit{Output} types of type. \\ 
+  \hline
+  \texttt{\{Type\}.inTypes} & Returns \textit{Input} types of type. \\ 
+  \hline
+  \texttt{\{Type\} isLike '\{Pattern\}'} & Checks if the type matches the pattern. \\ 
+  \hline
+  \texttt{\{Type\}.isDelegateOrExprTreeType} & Checks if the type is Delegate or Expression Tree type. \\ 
+  \hline
+\end{tabular}}
+\end{center}
+\caption{Description of used properties.}
+\label{table1:algorithmLegen}
+\end{table}
+\par
 \begin{figure}
 \begin{lstlisting}[style=myAlgo, mathescape=true]
 Input: method call M($E_1$,...$E_x$) and 
@@ -250,7 +278,7 @@ Basically, it finds arguments' types with corresponding parameter types and adds
 \par
 \begin{figure}
 \begin{lstlisting}[style=myAlgo, mathescape=true]
-fn InferOutputType(E, T):
+fn InferOutputType(Argument E, Type T):
   switch(E) {
 	E.isAnonymousFunc && $T$.isDelegateOrExprTreeType $\rightarrow$
 	  InferLower(InferReturnType(E), T.returnType) 
@@ -261,12 +289,12 @@ fn InferOutputType(E, T):
 	  }
 	E.isExpression && E.getType() is Type u $\rightarrow$ InferLower(u, T)
   }
-fn InferExplicitParameterType(E, T):
+fn InferExplicitParameterType(Argument E, Type T):
   if (E.isExplicitTypedAnonymousFunc && T.isDelegateOrExprTreeType
     && E.paramTypes.size == T.paramTypes.size)
       E.paramTypes.zip(T.paramTypes)
                   .foreach((e, t) $\rightarrow$ InferExact(e, t))
-fn InferExact(U, V):
+fn InferExact(Type U, Type V):
   if (X.any(x $\rightarrow$ V == x && F[x.idx] == null)) $B_{exact}$[i].add(U)
   switch(V) {
     V isLike '$V_1$[..]' && U isLike '$U_1$[..]' && V.rank == U.rank $\rightarrow$ 
@@ -289,7 +317,7 @@ The second point that will be important for us in the following sections is the 
 \par
 \begin{figure}
 \begin{lstlisting}[style=myAlgo, mathescape=true]
-fn InferLower(U, V):
+fn InferLower(Type U, Type V):
   if (X.any(x $\rightarrow$ V == x && F[x.idx] == null)) $B_{lower}[i]$.add(U)
   switch {
 	V isLike '$V_1$?' && U isLike '$U_1$?' $\rightarrow$ InferLower($V_1$, $U_1$)
@@ -300,7 +328,7 @@ fn InferLower(U, V):
 	  && U isLike '$U_1$[]' $\rightarrow$
 	    (!$U_1$.isRefType) ? InferExact($U_1$, $V_1$) : InferLower($U_1$, $V_1$)
 	V isLike 'C<$V_1,...,V_e$>' $\rightarrow$
-	  temp = ([U] + U.inheritedTypes + U.implementedTypes)
+	  temp = ([U] + U.inheritedTypes + U.implementedInterfaces)
 	    .filter(x $\rightarrow$ x isLike 'C<$U_1,...,U_e$>')
 	  if (temp.size == 1) $\rightarrow$
 	    V.typeArgs.zip(temp[0]).foreach((v, u) $\rightarrow$ 
@@ -311,7 +339,7 @@ fn InferLower(U, V):
 	      }
 	    )
   }
-fn InferUpper(U, V):
+fn InferUpper(Type U, Type V):
   if (X.any(x $\rightarrow$ V == x && F[x.idx] == null)) $B_{upper}[i]$.add(U)
   switch {
 	V isLike '$V_1$?' && U isLike '$U_1$?' $\rightarrow$
@@ -323,7 +351,7 @@ fn InferUpper(U, V):
 	  && V isLike '$V_1$[]' $\rightarrow$
 	    (!$U_1$.isRefType) ? InferExact($U_1$, $V_1$) : InferLower($U_1$, $V_1$)
 	U isLike 'C<$U_1,...,U_e$>' $\rightarrow$
-	  temp = ([V] + V.inheritedTypes + V.implementedTypes)
+	  temp = ([V] + V.inheritedTypes + V.implementedInterfaces)
 	    .filter(x $\rightarrow$ x isLike 'C<$V_1,...,V_e$>')
 	  if (temp.size == 1) $\rightarrow$
 	    U.typeArgs.zip(temp[0]).foreach((u, v) $\rightarrow$ 
@@ -349,7 +377,7 @@ The type variable is fixed to that type.
 \par
 \begin{figure}
 \begin{lstlisting}[style=myAlgo, mathescape=true]
-fn Fix(x):
+fn Fix(TypeParameter x):
   $U_{candidates}$ = $B_{lower}$[x.idx] + $B_{upper}$[x.idx] + $B_{exact}$[x.idx]
   $B_{exact}$[x.idx].foreach{b $\rightarrow$ 
     $U_{candidates}$.removeAll(u -> !b.isIdenticalTo(u))}

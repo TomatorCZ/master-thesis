@@ -62,6 +62,19 @@ language=[Sharp]C,
 numbers=left
 }
 
+\definecolor{key-color}{rgb}{0.8, 0.47, 0.196}
+
+\lstdefinestyle{myAlgo}
+{
+	numbers=left,
+    keywordstyle = [2]{\color{key-color}},
+    keywordstyle = [3]{\color{blue}},
+    keywordstyle = [4]{\bfseries\color{black}},
+    keywords = [2]{fn,elif,if,switch,is,while,else,return,default,isLike},
+    keywords = [3]{Type,null},
+    keywords = [4]{Input,Output}
+}
+
 %%% Algorithm
 
 \SetAlCapSty{}

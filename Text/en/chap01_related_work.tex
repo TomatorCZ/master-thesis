@@ -167,77 +167,56 @@ An unfixed type variable \texttt{$X_i$} \emph{depends directly on} an unfixed ty
 \end{defn}
 \par
 \info{Algorithm description}
-The method type inference process starts with receiving arguments of a method call and the method's signature, which type parameters have to be deduced, as we can see in the first schema \ref{alg01:methodTypeInference1}.
+The method type inference process starts with receiving arguments of a method call and the method's signature, which type parameters have to be deduced, as we can see in the first Figure \ref{img70:methodTypeInference1}.
 The algorithm has two phases where the first phase initializes initial bounds' sets of type variables(inferred type arguments), and the second phase repeats until all type variables are fixed or fails if there is insufficient information to deduce it.
 Each type variable has three types of bounds. 
 The exact bound consists of types, which have to be identical to the type variable, meaning that they can be converted to each other.
-The lower bound contains types that have to be convertible to the type variable, and the upper bound is opposite to it. 
+The lower bound contains types that have to be convertible to the type variable, and the upper bound is opposite to it.
 \par
-\begin{algorithm}
-\SetKwFunction{FirstPhase}{FirstPhase}
-\SetKwFunction{SecondPhase}{SecondPhase}
-\SetKwFunction{InferExplicitParameterType}{InferExplicitParameterType}
-\SetKwFunction{InferExact}{InferExact}
-\SetKwFunction{InferLowerBound}{InferLowerBound}
-\SetKwFunction{isValueParameter}{isValParam}
-\SetKwFunction{isReferenceParameter}{isRefParam}
-\SetKwFunction{isInputParameter}{isInParam}
-\SetKwFunction{isInputArgument}{isInArg}
-\SetKwFunction{isOutputParameter}{isOutParam}
-\SetKwFunction{Fix}{Fix}
-\SetKwFunction{Failed}{Failed}
-\SetKwFunction{Return}{Return}
-\SetKwFunction{inputTypes}{inTypes}
-\SetKwFunction{outputTypes}{outTypes}
-\SetKwFunction{GoTo}{GoTo}
-\SetKwFunction{InferOutputType}{InferOutputType}
-\SetKwProg{Fn}{fn}{:}{}
-
-\KwIn{a method call \texttt{M($\mathtt{E_1, ..., E_x}$)} and its signature \texttt{$\mathtt{T_e}$ M<$\mathtt{X_1, ..., X_n}$>($\mathtt{T_1 p_1, ..., T_x p_x}$)}}
-\KwOut{$X_1, ..., X_n$}
-$B_{lower}, B_{upper}, B_{exact}, F \gets [\ ]$\;
-\FirstPhase{}\;
-\SecondPhase{}\;
-\Fn{\FirstPhase{}}{
-	\ForEach{$E_i$}{
-		\If{$E_i$ $\in$ AnonymousFuncs}{
-			\InferExplicitParameterType{$E_i, T_i$}
-		}
-		\ElseIf{$E_i$ has a type $U$}{
-			\Switch(\tcc*[h]{At most one case is executed}){$U$}{
-				\lCase{\isValueParameter{$p_i$}}{\InferLowerBound($U, T_i$)}
-				\Case{\isReferenceParameter{$p_i$} $\vee$ \isOutputParameter{$p_i$}}{\InferExact{$U, T_i$}}
-				\Case{\isInputParameter{$p_i$} $\wedge$ \isInputArgument{$E_i$}}{\InferExact{$U, T_i$}}
-				\lCase{\isInputParameter{$p_i$}}{\InferLowerBound{$U, T_i$}}
-			}
-		}
-	}
-}
-\Fn{\SecondPhase{}}{
-	$X_{indep} \gets \forall X_i : F[i] = null \wedge \nexists X_e : dependsOn(X_i, X_e)$\;
-	$X_{dep} \gets \forall X_i\ :\ F[i] = null\ \wedge (\exists X_e : dependsOn(X_e, X_i) \vee B_{lower}[i] \cup B_{exact}[i] \cup B_{upper}[i] \neq empty)$\;
-	\Switch{$X_{indep}$, $X_{dep}$}{
-		\Case{$X_{indep}$ $\neq$ empty}{
-			\lForEach{$X_s$ $\in$ $X_{indep}$}{\Fix{$X_s$}}		
-		}
-		\Case{$X_{indep}$ = empty $\wedge$ $X_{dependent}$ $\neq$ empty}{
-			\lForEach{$X_s$ $\in$ $X_{indep}$}{\Fix{$X_s$}}				
-		}
-		\Case{$X_{indep}$ $\cup$ $X_{dep}$ = empty}{
-		\lIf{$\exists X_k$ : F[k] = null}{\Failed{}}
-		\lElse{\Return{F[0], ..., F[n]}}
-		}
-		\Other{
-			\lForEach{$E_i$ : $\exists$ $X_e$ : F[e] = null $\wedge$ $X_e$ $\in$  \outputTypes{$T_i$} $\wedge$ $\nexists$ $X_k$ : F[k] = null $\wedge$ $X_k$ $\in$ \inputTypes{$T_i$}}{
-				\InferOutputType{$E_i, T_i$}			
-			}	
-			\GoTo{\normalfont\texttt{16}}	
-		}
-	}
-}
+\begin{figure}
+\begin{lstlisting}[style=myAlgo, mathescape=true]
+Input: method call M($E_1$,...$E_x$) and 
+       its signature $T_e$ M<$X_1$,...,$X_n$>($T_1$ $p_1$,...,$T_x$ $p_x$)
+Output: inferred $X_1$,...$X_n$
+$B_{lower}$ = $B_{upper}$ = $B_{exact}$ = F = []
+FirstPhase()
+SecondPhase()
+fn FirstPhase():
+  E.foreach(e $\rightarrow$  
+    if (e.isAnonymousFunc)
+      InferExplicitParamterType(e, $T$[e.idx])
+    elif (e.getType() is Type u)
+      switch (u) {
+        p[e.idx].isValParam $\rightarrow$ InferLowerBound(u, $T$[e.idx])
+        p[e.idx].isRefParam || p[e.idx].isOutParam $\rightarrow$ 
+          InferExact(u, $T$[e.idx])
+        p[e.idx].isInParam && e.isInArg $\rightarrow$ 
+          InferLowerBound(u, $T$[e.idx])
+      }
+  )
+fn SecondPhase():
+  while (true):
+    $X_{indep}$ = $X$.filter(x $\rightarrow$ 
+      F[x.idx] == null && $X$.any(x $\rightarrow$ dependsOn(x, y)))
+    $X_{dep}$ = $X$.filter(x $\rightarrow$
+      F[x.idx] == null && $X$.any(y $\rightarrow$ 
+        dependsOn(y, x) && ($B_{lower}$+$B_{upper}$+$B_{exact}$).isNotEmpty))
+    switch {
+	  $X_{indep}$.isNotEmpty $\rightarrow$ $X_{indep}$.foreach(x $\rightarrow$ Fix(x))     
+	  $X_{dep}$.isNotEmpty && $X_{indep}$.isEmpty $\rightarrow$ $X_{dep}$.foreach(x $\rightarrow$ Fix(x))
+	  ($X_{indep}$+$X_{dep}$).isEmpty $\rightarrow$ 
+	    return if (F.any(x $\rightarrow$ x == null)) Fail() else Success(F)
+	  default $\rightarrow$ $E$.filter(e $\rightarrow$ 
+	      $X$.any(x $\rightarrow$ 
+	        F[x.idx] == null && $T$[e.idx].outTypes.contains(x)) 
+	      && !X.any(x $\rightarrow$ 
+	        F[x.idx] == null && $T$[e.idx].inTypes.contains(x))
+	    ).foreach(e $\rightarrow$ InferOutputType(e, $T$[e.idx]))
+    }
+\end{lstlisting}
 \caption{Phases of Method Type Inference}
-\label{alg01:methodTypeInference1}
-\end{algorithm}
+\label{img70:methodTypeInference1}
+\end{figure}
 \par
 \info{The first phase description}
 The first phase iterates over provided arguments and chooses the right set where to add the type of the argument by calling helper functions based on several conditions.
@@ -255,7 +234,7 @@ The second goal checks for output types, dependent on input types where the last
 We can see respecting the order of inferring the return type of anonymous functions at line 29, where the return type of lambdas is inferred if all type variables contained in the parameter list are fixed.
 \par
 \info{Describe infer output type}
-Algorithm \ref{alg02:methodTypeInference2} contains definitions of three inferences used in the first and second phases.
+Algorithm \ref{img71:methodTypeInference2} contains definitions of three inferences used in the first and second phases.
 \texttt{InferOutputType()} infers return types of parameter types, which are delegates or expression trees.
 We can notice two situations where the first one takes care of arguments, which are Lambdas, and the second deals with method groups with possible type arguments. 
 We can see two undefined methods used to achieve the inference above.
@@ -269,206 +248,123 @@ We can see two undefined methods used to achieve the inference above.
 \texttt{InferExact()} is one of the three inferences which adds new bounds to type variables' bound sets.
 Basically, it finds arguments' types with corresponding parameter types and adds these types to the bounds when they match type variables as we can see at line 16.
 \par
-\begin{algorithm}
-\SetKwFunction{OverloadResolution}{OverloadResolution}
-\SetKwFunction{InferOutputType}{InferOutputType}
-\SetKwFunction{InferExplicitParameterType}{InferExplicitParameterType}
-\SetKwFunction{InferReturnType}{InferReturnType}
-\SetKwFunction{InferExact}{InferExact}
-\SetKwFunction{InferLower}{InferLower}
-\SetKwFunction{Add}{Add}
-\SetKwProg{Fn}{fn}{:}{}
-
-\Fn{\InferOutputType{E, T}}{
-	\Switch{E}{
-		\Case{E $\in$ AnonymousFuncs $\wedge$ T $\in$ DelegateTypes $\cup$ ExprTreeTypes}{
-			\InferLower{\InferReturnType{E}, T.ReturnType}		
-		}
-		\Case{E $\in$ MethGroups $\wedge$ T $\in$ DelegateTypes $\cup$ ExprTreeTypes}{
-			$T_{ret}, T_1,...T_n \gets T.ReturnType, T.ParamTypes$\; 
-			$E_{resolved}$ $\gets$ \OverloadResolution{$E, T_1,...T_n$}\;
-			\If{$\|E_{resolved}\|$ = 1}{
-				\InferLower{$E_{resolved}[1].ReturnType, _{ret}$}			
-			}
-		}
-		\lCase{E $\in$ Expressions $\wedge$ E has a type U}{
-			\InferLower{U, T}
-		}	
-	}
-}
-\Fn{\InferExplicitParameterType{E, T}}{
-	\If{E $\in$ ExplicitlyTypedAnonymousFuncs $\wedge$ T $\in$ DelegateTypes $\cup$ ExprTreeTypes $\wedge$ $\|E.ParamTypes\| = \|T.ParamTypes\|$}{
-		\ForEach{$U_i, V_i$ : $U_i$ $\in$ E.ParamTypes $\wedge$ $V_i$ $\in$ T.ParamTypes}{
-			\InferExact{$U_i, V_i$}		
-		}	
-	}
-}
-\Fn{\InferExact{U, V}}{
-	\lIf{$\exists$ i : V = $X_i$ $\wedge$ F[i] = null }{
-		$B_{exact}[i]$.\Add{U}	
-	}
-	\Switch{V}{
-		\Case{V = $V_1$[...] $\wedge$ U = $U_1$[...] $\wedge$ V.Rank = U.Rank}{
-			\InferExact{$U_1, V_1$}		
-		}
-		\lCase{V = \normalfont\texttt{$V_1$?} $\wedge$ U = $U_1$}{
-			\InferExact{$V_1, U_1$}		
-		}
-		\Case{V = \normalfont\texttt{C<$V_1,...V_e$>} $\wedge$ U = \normalfont\texttt{C<$U_1,...U_e$>}}{
-			\lForEach{$V_i, U_i$}{
-				\InferExact{$V_i, U_i$}
-			}		
-		}
-	}	
-}
+\begin{figure}
+\begin{lstlisting}[style=myAlgo, mathescape=true]
+fn InferOutputType(E, T):
+  switch(E) {
+	E.isAnonymousFunc && $T$.isDelegateOrExprTreeType $\rightarrow$
+	  InferLower(InferReturnType(E), T.returnType) 
+	E.isMethodGroup && T.isDelegateOrExprTreeType $\rightarrow$ {
+	  	$E_{resolved}$= OverloadResolution(E, T.parameterTypes)
+	  	if ($E_{resolved}$.size == 1) 
+	  	  InferLower($E_{resolved}$[0].returnType, T.returnType) 
+	  }
+	E.isExpression && E.getType() is Type u $\rightarrow$ InferLower(u, T)
+  }
+fn InferExplicitParameterType(E, T):
+  if (E.isExplicitTypedAnonymousFunc && T.isDelegateOrExprTreeType
+    && E.paramTypes.size == T.paramTypes.size)
+      E.paramTypes.zip(T.paramTypes)
+                  .foreach((e, t) $\rightarrow$ InferExact(e, t))
+fn InferExact(U, V):
+  if (X.any(x $\rightarrow$ V == x && F[x.idx] == null)) $B_{exact}$[i].add(U)
+  switch(V) {
+    V isLike '$V_1$[..]' && U isLike '$U_1$[..]' && V.rank == U.rank $\rightarrow$ 
+      InferExact($U_1$, $V_1$)
+    V isLike '$V_1$?' && U isLike '$U_1$' $\rightarrow$ InferExact($V_1$, $U_1$)
+    V isLike 'C<$V_1,...,V_e$>' && U isLike 'C<$U_1,...,U_e$>' $\rightarrow$
+      V.typeArgs.zip(U.typeArgs)
+                .foreach((v, u) $\rightarrow$ InferExact(v, u)) 
+  }
+\end{lstlisting}
 \caption{\textit{Output type inference}, \textit{Explicit parameter type inference}, \textit{Exact inference}}
-\label{alg02:methodTypeInference2}
-\end{algorithm}
+\label{img71:methodTypeInference2}
+\end{figure}
 \par
 \info{Describe infer lower, upper}
-Algorithm \ref{alg03:methodTypeInference3} shows remaining two inferences, adding types to lower and upper bounds.
+Algorithm \ref{img72:methodTypeInference3} shows remaining two inferences, adding types to lower and upper bounds.
 We can see various conditions testing corresponding types between arguments and parameters. 
 An interesting fact about adding new bounds is that there is no need to check possible contradictions, which are checked in type variable fixation. 
 The second point that will be important for us in the following sections is the absence of unfixed type variables in bound sets, making the algorithm easier for implementation.
 \par
-\begin{algorithm}
-\SetKwFunction{InferExact}{InferExact}
-\SetKwFunction{InferLower}{InferLower}
-\SetKwFunction{InferUpper}{InferUpper}
-\SetKwFunction{isReferenceType}{isRefType}
-\SetKwFunction{Add}{Add}
-\SetKwFunction{IdenticalTo}{IdenticalTo}
-\SetKwFunction{Inherits}{Inherits}
-\SetKwFunction{Implements}{Implements}
-\SetKwFunction{isCovariant}{isCovariant}
-\SetKwFunction{isContravariant}{isContravariant}
-\SetKwFunction{isInvariant}{isInvariant}
-\SetKwProg{Fn}{fn}{:}{}
-
-
-\Fn{\InferLower{U, V}}{
-	\lIf{$\exists$ i : V = $X_i$ $\wedge$ F[i] = null }{
-		$B_{lower}[i]$.\Add{U}	
-	}
-	\Switch{V, U}{
-		\lCase{V = \normalfont\texttt{$V_1$?} $\wedge$ U = \normalfont\texttt{$U_1$?}}{
-			\InferLower{$V_1, U_1$}		
-		}
-		\Case{V = $V_1$[...] $\wedge$ U = $U_1$[...] $\wedge$ V.Rank = U.Rank}{
-			\lIf{\normalfont\texttt{!}\isReferenceType{$U_1$}}{
-				\InferExact{$U_1$, $V_1$}		
-			}
-			\lElse{
-				\InferLower($U_1$, $V_1$)			
-			}
-		}
-		\Case{V $\in$ \{\normalfont\texttt{IEnumerable<$V_1$>}, \normalfont\texttt{ICollection<$V_1$>}, \normalfont\texttt{IReadOnlyCollection<$V_1$>}, \normalfont\texttt{IReadOnlyCollection<$V_1$>}, \normalfont\texttt{IList<$V_1$>}\} $\wedge$ U = $U_1$[ ]}{
-			\lIf{\isReferenceType{$U_1$}}{
-				\InferExact{$U_1$, $V_1$}		
-			}
-			\lElse{
-				\InferLower($U_1$, $V_1$)			
-			}
-		}
-		\Case{V = \normalfont\texttt{C<$V_1, ..., V_e$>} $\wedge$ $\exists!$ \normalfont\texttt{C<$U_1, ..., U_e$>} : \IdenticalTo{U, \normalfont\texttt{C<$U_1, ..., U_e$>}} $\vee$ \Inherits{U, \normalfont\texttt{C<$U_1, ..., U_e$>}} $\vee$ \Implements{U, \normalfont\texttt{C<$U_1, ..., U_e$>}}}{
-			\Switch{${V_i}$}{
-				\lCase{\isCovariant{${V_i}$}}{
-					\InferLower{${U_i}$, ${V_i}$}
-				}
-				\lCase{\isContravariant{${V_i}$}}{
-					\InferUpper{${U_i}$, ${V_i}$}
-				}
-				\lCase{\isInvariant{${V_i}$}}{
-					\InferExact{${U_i}$, ${V_i}$}
-				}			
-			}
-		}
-	}
-}
-\Fn{\InferUpper{U, V}}{
-	\lIf{$\exists$ i : V = $X_i$ $\wedge$ F[i] = null }{
-		$B_{upper}[i]$.\Add{U}	
-	}
-	\Switch{V, U}{
-		\Case{V = \normalfont\texttt{$V_1$?} $\wedge$ U = \normalfont\texttt{$U_1$?}}{
-			\lIf{\normalfont\texttt{!}\isReferenceType{$U_1$}}{
-				\InferExact{$U_1$, $V_1$}		
-			}
-			\lElse{
-				\InferUpper($U_1$, $V_1$)			
-			}
-		}
-		\Case{V = $V_1$[...] $\wedge$ U = $U_1$[...] $\wedge$ V.Rank = U.Rank}{
-			\lIf{\normalfont\texttt{!}\isReferenceType{$U_1$}}{
-				\InferExact{$U_1$, $V_1$}		
-			}
-			\lElse{
-				\InferUpper($U_1$, $V_1$)			
-			}
-		}
-		\Case{U $\in$ \{\normalfont\texttt{IEnumerable<$U_1$>}, \normalfont\texttt{ICollection<$U_1$>}, \normalfont\texttt{IReadOnlyCollection<$U_1$>}, \normalfont\texttt{IReadOnlyCollection<$U_1$>}, \normalfont\texttt{IList<$U_1$>}\} $\wedge$ V = $V_1$[ ]}{
-			\lIf{\isReferenceType{$U_1$}}{
-				\InferExact{$U_1$, $V_1$}		
-			}
-			\lElse{
-				\InferLower($U_1$, $V_1$)			
-			}
-		}
-		\Case{U = \normalfont\texttt{C<$U_1, ..., U_e$>} $\wedge$ $\exists!$ \normalfont\texttt{C<$V_1, ..., V_e$>} : \IdenticalTo{V, \normalfont\texttt{C<$V_1, ..., V_e$>}} $\vee$ \Inherits{V, \normalfont\texttt{C<$V_1, ..., V_e$>}} $\vee$ \Implements{V, \normalfont\texttt{C<$V_1, ..., V_e$>}}}{
-			\Switch{${U_i}$}{
-				\lCase{\isCovariant{${U_i}$}}{
-					\InferUpper{${U_i}$, ${V_i}$}
-				}
-				\lCase{\isContravariant{${U_i}$}}{
-					\InferLower{${U_i}$, ${V_i}$}
-				}
-				\lCase{\isInvariant{${U_i}$}}{
-					\InferExact{${U_i}$, ${V_i}$}
-				}			
-			}
-		}
-	}
-}
+\begin{figure}
+\begin{lstlisting}[style=myAlgo, mathescape=true]
+fn InferLower(U, V):
+  if (X.any(x $\rightarrow$ V == x && F[x.idx] == null)) $B_{lower}[i]$.add(U)
+  switch {
+	V isLike '$V_1$?' && U isLike '$U_1$?' $\rightarrow$ InferLower($V_1$, $U_1$)
+	V isLike '$V_1$[..]' && U isLike '$U_1$[..]' && V.rank == U.rank $\rightarrow$
+	  (!$U_1$.isRefType) ? InferExact($U_1$, $V_1$) : InferLower($U_1$, $V_1$)
+	V isLike 'IEnumerable<$V_1$>' || 'ICollection<$V_1$>' || 'IList<$V_1$>'
+	  || 'IReadOnlyList<$V_1$>' || 'IReadOnlyCollection<$V_1$>' 
+	  && U isLike '$U_1$[]' $\rightarrow$
+	    (!$U_1$.isRefType) ? InferExact($U_1$, $V_1$) : InferLower($U_1$, $V_1$)
+	V isLike 'C<$V_1,...,V_e$>' $\rightarrow$
+	  temp = ([U] + U.inheritedTypes + U.implementedTypes)
+	    .filter(x $\rightarrow$ x isLike 'C<$U_1,...,U_e$>')
+	  if (temp.size == 1) $\rightarrow$
+	    V.typeArgs.zip(temp[0]).foreach((v, u) $\rightarrow$ 
+	      switch(v) {
+            v.isCovariant $\rightarrow$ InferLower(v, u)
+            v.isContravariant $\rightarrow$ InferUpper(v, u)
+            v.isInvariant $\rightarrow$ InferExact(v, u)
+	      }
+	    )
+  }
+fn InferUpper(U, V):
+  if (X.any(x $\rightarrow$ V == x && F[x.idx] == null)) $B_{upper}[i]$.add(U)
+  switch {
+	V isLike '$V_1$?' && U isLike '$U_1$?' $\rightarrow$
+	  (!$U_1$.isRefType) ? InferExact($U_1$, $V_1$) : InferUpper($U_1$, $V_1$)
+	V isLike '$V_1$[..]' && U isLike '$U_1$[..]' && V.rank == U.rank $\rightarrow$
+	  (!$U_1$.isRefType) ? InferExact($U_1$, $V_1$) : InferUpper($U_1$, $V_1$)
+	U isLike 'IEnumerable<$U_1$>' || 'ICollection<$U_1$>' || 'IList<$U_1$>'
+	  || 'IReadOnlyList<$U_1$>' || 'IReadOnlyCollection<$U_1$>' 
+	  && V isLike '$V_1$[]' $\rightarrow$
+	    (!$U_1$.isRefType) ? InferExact($U_1$, $V_1$) : InferLower($U_1$, $V_1$)
+	U isLike 'C<$U_1,...,U_e$>' $\rightarrow$
+	  temp = ([V] + V.inheritedTypes + V.implementedTypes)
+	    .filter(x $\rightarrow$ x isLike 'C<$V_1,...,V_e$>')
+	  if (temp.size == 1) $\rightarrow$
+	    U.typeArgs.zip(temp[0]).foreach((u, v) $\rightarrow$ 
+	      switch(u) {
+            u.isCovariant $\rightarrow$ InferUpper(u, v)
+            u.isContravariant $\rightarrow$ InferLower(u, v)
+            u.isInvariant $\rightarrow$ InferExact(u, v)
+	      }
+	    )
+  }
+\end{lstlisting}
 \caption{\textit{Upper-bound inference}, \textit{Lower-bound inference}}
-\label{alg03:methodTypeInference3}
-\end{algorithm}
+\label{img72:methodTypeInference3}
+\end{figure}
 \par
 \info{Fix}
-The last part of this algorithm is type variable fixation, shown in algorithm  \ref{alg04:methodTypeInference4}.
+The last part of this algorithm is type variable fixation, shown in algorithm  \ref{img73:methodTypeInference4}.
 At the beginning, a set of candidates for the type variable is constructed by collecting all its bounds. 
 Then, we go through each bounds and remove the candidates which do not satisfy the bound’s restriction. 
 If there is more than one candidate left, we try to find a unique type that is identical to all left candidates.
 The fixation is successful if the candidate is found.
 The type variable is fixed to that type.
 \par
-\begin{algorithm}
-\SetKwFunction{IdenticalTo}{IdenticalTo}
-\SetKwFunction{hasImplicitConversion}{hasImplicitConversion}
-\SetKwFunction{Failed}{Failed}
-\SetKwFunction{Fix}{Fix}
-\SetKwProg{Fn}{fn}{:}{}
-
-\Fn{\Fix{$X_i$}}{
-	$U_{candidates} \gets B_{upper}[i] \cup B_{exact}[i] \cup B_{lower}[i]$\;
-	\ForEach{U ${\in}$ $B_{exact}[i]$}{
-		$U_{candidates}$ -= \{$U_r$ : $U_r$ $\in$ $U_{candidates}$ $\wedge$ \normalfont\texttt{!}\IdenticalTo{$U_r$, U}\}
-	}
-	\ForEach{U ${\in}$ $B_{lower}[i]$}{
-		$U_{candidates}$ -= \{$U_r$ : $U_r$ $\in$ $U_{candidates}$ $\wedge$ \normalfont\texttt{!}\hasImplicitConversion{U, $U_r$}\}
-	}
-	\ForEach{U ${\in}$ $B_{upper}[i]$}{
-		$U_{candidates}$ -= \{$U_r$ : $U_r$ $\in$ $U_{candidates}$ $\wedge$ \normalfont\texttt{!}\hasImplicitConversion{$U_r$, U}\}
-	}
-	\lIf{$\exists!$ V : V $\in$ $U_{candidates}$ $\wedge$ $\forall$ $U_e$ $\in$ $U_{candidates}$ : \hasImplicitConversion{$U_e, V$}}{
-		F[i] = V
-	}
-	\lElse{
-		Failed()
-	}
-}
+\begin{figure}
+\begin{lstlisting}[style=myAlgo, mathescape=true]
+fn Fix(x):
+  $U_{candidates}$ = $B_{lower}$[x.idx] + $B_{upper}$[x.idx] + $B_{exact}$[x.idx]
+  $B_{exact}$[x.idx].foreach{b $\rightarrow$ 
+    $U_{candidates}$.removeAll(u -> !b.isIdenticalTo(u))}
+  $B_{lower}$[x.idx].foreach{b $\rightarrow$ 
+    $U_{candidates}$.removeAll(u -> !hasImplicitConversion(b, u))}
+  $B_{upper}$[x.idx].foreach{b $\rightarrow$ 
+    $U_{candidates}$.removeAll(u -> !hasImplicitConversion(u, b))}
+  temp = $U_{candidates}$.filter(x $\rightarrow$ $U_{candidates}$.all(y $\rightarrow$ 
+    hasImplicitConversion(y, x)))
+  if (temp.size == 1) F[i] = temp[0] else Fail()
+\end{lstlisting}
 \caption{Fixing of type variables}
-\label{alg04:methodTypeInference4}
-\end{algorithm}
+\label{img73:methodTypeInference4}
+\end{figure}
+\par
 \info{Array type inference}
 The third type inference happens in array initializers when the type of the array should be deduced from the initializer list.
 We can see an example of a situation when the type inference is used for determining \texttt{myArray} type on the first line in our code example \ref{img55:typeConst}.
@@ -581,49 +477,36 @@ The two last rules allow us to specify Poly types to Mono types and vice-versa.
 \info{Describe type inference}
 With the definitions given above, we can start to talk about H-M type inference, which is able to find the type of every expression of a completely untyped program.
 There exist several algorithms for inferring most general type of the expression.
-We show the W algorithm in schema \ref{alg05:w} since it is closely related to C\# and Rust type inference.
+We show the W algorithm in schema \ref{img74:w} since it is closely related to C\# and Rust type inference.
 Inputs are the context $\Gamma$ and an expression which type we want to infer.
 The process consists of systematic traversing the expression from bottom to top and deducing the type of sub-expressions following the mentioned rules.
 The algorithm uses the \texttt{Instantiate} method to replace quantified type variables in the expression with new type variables, the \texttt{Generelize} method to replace free type variables in the expression with quantified type variables, and the \texttt{Unify} method, also known as \textit{Unification} in Logic.
 Unification is an algorithm finding a substitution whose application on the unifying types makes them identical. 
 Outputs of this algorithm are the inferred type with a substitution used for the algorithm's internal state. 
 \par
-\begin{algorithm}
-\SetKwProg{Fn}{fn}{:}{}
-\SetKwFunction{Infer}{Infer}
-\SetKwFunction{Instantiate}{Instantiate}
-\SetKwFunction{Generelize}{Generelize}
-\SetKwFunction{NewVar}{NewVar}
-\SetKwFunction{Unify}{Unify}
-\SetKw{Ret}{return}
-
-\Fn{\Infer{$\Gamma$, expr}}{
-	\Switch{expr}{
-		\Case{expr is \normalfont{x}}{
-			\Ret (\{\}, \Instantiate{expr})		
-		}
-		\Case{expr is \normalfont{$\lambda$x$\rightarrow$e}}{
-			$\beta$ $\gets$ \NewVar{}\;
-			($S_1$, $\tau_1$) $\gets$ \Infer{$\Gamma$ + x : $\beta$, e}\;			
-			\Ret ($S_1$, $S_1 \beta$ $\rightarrow$ $\tau_1$)
-		}
-		\Case{expr is \normalfont{$e_1e_2$}}{
-			($S_1$,$\tau_1$) $\gets$ \Infer{$\Gamma$, $e_1$}\;
-			($S_2$,$\tau_2$) $\gets$ \Infer{$S_1 \Gamma$, $e_2$}\;
-			$\beta$ $\gets$ \NewVar{}\;
-			$S_3$ $\gets$ \Unify{$S_2 \tau_1$ ,$\tau_2 \rightarrow \beta$}\;
-			\Ret ($S_3 S_2 S_1$,$S_3 \beta$)		
-		}
-		\Case{expr is \normalfont{let x = $e_1$ in $e_2$}}{
-			($S_1$, $\tau_1$) $\gets$ \Infer{$\Gamma$, $e_1$}\;
-			($S_2$, $\tau_2$) $\gets$ \Infer{$\Gamma$ + x : \Generelize{$S_1 \Gamma$, $\tau_1$}, $e_2$}\;
-			\Ret{$S_2 S_1$,$\tau_2$}
-		}
-	}
-}
+\begin{figure}
+\begin{lstlisting}[style=myAlgo, mathescape=true]
+fn Infer($\Gamma$, expr):
+  switch(expr):
+    expr isLike 'x' $\rightarrow$ return ({}, Instantiate(expr))
+    expr isLike '$\lambda x \rightarrow e$' $\rightarrow$
+      $\beta$ = NewVar()
+      ($S_1$, $\tau_1$) = Infer($\Gamma$ + x: $\beta$, e)
+      return ($S_1$, $S_1$$\beta$ $\rightarrow$ $\tau_1$)
+    expr isLike '$e_1$$e_2$' $\rightarrow$
+      ($S_1$, $\tau_1$) = Infer($\Gamma$, $e_1$)
+      ($S_2$, $\tau_2$) = Infer($S_1$$\Gamma$, $e_2$)
+      $\beta$ = NewVar()
+      ($S_3$, $\tau_1$) = Unify($S_2$$\tau_1$, $\tau_2$ $\rightarrow$ $\beta$)
+      return ($S_3$$S_2$$S_1$, $S_3$$\beta$)
+    expr isLike 'let x = $e_1$ in $e_2$' $\rightarrow$
+      ($S_1$, $\tau_1$) = Infer($\Gamma$, $e_1$)
+      ($S_2$, $\tau_2$) = Infer($\Gamma$ + x: Generalize($S_1$$\Gamma$, $\tau_1$), $e_2$)
+      return ($S_2$$S_1$, $\tau_2$)
+\end{lstlisting}
 \caption{\textit{W} algorithm}
-\label{alg05:w}
-\end{algorithm}
+\label{img74:w}
+\end{figure}
 \par
 \info{Mention relation to Method type inference}
 Relations between this algorithm and C\#, Rust type inference will be discussed in detail later, although we can notice that the unification part of this algorithm is the same as Method type inference mentioned in the C\# section where the substitution represents inferred type arguments of the method which parameters were unified with matching arguments.

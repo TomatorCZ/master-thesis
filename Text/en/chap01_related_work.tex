@@ -146,7 +146,7 @@ The most challenging is Lamdas, whose return type has to be inferred after all l
 As we can see, the method type inference is a complex process containing many steps.
 Since one of our improvements is adjusting the algorithm, we present its complete description.
 The algorithm is divided into four sections to explain its functionality better.
-Before we show schema, we have to present definitions that are used by the algorithm referred in \cite{online:csTypeInference}.
+Before we show the algorithm, we have to present definitions that are used by the algorithm referred in the C\# specification \cite{online:csTypeInference}.
 \par
 \begin{defn}[Fixed type variables, bounds]
 We call inferred type parameters \emph{type variables} which are at the beginning of the algorithm unknown, \emph{unfixed}. 
@@ -167,12 +167,6 @@ An unfixed type variable \texttt{$X_i$} \emph{depends directly on} an unfixed ty
 \end{defn}
 \par
 \info{Algorithm description}
-The method type inference process starts with receiving arguments of a method call and the method's signature, which type parameters have to be deduced, as we can see in the first Figure \ref{img70:methodTypeInference1}.
-The algorithm has two phases where the first phase initializes initial bounds' sets of type variables(inferred type arguments), and the second phase repeats until all type variables are fixed or fails if there is insufficient information to deduce it.
-Each type variable has three types of bounds. 
-The exact bound consists of types, which have to be identical to the type variable, meaning that they can be converted to each other.
-The lower bound contains types that have to be convertible to the type variable, and the upper bound is opposite to it.
-\par
 \begin{table}
 \begin{center}
 \resizebox{\textwidth}{!}{\begin{tabular}{ | l | l | } 
@@ -201,7 +195,14 @@ The lower bound contains types that have to be convertible to the type variable,
 \label{table1:algorithmLegen}
 \end{table}
 \par
-\begin{figure}
+The method type inference process starts with receiving arguments of a method call and the method's signature, which type parameters have to be deduced, as we can see in the first Figure \ref{img70:methodTypeInference1}.
+Our representation of the algorithm uses many helper functions which description is given in Table \ref{table1:algorithmLegen}.
+The algorithm has two phases where the first phase initializes initial bounds' sets of type variables(inferred type arguments), and the second phase repeats until all type variables are fixed or fails if there is insufficient information to deduce it.
+Each type variable has three types of bounds. 
+The exact bound consists of types, which have to be identical to the type variable, meaning that they can be converted to each other.
+The lower bound contains types that have to be convertible to the type variable, and the upper bound is opposite to it.
+\par
+\begin{figure}[h!]
 \begin{lstlisting}[style=myAlgo, mathescape=true]
 Input: method call M($E_1$,...$E_x$) and 
        its signature $T_e$ M<$X_1$,...,$X_n$>($T_1$ $p_1$,...,$T_x$ $p_x$)
@@ -247,34 +248,32 @@ fn SecondPhase():
 \end{figure}
 \par
 \info{The first phase description}
-The first phase iterates over provided arguments and chooses the right set where to add the type of the argument by calling helper functions based on several conditions.
-We suppose the reader has knowledge of C\# language, so we quickly mention used functions contained in the conditions for clarifying meant constructs of parameters and arguments.
-\texttt{isValParam()} and \texttt{isRefParam()} functions determine if the parameter is passed by value or by reference.
-There are also \texttt{isInParam()}, \texttt{isOutParam()}, \texttt{isInArg()} referring to the use of \texttt{in} and \texttt{out} keywords in parameter declarations and \texttt{in} keyword in the argument position.
+\texttt{FirstPhase()} iterates over provided arguments and chooses the right set where to add the type of the argument by calling helper functions based on several conditions.
+\par
 \info{The second phase description}
-The second phase happens iteratively, respecting \textit{depends on} relation.
+\texttt{SecondPhase()} happens iteratively, respecting \textit{depends on} relation.
 Each iteration has two goals.
 The first one is the fixation of at least one type variable.
 If there is no type variable to fix because either all type variables are fixed or there are no other type bounds which could be used for type variable deduction, the phases and algorithm ends.
 The sets \texttt{$X_{indep}$} and \texttt{$X_{dep}$} refer to type variables, which can be fixed in the current iteration.
-Line 24 contains a case ending the algorithm when all type variables are fixed, or there is no way to infer the next ones.
+Line 31 contains a case ending the algorithm when all type variables are fixed, or there is no way to infer the next ones.
 The second goal checks for output types, dependent on input types where the last unfixed types were fixed in this iteration, and infers them.
-We can see respecting the order of inferring the return type of anonymous functions at line 29, where the return type of lambdas is inferred if all type variables contained in the parameter list are fixed.
+We can see respecting the order of inferring the return type of anonymous functions at line 32, where the return type of lambdas is inferred if all type variables contained in the parameter list are fixed.
 \par
 \info{Describe infer output type}
-Algorithm \ref{img71:methodTypeInference2} contains definitions of three inferences used in the first and second phases.
+Figure \ref{img71:methodTypeInference2} contains definitions of three inferences used in the first and second phases.
 \texttt{InferOutputType()} infers return types of parameter types, which are delegates or expression trees.
 We can notice two situations where the first one takes care of arguments, which are Lambdas, and the second deals with method groups with possible type arguments. 
 We can see two undefined methods used to achieve the inference above.
 \texttt{InferReturnType()} utilizes already known types of lambdas argument to infer its return type.
-\texttt{OverloadResolution} tries resolving a method group to one method in order to infer the return type of that method.
+\texttt{OverloadResolution()} tries resolving a method group to one method in order to infer the return type of that method.
 \par
 \info{Describe infer explicit parameter type}
 \texttt{ExplicitParamterType()} method is used when an argument is explicitly typed anonymous function where the given parameter types are used to get information about type variables contained in a parameter of delegate or expression tree type.
 \par
 \info{Describe infer exact}
 \texttt{InferExact()} is one of the three inferences which adds new bounds to type variables' bound sets.
-Basically, it finds arguments' types with corresponding parameter types and adds these types to the bounds when they match type variables as we can see at line 16.
+Basically, it finds arguments' types with corresponding parameter types and adds these types to the bounds when they match type variables as we can see at line 19 where we choose the bound based on several kinds of match.
 \par
 \begin{figure}
 \begin{lstlisting}[style=myAlgo, mathescape=true]
@@ -310,7 +309,7 @@ fn InferExact(Type U, Type V):
 \end{figure}
 \par
 \info{Describe infer lower, upper}
-Algorithm \ref{img72:methodTypeInference3} shows remaining two inferences, adding types to lower and upper bounds.
+Figure \ref{img72:methodTypeInference3} shows remaining two inferences, adding types to lower and upper bounds.
 We can see various conditions testing corresponding types between arguments and parameters. 
 An interesting fact about adding new bounds is that there is no need to check possible contradictions, which are checked in type variable fixation. 
 The second point that will be important for us in the following sections is the absence of unfixed type variables in bound sets, making the algorithm easier for implementation.
@@ -368,7 +367,7 @@ fn InferUpper(Type U, Type V):
 \end{figure}
 \par
 \info{Fix}
-The last part of this algorithm is type variable fixation, shown in algorithm  \ref{img73:methodTypeInference4}.
+The last part of this algorithm is type variable fixation, shown in Figure \ref{img73:methodTypeInference4}.
 At the beginning, a set of candidates for the type variable is constructed by collecting all its bounds. 
 Then, we go through each bounds and remove the candidates which do not satisfy the bound’s restriction. 
 If there is more than one candidate left, we try to find a unique type that is identical to all left candidates.
@@ -416,7 +415,7 @@ In this section, we present Roslyn’s architecture to better understand the con
 \end{figure}
 \par
 \info{Overview of compilation pipeline, the first phase}
-The compilation pipeline, described in \cite{online:roslynArchitecture}, starts with loading the \texttt{.csproj} file with related C\# sources (\texttt{.cs}) and referenced libraries (\texttt{.dll}), as we can see in Figure \ref{img56:roslynPip}.
+The compilation pipeline, described in Microsoft documentation \cite{online:roslynArchitecture}, starts with loading the \texttt{.csproj} file with related C\# sources (\texttt{.cs}) and referenced libraries (\texttt{.dll}), as we can see in Figure \ref{img56:roslynPip}.
 C\# sources are passed to the lexer, creating tokens used by the parser forming \ac{AST}.
 Constructing \ac{AST} is the first phase (green color boxes of Figure \ref{img56:roslynPip}) of the compiler checking syntax of C\# sources.
 \par
@@ -505,7 +504,7 @@ The two last rules allow us to specify Poly types to Mono types and vice-versa.
 \info{Describe type inference}
 With the definitions given above, we can start to talk about H-M type inference, which is able to find the type of every expression of a completely untyped program.
 There exist several algorithms for inferring most general type of the expression.
-We show the W algorithm in schema \ref{img74:w} since it is closely related to C\# and Rust type inference.
+We show the W algorithm in Figure \ref{img74:w} since it is closely related to C\# and Rust type inference.
 Inputs are the context $\Gamma$ and an expression which type we want to infer.
 The process consists of systematic traversing the expression from bottom to top and deducing the type of sub-expressions following the mentioned rules.
 The algorithm uses the \texttt{Instantiate} method to replace quantified type variables in the expression with new type variables, the \texttt{Generelize} method to replace free type variables in the expression with quantified type variables, and the \texttt{Unify} method, also known as \textit{Unification} in Logic.

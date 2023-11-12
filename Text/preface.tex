@@ -1,75 +1,78 @@
 \chapter{Introduction}
 
-\info{Tell what is C\# and a goal of the thesis}
 C\# is an object-oriented programming language developed by Microsoft. 
 It belongs to the strongly typed languages helping programmers to possibly reveal bugs at compile time. 
 The first part of this thesis focuses on exploring type systems of strongly typed languages and proposes an improvement to the C\# type system. 
-The second part concerns the implementation of the improvement in the current C\# compiler and the creation of a proposal that will likely be discussed by the \ac{LDM} accepting new C\# language features.
+The second part concerns the implementation of the improvement in the current C\# compiler and the creation of a proposal that has sufficient potential to be discussed by the \ac{LDM} accepting new C\# language features.
 
 \section{Improving C\# type system}
 
-\info{What is type inference in context of strongly typed languages}
 A key feature of strongly typed languages is type safety, prohibiting operations on incompatible data, achieved by determining data types at compile time. 
 The easiest way for a compiler to reason about types of variables in the code is by providing type annotations determining the data type that these variables hold. 
-We can see an example of a type annotation given by a programmer using an example \ref{img01:csharp_type_anot} written in the C\# programming language. 
-The type declaration of the \texttt{people} variable guarantees that any possible chances to threaten it differently from \texttt{List<T>} will be reported at compile time to save the programmer time to debug it. 
-On the other hand, the programmer has to write more code to annotate a variable declaration whose type has a long name, as we can see in the listing. 
-This disadvantage of strongly typed languages can be removed by {\it Type inference} when a missing type annotation can be deduced using the context. 
-Taking our example, we can notice redundancy of type annotation \texttt{List<String>} in the code. Since we do the initialization and type declaration in the same place, the declared variable \texttt{people} has to have the same type as the initializing value. 
-The use of type inference can be seen in the \texttt{myFriend} variable declaration, where we used the \texttt{var} keyword triggering C\# type inference to determine the variable's type being the type of initializing value, \texttt{System.String} in this case.
-\par
-\begin{figure}
+There is Figure \ref{img01:csharp_type_sef} showing an usage of type annotations given by a programmer written in the C\# programming language. 
+The type declaration of the \texttt{people} variable guarantees that the following atempt to concatanate \texttt{"Tom"} string to that variable will be reported as an error at compile time since the operation is not defined for a pair of the \texttt{List<string>} type and \texttt{string} type.
+\begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-using System.Collections.Generic;
-
-List<string> people = new List<string>() {"Joe", "Nick", "Mike"};
+List<string> people = new List<string>() {"Joe", "Nick"};
 people += "Tom"; // Error reported during compilation
-var myFriend = "Tom";
 \end{lstlisting}
-\caption{Type annotations in the C\# programming language.}
-\label{img01:csharp_type_anot}
+\caption{Type safety in the C\# programming language.}
+\label{img01:csharp_type_sef}
 \end{figure}
 \par
-\info{Describe C\# and Rust type inference in context of generics}
-Scenarios where type inference can deduce a type vary in strongly typed languages. 
-An example can be seen in type arguments deduction of generic methods. 
-In the context of C\#, a generic method is a method that is parametrized by types besides common parameters, as you can find in code \ref{img02:csharp_infer_meth}. 
-Although the type inference deduces type arguments of the first generic method \texttt{Foo}, it fails to deduce type arguments of \texttt{Bar} even though it could be possible in this case since we know the method's return type.
+On the other hand, the programmer has to write more code to annotate the variable declaration and object creation whose type has a long name, as we can see in the example. 
+This disadvantage of strongly typed languages can be removed by \textit{type inference} when a missing type annotation can be deduced using the context. 
+Taking the example shown above, one of the \texttt{List<string>} type annotations could be removed since the type of \texttt{people} variable declaration can be deduced from its initializing value or the type of object creation can be deduced from the type of the assigning variable.
+There is an example of C\# type inference in Figure \ref{img02:csharp_type_inf}, where the \texttt{var} keyword is used to trigger type inference determining a type of \texttt{people} variable to be the \texttt{List<string>} type.
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+var people = new List<string>();
+\end{lstlisting}
+\caption{Type inference in the C\# programming language.}
+\label{img02:csharp_type_inf}
+\end{figure}
 \par
+Power of type inference varies in strongly typed languages.
+An example of the difference can be seen in type arguments deduction of generic methods. 
+In the context of C\#, a generic method is a method that is parametrized by types besides common parameters, as can found in Figure \ref{img03:csharp_gen_meth}.
+There is a generic method \texttt{GetField} enabling to return a value of \texttt{o}'s field with the \texttt{fieldName} name.
+The type of returned value is generic parameter \texttt{T} since it depends on the type of object's field.
+The \texttt{name} variable is initialized by using the method to retrive \texttt{person}'s name which is supposed to be a string.
+There is a redundancy in that statement since the type argument list of \texttt{GetField} method could be removed and \texttt{T} could be deduced from the type of \texttt{name} variable which has to be compatible with the return type.
+Although, the current version of C\# type inference fails to deduce it.
 \begin{figure}
 \begin{lstlisting}[style=csharp]
-Foo("Tom");
-int temp = Bar(); // Error reported during compilation
+T GetField<T>(object o, string fieldName) { ... }
 
-void Foo<T> (T arg) { ... }
-T Bar<T>() { ... }
+object person = ...
+string name = GetField<string>(person, "name");
 \end{lstlisting}
 \caption{C\# Type inference of generic methods.}
-\label{img02:csharp_infer_meth}
+\label{img03:csharp_gen_meth}
 \end{figure}
 \par
-When we compare it with example \ref{img03:rust_infer_meth}, demonstrating similar functionality written in Rust language, which belongs to strongly type languages too, we can see that Rust's type inference uses the target type to deduce the type arguments.
-\par
-\begin{figure}
+The similar concept of generic methods were introduced in the Rust \cite{online:rust} programming language which belongs to strongly type languages too.
+Figure \ref{img04:rust_gen_meth} shows a definition of generic method \texttt{GetField} which is equivalent of C\# method mentioned in the previous example.
+There is equivalent initialization of \texttt{name} variable declaration starting with \texttt{let} keyword, where Rust type inference deduces the type argument \texttt{T} to be \texttt{\&str} type utilizing the type information from the \texttt{name} variable.
+\begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-fn main() {
-    let elem : Option<u8> = foo(); 
-}
+fn GetField<T>(o: &object, fieldName: &str) -> T { ... }
 
-fn foo<T>() -> Option<T> { return None; }
+let person: &object = ...;
+let name: &str = GetField(person, "name");
 \end{lstlisting}
 \caption{Rust Type inference of generic methods.}
-\label{img03:rust_infer_meth}
+\label{img04:rust_gen_meth}
 \end{figure}
 \par
-\info{Introduce Hindley-Millner type system and type inference as a formalization}
-Type inference capabilities of C\# and Rust can be formalized by Hindley-Millner type inference \cite{online:yHM} used by these languages in a modified way. 
+Although Rust is younger than C\# and has different type system it managed to make type inference more powerful in the context of strongly typed languages to significantly save type annotations typing.
+The first goal of this thesis is to investigate if the same level of type inference can be achieved in C\# and improve C\# type inference to be used in more scenarios saving type annotations typing.
+\par
+The investigation recognizes type system requirements and type inference differencies to achieve desired level of type inference by formalizing Rust and C\# type inference.
+These formalizations can be partially identified as a part of existing Hindley-Millner \cite{online:yHM} type inference formalization which helps to unify the processes in these languages.
 Traditional Hindley-Millner type inference is defined in the Hindley-Millner type system \cite{online:wikiHM}, where it can deduce types of all variables in an entirely untyped code. 
 The power of type inference is caused by properties of the type system, which, in comparison with the C\# type system, doesn't use type inheritance or overloading. 
 Despite these barriers, Hindley-Millner type inference can be modified to work with other type systems like Rust or C\#, causing limited use cases where it can be applied.
-\par
-\info{Present goal of this part of thesis}
-The first part of the thesis aims to explore possible extension of C\# type inference based on Rust's type inference observation and the theoretical background given by Hindley-Millner type inference, which these languages use with modifications.
 
 \section{Implementation}
 

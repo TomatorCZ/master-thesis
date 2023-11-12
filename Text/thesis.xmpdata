@@ -1,0 +1,7 @@
+% Metadata to be stored in PDF, see documentation of the pdfx package for more details.
+
+\Author{Tomáš Husák}
+\Title{Improving Type Inference in the C\# Language}
+\Keywords{Type Inference\sep C\#\sep Roslyn}
+\Subject{TODO}
+\Publisher{Charles University}

@@ -3,7 +3,7 @@
 C\# is an object-oriented programming language developed by Microsoft. 
 It belongs to the strongly typed languages helping programmers to possibly reveal bugs at compile time. 
 The first part of this thesis focuses on exploring type systems of strongly typed languages and proposes an improvement to the C\# type system. 
-The second part concerns the implementation of the improvement in the current C\# compiler and the creation of a proposal that has sufficient potential to be discussed by the \ac{LDM} accepting new C\# language features.
+The second part concerns the implementation of the improvement in the current C\# compiler and the creation of a proposal that has sufficient potential to be discussed by the \ac{LDT} accepting new C\# language features.
 
 \section{Improving C\# type system}
 
@@ -39,7 +39,7 @@ There is a generic method \texttt{GetField} enabling to return a value of \textt
 The type of returned value is generic parameter \texttt{T} since it depends on the type of object's field.
 The \texttt{name} variable is initialized by using the method to retrive \texttt{person}'s name which is supposed to be a string.
 There is a redundancy in that statement since the type argument list of \texttt{GetField} method could be removed and \texttt{T} could be deduced from the type of \texttt{name} variable which has to be compatible with the return type.
-Although, the current version of C\# type inference fails to deduce it.
+However, the current version of C\# type inference fails to deduce it.
 \begin{figure}
 \begin{lstlisting}[style=csharp]
 T GetField<T>(object o, string fieldName) { ... }
@@ -53,7 +53,7 @@ string name = GetField<string>(person, "name");
 \par
 The similar concept of generic methods were introduced in the Rust \cite{online:rust} programming language which belongs to strongly type languages too.
 Figure \ref{img04:rust_gen_meth} shows a definition of generic method \texttt{GetField} which is equivalent of C\# method mentioned in the previous example.
-There is equivalent initialization of \texttt{name} variable declaration starting with \texttt{let} keyword, where Rust type inference deduces the type argument \texttt{T} to be \texttt{\&str} type utilizing the type information from the \texttt{name} variable.
+There is equivalent initialization of \texttt{name} variable declaration starting with \texttt{let} keyword, where Rust type inference deduces the type argument \texttt{T} to be \texttt{\&str} type utilizing the type information from the \texttt{name} variable declaration.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
 fn GetField<T>(o: &object, fieldName: &str) -> T { ... }
@@ -68,27 +68,26 @@ let name: &str = GetField(person, "name");
 Although Rust is younger than C\# and has different type system it managed to make type inference more powerful in the context of strongly typed languages to significantly save type annotations typing.
 The first goal of this thesis is to investigate if the same level of type inference can be achieved in C\# and improve C\# type inference to be used in more scenarios saving type annotations typing.
 \par
-The investigation recognizes type system requirements and type inference differencies to achieve desired level of type inference by formalizing Rust and C\# type inference.
-These formalizations can be partially identified as a part of existing Hindley-Millner \cite{online:yHM} type inference formalization which helps to unify the processes in these languages.
+The investigation explores type system requirements and type inference differencies to achieve desired level of type inference by formalizing Rust and C\# type inference.
+These formalizations can be partially identified as a part of existing Hindley-Millner \cite{online:yHM} type inference formalization which helps to reason about the inference in these languages.
 Traditional Hindley-Millner type inference is defined in the Hindley-Millner type system \cite{online:wikiHM}, where it can deduce types of all variables in an entirely untyped code. 
 The power of type inference is caused by properties of the type system, which, in comparison with the C\# type system, doesn't use type inheritance or overloading. 
-Despite these barriers, Hindley-Millner type inference can be modified to work with other type systems like Rust or C\#, causing limited use cases where it can be applied.
+Despite of deferencies, Hindley-Millner type inference can be modified to work with other type systems like Rust or C\#, causing limited use cases where it can be applied.
+Observing the influence of deferencies between these type systems on type inference will help to understand a limitation of possible type inference improvement in C\#.
 
 \section{Implementation}
 
-\info{Describe proposing a new feature}
-C\# is an open-source project where the community can contribute by fixing issues of the compiler, proposing new language features, and elaborating on implementing them. 
-Proposing new C\# features is done in public discussions of the C\# language repository \cite{online:langRepo}, where everyone can add his ideas or comment on others' ideas. 
-Although there is no required structure for how the idea should be described, \ac{LDM} created a template \cite{online:proposalTemplate} containing a base structure for proposing the feature in order to make the idea more likely to be discussed by the team. 
+The first part of the thesis explores limitiations of C\# type inference and proposes an improvement.
+The first goal of the second part tests the improvement by implementing it in an official C\# compiler, Roslyn \cite{online:langRepo}, which is an open-source project managed by Microsoft.
+The prototype is used to explore potential implementation issues, which the improvement can cause and which helps to adjust the improvement to be potentially enabled in the C\# compiler.
+\par
+Although the compiler is managed by the company, it has an open-source development which makes contributions from interested people possible to be merged into the production.
+Altough it is sufficient to make an \textit{pull request} containing a fix for solving compiler issues to be merged, language design improvements, similar to what thesis proposes, require a special process of validating the actual benefit.
+The process starts by proposing new C\# features in public discussions of the C\# language repository \cite{online:langRepo}, where everyone can add his ideas or comment on others' ideas. 
+It is preferred to use predefined template \cite{online:proposalTemplate} for describing the idea proposing the feature in order to make the idea more likely to be discussed by the team responible for accepting new language features. 
 The template includes motivation, detailed description, needed C\# language specification \cite{online:langSpec} changes, and other possible alternatives.
-\par
-\info{Roslyn}
-Language feature prototypes are implemented in feature branches of the Roslyn repository \cite{online:roslynRepo}, which contains an open-source C\# compiler developed by Microsoft and the community.
-\par
-\info{Present goal of the second thesis part}
-The process of language proposal ends with \ac{LDM} accepting or declining it. 
-The second part of this thesis regards creating the proposal describing our improvement using the prepared template and implementing it in Roslyn’s feature branch.
-\par
+The second goal of this part is to create the improvement as the language proposal, which would be presented to the team to has a potential to be a part of the current C\# language.
+The process of language proposal ends with \ac{LDT} accepting or declining it. 
 
 \section{Summary}
 
@@ -98,6 +97,6 @@ We summarize goals of this thesis in the following list:
 \begin{enumerate}
   \item[G1.] Explore possibilities of type inference in strongly typed languages
   \item[G2.] Improve C\# type inference based on previous analysis
-  \item[G3.] Create an proposal containing the improvement
-  \item[G4.] Implement the prototype in Roslyn
+  \item[G3.] Implement the prototype in Roslyn
+  \item[G4.] Create an proposal containing the improvement
 \end{enumerate}

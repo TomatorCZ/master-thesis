@@ -12,26 +12,25 @@ These areas concern the C\# type system, including generics and language constru
 
 \subsection{Type system}
 
-As we mentioned in the introduction, each variable and expression returning a value has to have a type in the C\# type system \cite{online:cSharpTypeSystem} called the \ac{CTS}.
-Its fundamental characteristic is type inheritance, where every type directly or indirectly inherits a base type \texttt{System.Object}, as you can see in the picture \ref{img04:typeSys}.
-This chain of inheritance forms a tree, meaning that it is prohibited to inherit more than one type.
-Types are divided into value and reference types.
-Value types consist of built-in numeric types, structures (\texttt{struct}), and enumeration (\texttt{enum}).
-Compared to classes (\texttt{class}) and records (\texttt{record}) belonging to reference types, value types can't be inherited by other types.
-The last relevant member of reference types is interface (\texttt{interface}), which can extend multiple interfaces and be implemented by \texttt{class}, \texttt{record}, or \texttt{struct}.
-\par
-\begin{figure}[b!]
+\begin{figure}[b]
 \centering
-\includegraphics[width=140mm, height=100mm]{./img/value-reference-types-common-type-system.png}
-\caption{The C\# type system \cite{online:cSharpTypeSystem}.}
+\includegraphics[width=140mm, height=65mm]{./img/CSTypeSystem.drawio.png}
+\caption{The C\# data types schema adjusted from a C\# blog\cite{online:cSharpTypeSystem}.}
 \label{img04:typeSys}
 \end{figure}
+C\# data types are defined in C\# type system which also defines relations between them.
+Its the most fundamental relation is type inheritance, where every type inherits an other type forming a tree with \texttt{System.Object} as a root node which doesn't inherit any type.
+Types are divided into value and reference types shown in Figure \ref{img04:typeSys} where arrows mean \textit{is inherited by} relation.
+Value types consist of built-in numeric types referred as \textit{simple types}, enumerations referred as \textit{enum types}, structures referred as \textit{struct types}, and \textit{nullable types}.
+Compared to reference types, value types are implicitly sealed meaning that they can't be inherited by other types.
+Reference types consist of interfaces, classes, arrays, and delegates.
+An interface introduces a new relation to the type system by defining list of methods, called also a contract, which has to be implemented by a type which \textit{implements} the interface.
+The relation forms an acyclic graph meaining that it is allowed to implement multiple interfaces but it can't form a cycle.
+Delegates represents typed pointers to methods describing its signature including generic parameters, parameters and a return type.
 \par
-\info{Nullability analysis}
-C\# type inference infers, besides a type, its nullability, determining if it is possible to assign \texttt{null} value to that type.
-C\# implicitly allows to assign \texttt{null} values to reference types indicating invalid value.
-Since C\# 2.0 \cite{online:csHist}, it allows to assign \texttt{null} values to nullable value types, which are generic wrappers around value types.
-Because assigning \texttt{null} value is referred to as a billion-dollar mistake, C\# 8.0 introduces optional settings prohibiting it and created nullable reference types explicitly allowing \texttt{null} assignment as a way of interaction with legacy code not using the feature.
+The type system implicitly allows to assign \texttt{null}, indicating an invalid value, to reference types.
+Since C\# 2.0 \cite{online:csHist}, it allows to assign \texttt{null} value to nullable types which are equivalents of other value types prohibiting it.
+Because assigning \texttt{null} value is referred to as a billion-dollar mistake, C\# 8.0 \cite{online:csHist} introduces optional settings warning about asigning \texttt{null} values and created nullable reference types which together with nullable types explicitly allows \texttt{null} assignment as a way of interaction with legacy code not using the feature.
 \par
 \info{Generic types and methods}
 An essential part of the type system is C\# Generics, allowing parametrization of types and methods by other types. 
@@ -46,7 +45,7 @@ We can see examples of type constraints in the following code \ref{img05:typeCon
 The second restriction forces the type argument to have a default constructor.
 Another restriction concerns an obligation that the type will be a value type or the type has to be non-nullable.
 \par
-\begin{figure}
+\begin{figure}[h]
 \begin{lstlisting}[style=csharp]
 class MyList<T> : where T : IComparable<T>, new()
 {  

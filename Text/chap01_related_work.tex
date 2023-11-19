@@ -1,22 +1,17 @@
 \chapter{Related work}
 
-In the introduction, we presented the programming language C\# and its possible improvement of type inference. 
+The introduction presented the programming language C\# and its possible improvement of type inference. 
 This chapter continues by describing relevant sections of the C\# language and its type inference algorithm to understand the possible barriers to implement improved type inference. 
-As a primary source of inspiration for the improvement, we will explore Hindley-Milner type inference in more detail and describe its modification in Rust and C\# programming languages. 
-For the third goal of this thesis, we will mention relevant C\# language issues presented on the GitHub repository, which we use later to prioritize the improvement features to make it more likely to be accepted by \ac{LDM}. 
+A primary source of inspiration for the improvement is Hindley-Milner type inference, which is explored in more detail with references to its modification in Rust and C\# programming languages.
+In the end, the chapter mentions relevant C\# language issues presented on the GitHub repository, which is used later to prioritize the improvement features to make it more likely to be discussed at \ac{LDM} held by \ac{LDT}. 
 
 \section{C\# programming language}
 
-\info{Explain purpose of this section}
-Although C\# language features complement each other, we try to extract only relevant components for type inference in this section. 
-We describe the type system, including C\# generics and their possibilities. 
-Then, we mention unrelated language constructs that influence the type inference, and we have to count on them in proposing improved type inference. 
-At the end of this section, we list types of type inference in C\# and describe them in necessary detail for the following chapters.
+Since type inference is a complicated process touching many areas of the C\# language, this section firstly sorts these areas into separated groups described in necessary detail to understand all parts of the current type inference. 
+These areas concern the C\# type system, including generics and language constructs where the type inference occurs or interacts with.
 
 \subsection{Type system}
 
-\info{Value/reference types}
-\info{Inheritance}
 As we mentioned in the introduction, each variable and expression returning a value has to have a type in the C\# type system \cite{online:cSharpTypeSystem} called the \ac{CTS}.
 Its fundamental characteristic is type inheritance, where every type directly or indirectly inherits a base type \texttt{System.Object}, as you can see in the picture \ref{img04:typeSys}.
 This chain of inheritance forms a tree, meaning that it is prohibited to inherit more than one type.

@@ -18,19 +18,17 @@ These areas concern the C\# type system, including generics and language constru
 \caption{The C\# data types schema adjusted from a C\# blog\cite{online:cSharpTypeSystem}.}
 \label{img04:typeSys}
 \end{figure}
-C\# data types are defined in C\# type system which also defines relations between them.
-Its the most fundamental relation is type inheritance, where every type inherits an other type forming a tree with \texttt{System.Object} as a root node which doesn't inherit any type.
-Types are divided into value and reference types shown in Figure \ref{img04:typeSys} where arrows mean \textit{is inherited by} relation.
-Value types consist of built-in numeric types referred as \textit{simple types}, enumerations referred as \textit{enum types}, structures referred as \textit{struct types}, and \textit{nullable types}.
-Compared to reference types, value types are implicitly sealed meaning that they can't be inherited by other types.
-Reference types consist of interfaces, classes, arrays, and delegates.
-An interface introduces a new relation to the type system by defining list of methods, called also a contract, which has to be implemented by a type which \textit{implements} the interface.
-The relation forms an acyclic graph meaining that it is allowed to implement multiple interfaces but it can't form a cycle.
-Delegates represents typed pointers to methods describing its signature including generic parameters, parameters and a return type.
+C\# data types are defined in the C\# type system, which also defines relations between them. 
+The most fundamental relation is type inheritance, where every type inherits another type, forming a tree with \texttt{System.Object} as a root node that doesn’t inherit any type.
+Types are divided into value and reference types, shown in Figure 2.1, where an arrow means \textit{is inherited by} relation. 
+Value types consist of built-in numeric types referred to as \textit{simple types}, and enumerations referred to as \textit{enum types}, structures referred to as \textit{struct types}, and nullable types. 
+Compared to reference types, value types are implicitly sealed, meaning that they can’t be inherited by other types. 
+Reference types consist of interfaces, classes, arrays, and delegates. 
+An interface introduces a new relation to the type system by defining a list of methods, called a contract, which has to be implemented by a type that implements the interface.
+The relation forms an acyclic graph, meaning a type can implement multiple interfaces, but the implementation relations can’t form a cycle. 
+Delegates represent typed pointers to methods describing its signature, including generic parameters, parameters, and a return type.
 \par
-The type system implicitly allows to assign \texttt{null}, indicating an invalid value, to reference types.
-Since C\# 2.0 \cite{online:csHist}, it allows to assign \texttt{null} value to nullable types which are equivalents of other value types prohibiting it.
-Because assigning \texttt{null} value is referred to as a billion-dollar mistake, C\# 8.0 \cite{online:csHist} introduces optional settings warning about asigning \texttt{null} values and created nullable reference types which together with nullable types explicitly allows \texttt{null} assignment as a way of interaction with legacy code not using the feature.
+The type system implicitly allows to assign \texttt{null}, indicating an invalid value, to reference types. Since C\# 2.0 \cite{online:csHist}, it allows to assign \texttt{null} value to nullable types, which are equivalents of the rest of value types prohibiting it. Because assigning \texttt{null} value is referred to as a billion-dollar mistake, C\# 8.0 \cite{online:csHist}, introduced optional settings warning about assigning null values and created nullable reference types, which, together with nullable types, explicitly allows \texttt{null} assignment as a way of interaction with legacy code not using the feature.
 \par
 \info{Generic types and methods}
 An essential part of the type system is C\# Generics, allowing parametrization of types and methods by other types. 

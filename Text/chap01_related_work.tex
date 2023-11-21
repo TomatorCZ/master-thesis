@@ -30,43 +30,36 @@ Delegates represent typed pointers to methods describing its signature, includin
 \par
 The type system implicitly allows to assign \texttt{null}, indicating an invalid value, to reference types. Since C\# 2.0 \cite{online:csHist}, it allows to assign \texttt{null} value to nullable types, which are equivalents of the rest of value types prohibiting it. Because assigning \texttt{null} value is referred to as a billion-dollar mistake, C\# 8.0 \cite{online:csHist}, introduced optional settings warning about assigning null values and created nullable reference types, which, together with nullable types, explicitly allows \texttt{null} assignment as a way of interaction with legacy code not using the feature.
 \par
-\info{Generic types and methods}
-An essential part of the type system is C\# Generics, allowing parametrization of types and methods by other types. 
-An example of a generic class is \texttt{System.Collections.Generic.List<T>} representing resizeable mutable array where  \texttt{T} represents arbitrary data type, which we want to have a collection of. 
-Providing a type argument for  \texttt{T}, we create a new type where the type argument replaces the usages of  \texttt{T}.
-\par
-\info{Generic constraints}
-Because a type parameter can be arbitrary, C\# treats it as a \texttt{System.Object}, which is insufficient in cases where the type parameter should provide special behaviour distinct from \texttt{System.Object}.
-This requirement is achieved by type constraints, which restrict a set of types that can be passed to the parameter.
-Several types of restrictions can be applied to type parameters in order to enable more actions on values of the restricted type parameters.
-We can see examples of type constraints in the following code \ref{img05:typeConst}, where we use implementation restriction forcing the \texttt{T} to implement an interface providing API for comparing values with the same type.
-The second restriction forces the type argument to have a default constructor.
-Another restriction concerns an obligation that the type will be a value type or the type has to be non-nullable.
-\par
+A big part of the type system is C\# \textit{generics}, allowing the parameterization of types and methods by arbitrary types. 
+A specific generic method or type is \textit{constructed} by providing required type arguments, where \textit{construction} means replacing all occurrences of type parameters with the type arguments. 
+Since type argument can be arbitrary type, the type parameter is considered to be the most general type in the type system, \texttt{System.Object}. 
+Assuming additional API from the type parameter is achieved by restricting a set of types, which can replace the type parameter, enabling a specific interface of this set. 
+The restriction is described by type constraints, which can be applied to type parameters. 
+There are several kinds of constraints that can be combined together, forcing the type argument to fulfill all of them. 
+Figure \ref{img05:typeConst} shows only two of them, and the rest can be found in the C# documentation \cite{online:csharpTypeConst}. 
+There is a definition of the \texttt{PrioritySorter} generic class with the \texttt{TItem} type parameter containing two constraints that the type argument has to hold. 
+The \texttt{class} constraint allows only reference types. 
+The \texttt{IPriorityGetter} constraint allows only types that implement the
+interface.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-class MyList<T> : where T : IComparable<T>, new()
-{  
-	private T[] myBuffer;
-	
-	int CompareOnIndicies(int idx1, int idx2) {
-		return myBuffer[idx1].CompareTo(myBufffer[idx2])	
-	}
-}
+class PrioritySorter<TItem> where TItem : class, IPriorityGetter 
+{ ... }
 \end{lstlisting}
 \caption{C\# type constraints.}
 \label{img05:typeConst}
 \end{figure}
 \par
-\info{Variance and contra-variance}
-The last feature of generics influencing type inference is the concept of type variance.
-Initially, type parameters are invariant, meaning an obligation to assign a generic type to another generic type having the same types of type parameters.
-Generic interfaces introduce additional modifiers (\texttt{in}, and \texttt{out}) of type parameters, which allow to assign a type with the more specialized type argument to a type with the less specialized type argument or vice-versa respectively.
+Constructed methods and types are new entities that don’t have any special relations between themselves implied from the construction. 
+However, C\# generic interfaces can utilize a concept of type variance to introduce additional relations between constructed types. 
+Initially, type parameters are \textit{invariant}, meaning an obligation to use the same type arguments as initially required. 
+A type parameter can be specified to be \textit{covariant}, by prepending the type parameter declaration with the \texttt{in} keyword, allowing to use more derived type than initially required. 
+0pposite \textit{contravariance} uses the \texttt{out} keyword, allowing to use
+more general type than initially required.
 \par
-\info{Overloading}
-We end this subsection by presenting method overloading. 
-C\# allows the definition of multiple methods with the same and count of type arguments having different parameters. 
-We will see in the following chapters why this feature is one of the barriers to implement strong and efficient type inference.
+The last relevant feature of the type system is method overloading, which
+allows definitions of multiple methods with the same name, return type, and count of type parameters having different types of parameters. 
+Further chapters will mention the feature as an obstacle in designing efficient type inference.
 
 \subsection{Relevant constructs}
 

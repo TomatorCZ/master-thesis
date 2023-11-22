@@ -36,7 +36,7 @@ Since type argument can be arbitrary type, the type parameter is considered to b
 Assuming additional API from the type parameter is achieved by restricting a set of types, which can replace the type parameter, enabling a specific interface of this set. 
 The restriction is described by type constraints, which can be applied to type parameters. 
 There are several kinds of constraints that can be combined together, forcing the type argument to fulfill all of them. 
-Figure \ref{img05:typeConst} shows only two of them, and the rest can be found in the C# documentation \cite{online:csharpTypeConst}. 
+Figure \ref{img05:typeConst} shows only two of them, and the rest can be found in the C\# documentation \cite{online:csharpTypeConst}. 
 There is a definition of the \texttt{PrioritySorter} generic class with the \texttt{TItem} type parameter containing two constraints that the type argument has to hold. 
 The \texttt{class} constraint allows only reference types. 
 The \texttt{IPriorityGetter} constraint allows only types that implement the
@@ -63,23 +63,51 @@ Further chapters will mention the feature as an obstacle in designing efficient 
 
 \subsection{Relevant constructs}
 
-For this and the following section, we use the code example \ref{img55:typeConst} to better demonstrate the constructs and type inference.
-\par
-\info{Dynamic}
-C\# type inference mostly happens at compile time, with one exception. 
-We previously mentioned that C\# requires knowing the types of all variables and expressions during compilation. 
-It turned out that the possibility of expressing type, which is unknown at compile time, became crucial for interoperability with other dynamic typed languages. 
-To make the interoperability easier, C\# introduced a dynamic keyword that can be used as an ordinary type, which causes late binding of all expressions containing the dynamic value.
-We can see an usage of the \texttt{dynamic} keyword on line 6 in the figure \ref{img55:typeConst} where we can notice the late binding on line 7 which doesn't cause a compile time error even the referring value doesn't define any method with the name \texttt{Foo}.
-Internally, the type is \texttt{System.Object}, however, the compiler skips its binding and postpones it to the runtime.
-Although the mentioned error on line 7 occurs at runtime, the compiler still attempts to check certain expressions containing dynamic values to reveal possible errors at compile time as we can see on line 8 where an error regarding of passing \texttt{System.String} to \texttt{System.Int} occurs during compilation.
-\par
-\info{Implicit typed lambdas}
+This section mentions unrelated C\# constructs where type inference occurs or influence the type inference algorithm.
+Their internals are then taken into condideration in the following chapters regarding a design of the improvement.
+
+\subsubsection*{Dynamic}
+
+The introduction \ref{sect01:imprv} mentioned that strongly typed languages requires to know types of data at compile time to prohibit incompatible operations on them.
+In the context of C\#, data means values of expressions which are transformed using operations defined on their types.
+It turned out that operations on expressions of unknown type at compile time became crucial for interoperability with other dynamic typed languages whose types of expressions are known at runtime. 
+To make the interoperability easier, C\# introduced the \texttt{dynamic} type that can be used as an ordinary type, which avoids the checks and causes \textit{dynamic binding}.
+\textit{Binding} is a process of resolving referenced operations based on the type and value of the expression.
+Major of the C\# binding is happened statically, at compile time.
+Expressions containing a value of the \texttt{dynamic} type are dynamic bound at runtime bypassing the static binding of the compiler.
+This behavior can lead to possible bugs regarding invalid operations on the dynamic data types which will be reported during runtime.
+There is Figure \ref{img06:dynamic} showing an usage of the \texttt{dynamic} keyword where the \texttt{a} variable is defined with the \texttt{dynamic} type.
+Dynamic binding occurs in the \texttt{a.Foo()} expression, where undefined operation \texttt{Foo()} on the \texttt{string} type doesn't cause a compilation error.
+The error is reported at runtime when the actual type of the \texttt{a} variable is determined to be \texttt{string}.
+Despite the dynamic binding, a compiler can still little check certain kinds of expressions containing values of dynamic types to reveal possible errors at compile time.
+An example of such checking is the \texttt{Bar()} method call where the compiler can check the first argument which type is known at compile time as the type of the parameter. 
+An apropriate error occurs during the compilation, because \texttt{string} value has the \texttt{string} type and it is passed as the \texttt{p1} parameter which has the \texttt{int} type.
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+dynamic a = "string";
+a.Foo();
+Bar("string", 1, a); \\ Compilation error reported
+
+void Bar<T>(int p1, T p2, long p3) {...}
+\end{lstlisting}
+\caption{C\# dynamic type.}
+\label{img06:dynamic}
+\end{figure}
+
+\subsubsection*{Anonymous function}
 The next language construct influencing type inference is an anonymous function, also known as Lambda, which, instead of declaring a dedicated method with a signature and a body, allows to specify only the body with untyped parameters on places where a function delegate is required.
 We can see an example of Lambda expression on line 4 in the figure \ref{img55:typeConst} where we pass it as the fourth argument. 
 Type inference infers its signature based on the surrounding context.
-\par
-\info{Object creation expression and initializers}
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+class PrioritySorter<TItem> where TItem : class, IPriorityGetter 
+{ ... }
+\end{lstlisting}
+\caption{C\# type constraints.}
+\label{img05:typeConst}
+\end{figure}
+
+\subsubsection*{Object creation expression and initializer}
 The last language feature which will take part in the improved type inference are initializers used as a shortcut during an object instantiation.
 The most simple one is an object initializer that allows to assign values to the object's fields in a pleasant way instead of assigning them separately after the initialization.
 The second type of initializers regard arrays and collections.
@@ -90,7 +118,6 @@ One of the interface's declaring methods is \texttt{void Add<T>(T)} with adding 
 Each type implementing this interface is allowed to use an initializer list in the same manner as an array initializer.
 It's just a sugar code hiding to call the `Add` method for each item in the initializer list.
 The last type of initializer uses indexer to store referred values on predefined positions.
-\par
 \begin{figure}
 \begin{lstlisting}[style=csharpN]
 var myArray = new [] {new object(), "string"};
@@ -98,9 +125,7 @@ List<int> myList = new();
 
 Helper.Method2((long)1, (int)1, myList, (p1) => p1 + 1);
 
-dynamic dynamicValue = "string";
-dynamicValue.Foo();
-Helper.Method1("string", myArray, dynamicValue);
+
 
 class Helper {
  static void Method1<T>(int p1, IList<T> p3) {...}

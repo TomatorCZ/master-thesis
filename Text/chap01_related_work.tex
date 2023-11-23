@@ -63,25 +63,23 @@ Further chapters will mention the feature as an obstacle in designing efficient 
 
 \subsection{Relevant constructs}
 
-This section mentions unrelated C\# constructs where type inference occurs or influence the type inference algorithm.
-Their internals are then taken into condideration in the following chapters regarding a design of the improvement.
+This section mentions unrelated C\# constructs where type inference occurs or influences the type inference algorithm.
+Their internals are then considered in the following chapters regarding the design of the improvement.
 
 \subsubsection*{Dynamic}
 
-The introduction \ref{sect01:imprv} mentioned that strongly typed languages requires to know types of data at compile time to prohibit incompatible operations on them.
-In the context of C\#, data means values of expressions which are transformed using operations defined on their types.
-It turned out that operations on expressions of unknown type at compile time became crucial for interoperability with other dynamic typed languages whose types of expressions are known at runtime. 
-To make the interoperability easier, C\# introduced the \texttt{dynamic} type that can be used as an ordinary type, which avoids the checks and causes \textit{dynamic binding}.
-\textit{Binding} is a process of resolving referenced operations based on the type and value of the expression.
-Major of the C\# binding is happened statically, at compile time.
-Expressions containing a value of the \texttt{dynamic} type are dynamic bound at runtime bypassing the static binding of the compiler.
-This behavior can lead to possible bugs regarding invalid operations on the dynamic data types which will be reported during runtime.
-There is Figure \ref{img06:dynamic} showing an usage of the \texttt{dynamic} keyword where the \texttt{a} variable is defined with the \texttt{dynamic} type.
-Dynamic binding occurs in the \texttt{a.Foo()} expression, where undefined operation \texttt{Foo()} on the \texttt{string} type doesn't cause a compilation error.
-The error is reported at runtime when the actual type of the \texttt{a} variable is determined to be \texttt{string}.
-Despite the dynamic binding, a compiler can still little check certain kinds of expressions containing values of dynamic types to reveal possible errors at compile time.
-An example of such checking is the \texttt{Bar()} method call where the compiler can check the first argument which type is known at compile time as the type of the parameter. 
-An apropriate error occurs during the compilation, because \texttt{string} value has the \texttt{string} type and it is passed as the \texttt{p1} parameter which has the \texttt{int} type.
+Introduction \ref{sect01:imprv} mentioned that strongly typed languages require knowing data types at compile time to prohibit incompatible operations on them. 
+In the context of C\#, data means values of expressions that are transformed by operations defined on their types. 
+It turned out that operations on expressions of unknown type at compile time became crucial for interoperability with other dynamic-typed languages whose types of expressions are known at runtime. 
+To make the interoperability easier, C\# introduced the \texttt{dynamic} type that can be used as an ordinary type, which avoids the checks and causes \textit{dynamic binding}. 
+\textit{Binding} is a process of resolving referenced operations based on the type and value of the expression. 
+The majority of the C\# binding happens statically at compile time. Expressions containing a value of the \texttt{dynamic} type are dynamic bound at runtime, bypassing the static binding of the compiler. 
+This behavior can lead to possible bugs regarding invalid operations on the dynamic data types, which will be reported during runtime. 
+Figure \ref{img06:dynamic} shows a declaration of the \texttt{a} variable of the dynamic type.
+Dynamic binding occurs in the \texttt{a.Foo()} expression, where the \texttt{Foo()} operation is not checked during compilation. 
+An error is reported at runtime when the actual type of the \texttt{a} variable is determined to be \texttt{string}, which doesn’t define \texttt{Foo()} operation. Despite the dynamic binding, a compiler can still little check certain kinds of expressions containing values of dynamic types to reveal possible errors at compile time. 
+An example of such checking is the \texttt{Bar()} method call, where the compiler can check the first argument, whose type is known at compile time as the type of the parameter. 
+An appropriate error occurs during the compilation because string value has the \texttt{string} type, and it is passed as the texttt{p1} parameter, which has the \texttt{int} type.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
 dynamic a = "string";
@@ -95,29 +93,51 @@ void Bar<T>(int p1, T p2, long p3) {...}
 \end{figure}
 
 \subsubsection*{Anonymous function}
-The next language construct influencing type inference is an anonymous function, also known as Lambda, which, instead of declaring a dedicated method with a signature and a body, allows to specify only the body with untyped parameters on places where a function delegate is required.
-We can see an example of Lambda expression on line 4 in the figure \ref{img55:typeConst} where we pass it as the fourth argument. 
-Type inference infers its signature based on the surrounding context.
+C\# allows to define a function without a name, called \textit{anonymous function}.
+The function is represented as an expression that can be called or stored in a variable.
+There are three types of anonymous function.
+The first type is \textit{anonymous method} shown in Figure \ref{img06:anonymousF} where it is stored in the \texttt{a} variable.
+The \texttt{b} variable contains the second type called \textit{explicit typed anonymous function}.
+The third variable \texttt{c} contains the last type called \textit{implicit typed anonymous function}.
+As can be seen, all of them have inferred return types based on return expression inside their bodies.
+The most interesting type is the last one, where even parameter types are inferred based on a surrounding context and which is especially threatened by \textit{method type inference} algorithm mentioned in Type inference section \ref{sect02:typeInference}.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-class PrioritySorter<TItem> where TItem : class, IPriorityGetter 
-{ ... }
+Func<int, int> a = delegate(int p1) { return p1 + 1; };
+Func<int, int> b = (int p1) => { return p1 + 1; };
+Func<int, int> c = (p1) => { return p1 + 1; };
 \end{lstlisting}
-\caption{C\# type constraints.}
-\label{img05:typeConst}
+\caption{C\# anonymous functions.}
+\label{img06:anonymousF}
 \end{figure}
 
 \subsubsection*{Object creation expression and initializer}
-The last language feature which will take part in the improved type inference are initializers used as a shortcut during an object instantiation.
-The most simple one is an object initializer that allows to assign values to the object's fields in a pleasant way instead of assigning them separately after the initialization.
-The second type of initializers regard arrays and collections.
-Array initializers are used to create fixed arrays with predefined content as we can see on the first line of our example \ref{img55:typeConst} where we create an array of \texttt{System.Object} with two items.
-Under the hood, each of the items in the initializer is assigned to the corresponding index of the array after the array creation.
-Collection initializers are similar to an array initializer defined on collections which are determined by implementing \texttt{ICollection<T>} interface.
-One of the interface's declaring methods is \texttt{void Add<T>(T)} with adding semantic.
+Initializers are used as a shortcut during an object instantiation.
+The simplest one is \textit{object initializer} allowing to assign values to the object's fields pleasantly instead of assigning them separately after the initialization.
+The second type of initializers regards arrays and collections.
+\textit{Array initializers} are used to create fixed-size arrays with predefined content.
+Figure \ref{img07:initializer} shows the \texttt{arrayInit} variable initialized by an array of \texttt{int} with two items using the initializer.
+Under the hood, each item in the initializer is assigned to the corresponding index of the array after the array creation.
+\textit{Collection initializers} are similar to array initializers defined on collections, which are created by implementing \texttt{ICollection<T>} interface.
+One of the interface's declaring methods is \texttt{void Add<T>(T)} with adding semantics.
 Each type implementing this interface is allowed to use an initializer list in the same manner as an array initializer.
-It's just a sugar code hiding to call the `Add` method for each item in the initializer list.
-The last type of initializer uses indexer to store referred values on predefined positions.
+It's just a sugar code hiding to call the \textit{Add} method for each item in the initializer list.
+The last type of an initializer uses an indexer to store referred values on predefined positions, which is used in the second statement where the \texttt{indexerInit} variable is initialized by a dictionary object using indexers in its initializer list.
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+var arrayInit = new int[] { 1, 2 };
+var indexerInit = new Dictionary<string, int>() { 
+    ["a"] = 1, ["b"] = 2 
+};
+\end{lstlisting}
+\caption{C\# collection initializer.}
+\label{img07:initializer}
+\end{figure}
+
+\subsection{Type inference} \label{sect02:typeInference}
+
+\info{Introduce kinds of type inferences}
+
 \begin{figure}
 \begin{lstlisting}[style=csharpN]
 var myArray = new [] {new object(), "string"};
@@ -138,9 +158,7 @@ class Helper {
 \label{img55:typeConst}
 \end{figure}
 
-\subsection{Type inference}
 
-\info{Introduce kinds of type inferences}
 \info{Method type inference}
 C\# type inference occurs in many contexts. 
 However, we mention only these related to our improvement described in the following sections. 

@@ -414,56 +414,49 @@ var myArray = new[] {new object(), "string"};
 
 \section{Roslyn}
 
-\info{Intro}
 The implementation of C\# type inference can be found in the Roslyn compiler, as open-source C\# and VisualBasic compiler developed at the GitHub repository. 
-In this section, we present Roslyn’s architecture to better understand the context and restrictions that we must consider to plug the improved type inference into the compiler.
-\par
+This section presents Roslyn’s architecture to better understand the context and restrictions that has to be cosidered to plug the improved type inference into the compiler.
 \begin{figure}
 \centering
 \includegraphics[width=120mm, height=70mm]{./img/Roslyn_Arch.png}
 \caption{Roslyn architecture}
-\label{img56:roslynPip}
+\label{img15:roslynPip}
 \end{figure}
 \par
-\info{Overview of compilation pipeline, the first phase}
-The compilation pipeline, described in Microsoft documentation \cite{online:roslynArchitecture}, starts with loading the \texttt{.csproj} file with related C\# sources (\texttt{.cs}) and referenced libraries (\texttt{.dll}), as we can see in Figure \ref{img56:roslynPip}.
+Figure \ref{img56:roslynPip} shows the compilation pipeline, described in Microsoft documentation \cite{online:roslynArchitecture}.
+The pipeline starts with loading the \texttt{.csproj} file with related C\# sources (\texttt{.cs}) and referenced libraries (\texttt{.dll}).
 C\# sources are passed to the lexer, creating tokens used by the parser forming \ac{AST}.
-Constructing \ac{AST} is the first phase (green color boxes of Figure \ref{img56:roslynPip}) of the compiler checking syntax of C\# sources.
+\ac{AST} construction is the first phase (green boxes in Figure \ref{img56:roslynPip}) of the compiler checking syntax of C\# sources.
 \par
-\info{Describe the second phase}
-The second phase, marked by orange, forms \emph{Named symbols} exposed by public API representing defined namespaces, classes, methods, etc., in the C\# project. 
-The declarations are received from C\# sources by traversing AST and seeking for the particular syntax. Stored in \texttt{.dll} format, Libraries are parsed by \texttt{MetadataLoader}, creating the same Named symbols as those received from C\# sources.
+The second phase, marked by orange, forms \emph{named symbols} exposed by public API representing defined namespaces, classes, methods, etc., in the C\# project. 
+The declarations are received from C\# sources by traversing AST and seeking for the particular syntax. Libraries, stored in \texttt{.dll} format are parsed by \texttt{MetadataLoader}, creating the same named symbols as those received from C\# sources.
 \par
-\info{Describe the third phase}
-The third phase, also called the binding phase, matches identifiers in the code with received Named symbols from the previous phase. 
+The third phase, also called the binding phase, matches identifiers in the code with received named symbols from the previous phase. 
 Because the processing of a method body is not dependent on other method bodies since the code only uses already known declarations, Roslyn makes this phase concurrent. 
-The result of the phase is a \emph{Bound tree} where all identifiers refer to the Named symbols. 
-A method binding itself is a complicated procedure consisting of many subtasks such as \emph{Overload resolution} or mentioned Method type inference, which algorithm we described in detail in the previous section.
+The result of the phase is a \emph{bound tree} where all identifiers refer to the named symbols. 
+A method binding itself is a complicated procedure consisting of many subtasks such as \emph{overload resolution} or mentioned method type inference, which algorithm is described in detail in the previous section.
 \par
-\info{Binder}
 The binding is divided into a chain of binders, taking care of smaller code scopes. 
-One purpose of the binders is the ability to resolve an identifier to the Named symbol if the referred symbol lies in their scope. 
+One purpose of the binders is the ability to resolve an identifier to the named symbol if the referred symbol lies in their scope. 
 If they can’t find the symbol, they ask the preceding binder. 
-This process is called \emph{LookUp}, determining which Named symbols are accessible in the current position. 
+The process of finding referred symbols is called \emph{LookUp}. 
 Examples of binders are \texttt{NamespaceBinder} resolving defined top-level entities in the namespace scope, \texttt{ClassBinder} resolving defined class members, or \texttt{MethodBinder} binding method bodies. 
 The last mentioned binder sequentially iterates body statements and matches identifiers with their declarations. 
-Statement and expression binding are important steps that are related to type inference. 
-The first observation is that statement binding doesn’t involve binding of the following statements, which can be referred to as backward binding. 
+Statement and expression binding are important steps that are related to type inference.
+An important observation is that statement binding doesn’t involve binding of the following statements, which can be referred to as backward binding. 
 The consequence is that C\# is not able to infer types in the backward direction. 
 An example can be the usage of the \texttt{var} keyword in variable declarations, which has to be used always with initializing value. 
-If C\# would allow backward binding, we could initialize the variable later in one of the following statements.
+If C\# would allow backward binding, we could initialize the variable later in one of the following statements which would determine the type of the variable.
 \par
-\info{OverloadResolution, MethodTypeInferrer}
-The preceding step before Method type inference is Overload resolution, part of \texttt{MethodCallExpression} or \texttt{ObjectCreationExpression} binding. 
-As we mentioned previously, method overloading allows to define multiple methods with the same name differing in parameters. 
-So, when deciding which method should be called, we have to resolve the right version of the method by following language rules for method resolution. 
+The preceding step before method type inference is overload resolution, part of \texttt{MethodCallExpression} or \texttt{ObjectCreationExpression} binding. 
+As mentioned previously, method overloading allows to define multiple methods with the same name differing in parameters. 
+So, when the compiler decides which method should be called, it has to resolve the right version of the method by following language rules for method resolution. 
 This step involves binding the method call arguments first and then deciding which parameter list of the method group fits the argument list the best. 
-If the method group is generic and the expression doesn’t specify any type arguments, Method type inference is invoked to determine the type arguments of the method before the selection of the best candidate for the call.
+If the method group is generic and the expression doesn’t specify any type arguments, method type inference is invoked to determine the type arguments of the method before the selection of the best candidate for the call.
 When the right overload with inferred type arguments is chosen, unbinded method arguments requiring target type (for example already mentioned target-typed \texttt{new()} operator) are binded using corresponding parameter type.
 \par
-\info{NullableWalker}
-Method type inference can occur for the second time if we turn on the nullability analysis mentioned previously. 
-Nullability analysis is a kind of Flow analysis that uses a Bound tree to check and rewrite already created bound nodes according to nullability. 
+Method type inference can occur for the second time if previously mentioned nullability analysis is turned on. 
+Nullability analysis is a kind of flow analysis that uses a bound tree to check and rewrite already created bound nodes according to nullability. 
 Because overloading and method type inference are nullable-sensitive, the whole binding process is repeated, respecting the nullability and reusing results from the previous binding. 
 The required changes are stored during the analysis, and the Bound tree is rewritten by the changes at the end of the analysis.
 

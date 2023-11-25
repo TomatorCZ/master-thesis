@@ -551,50 +551,52 @@ However, in the worst case, it still takes exponential time to infer types.
 
 \section{Rust type inference}
 
-\info{Intro}
 Rust is a strongly typed programming language developed by Mozzila and an open community created for performance and memory safety without garbage collection. 
-Besides its specific features like traits or variable regions, it also has advanced type inference, which we now describe in a high-level perspective to get inspiration for our proposed improvement.
+Besides its specific features like traits or variable regions, it also has advanced type inference, which is now described in a high-level perspective to get inspiration for the proposed C\# improvement.
 \par
-\info{Type inference}
-We use code example \ref{img58:rustCodeExample} to show the significant difference between C\# method type inference and global Rust type inference.
-We can see that it can infer a type argument of generic type \texttt{vec<T>}, referring to a resizeable array, despite of the type information determining a type of the type argument is given in the later statement.
+Figure \ref{img17:rustCodeExample} shows a significant difference between C\# type inference and global Rust type inference.
+There is the \texttt{a} variable declaraction initialized by the \texttt{Vec<T>} generic type which type argument is going to be inferred.
+The second statement calls the \texttt{push} method on the \texttt{a} variable, which is also generic and takes an argument of the \texttt{T} type.
+Since \texttt{1} value is passed into this call, \texttt{T} is inferred to be the \texttt{i32} type and the type argument of the creating vector becomes \texttt{i32}.
+An interesting behavior regarding the type inference is that it infers the type of creating object used in the first statement using information obtained from the second statement.
 \begin{figure}[h]
 \begin{lstlisting}
-fn main() {
-    let mut things = vec![];
-    things.push("thing");
-}
+let mut a  = Vec::new();
+a.push(1);
 \end{lstlisting}
-\caption{Rust code example taken from \cite{online:rustTypeInference}.}
-\label{img58:rustCodeExample}
+\caption{Rust type inference example.}
+\label{img17:rustCodeExample}
 \end{figure}
-\par
-This is possible thanking to type inference context, which is shared across multiple statements. 
-We show a basic principle of the context in Figure 2.6. 
-It starts with an empty context. 
-As the compiler traverses a method body, it adds new type variables that have to be solved and constrains them by the types which they are interacting with. 
-In the figure, it constrains a type variable T1, required to infer the type variable of variable a by an initializing type. 
-However, the initializing type can't be fully resolved because the constraint contains an unbound type variable. 
-So, it passes the context to binding the next statement, where it collects another constraint about the type argument of the initializing value. 
-The collection of the constraints is similar to the Unification seen in the previous sections, where we extract the required bounds of unbound type variables by finding substitutions for type variables in order to make matching types containing the type variables equal.
-When there is enough information to resolve type variables, they are resolved by finding an appropriate type for the type variable with respect to collected types.
-\par
-\begin{figure}
+\begin{figure}[h]
 \centering
 \includegraphics[width=120mm, height=45mm]{./img/RustTypeInference.png}
 \caption{Rust type inference}
-\label{img57:rustTypeInference}
+\label{img18:rustTypeInference}
 \end{figure}
 \par
-\info{Properties of the type inference. More source of type info, Probing, Snapshots, No overloading}
-The mentioned sharing of context enables type inference to be a back forward, meaning that based on future type information, it is possible to infer already collected unbounded type variables. 
+\par
+This global type inference is possible thanks to a type inference context which is shared across multiple statements. 
+Figure \ref{img18:rustTypeInference} shows a basic principle how the the context works. 
+It starts with an empty context. 
+As the compiler traverses a method body, it adds new type variables that have to be solved and constrains them by the types which they are interacting with. 
+The figure demonstrates it by adding a new type variable \texttt{T1} representing a type of the \texttt{a} variable.
+It uses the \texttt{sub} function which adds the \texttt{Vec<T2>} subtyping constaint to the \texttt{T1} variable represented by a thick green line.
+This constraint was obtained from a type of the initializing value \texttt{Vec::new()} which contains an unspecified type argument represented by a new \texttt{T2} type variable.
+Since, the initializing type can't be fully resolved because the constraint contains the \texttt{T2} unbound type variable it has to postpone the resolution. 
+It passes the context to binding the next statement, where it collects another constraint about the \texttt{T2} type argument of the initializing value.
+The \texttt{sub} function is similar to the unification seen in the previous section, where it extracts the required bounds of unbound type variables by finding substitutions for type variables in order to make matching types containing the type variables equal.
+When there is enough information to resolve \texttt{T1} and \texttt{T2} type variables, they are resolved by finding an appropriate type for the type variable with respect to collected bounds.
+In the given example, the bounds contain only one type, so the type variables are resolved to them.
+\par
+The mentioned sharing of context enables type inference to be backward, meaning that based on future type information, it is possible to infer already collected unbounded type variables. 
 Besides sharing the context, there are other inference features that are missing in C\# type inference and would be valuable. 
 The first of them is type inference in object creation expressions, which doesn't exist in C\#. 
 The next regards collecting type constraints, which are obtained from a wider context than C\# uses. 
 For example, If a generic method containing a type variable in the return type is used as an assignment of an already typed variable, the type variable is constrained by the type of the target. Other features regard the inner implementation of type inference, which offers probing to constrain a type variable without influencing the context. 
 There is a possibility of a snapshot that records all changes and can be used for backtracking and finding the right inferred type arguments.
-Although Rust type inference is more advanced in comparison with C\#, we have to still consider language differences making type inference computation cost and difficulty relative to their features. As an example we can mention overloading causing already mentioned computation cost. 
-Since Rust doesn't have overloading, the type inference can be more powerful without significant slowdown, which is not the case of C\#.
+Although Rust type inference is more advanced in comparison with C\#, it has to be considered language differences making type inference computation cost and difficulty relative to their features. 
+As an example, the overloading can mentioned causing exponetial time of type inference. 
+Since Rust doesn't have overloading, the type inference can be more powerful without significant slowdown, which is not the case of C\# as will be shown in the following chapter.
 
 \section{Github issues}
 

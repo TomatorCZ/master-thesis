@@ -726,7 +726,7 @@ static class A<T1> {
 \end{figure}
 \par
 The last discussion \cite{online:CtorTInf}, which is mentioned here, regards \textit{constructor type inference} enabling type inference for object creation expressions. 
-The type inference can be seen in Figure \ref{img66:CtorTInf}, where the \texttt{T} type parameter of the \texttt{C<T>} generic type can be deduced by using type information from its constructor.
+The type inference can be seen in Figure \ref{img26:CtorTInf}, where the \texttt{T} type parameter of the \texttt{C<T>} generic type can be deduced by using type information from its constructor.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
 var temp = new C<_>(1); // T = int
@@ -734,5 +734,5 @@ var temp = new C<_>(1); // T = int
 class C<T> { public C(T p1) {}}
 \end{lstlisting}
 \caption{Constructor type inference.}
-\label{img66:CtorTInf}
+\label{img26:CtorTInf}
 \end{figure}

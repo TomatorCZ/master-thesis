@@ -2,9 +2,10 @@
 \info{Describe the chapter}
 The chapter divides the analysis into four sections. 
 The first section describes the scope of the improvement based on the mentioned championed issue recommended by \ac{LDT}. 
-The second section mentions use cases that use the proposed improvement. 
-The third section determines requirements based on the use cases, requirements given by proposing new language features, and Roslyn implementation internals. 
-The last section describes the proposed language feature design, which is inspired by C\# language feature ideas mentioned in the previous chapter and validated by the requirements.
+The second section mentions a concrete motivation which leads us to the proposed improvement. 
+The third section determines requirements based on the motivation, requirements given by proposing new language features, and Roslyn implementation internals. 
+The fourth section describes the proposed language feature design, which is inspired by C\# language feature ideas mentioned in the previous chapter and validated by the requirements.
+The last section mentions type inference improvements, whose implementation and proposal is not in the scope of this text, altought their possible implementation is sketched for being inspiration of future improvements. 
 
 \section{Scope}
 \info{Describe why we choose only a small part of the C\# type inference}
@@ -18,8 +19,124 @@ The thesis focuses on the already-mentioned \textit{partial type inference}, whi
 Analysis of this improvement contains a consideration of existing ideas, their consequences on C\#, and their difficulties in implementing them in Roslyn. 
 Additionally, the work describes the relation to the Hindley-Millner formalization to express the strength of the type inference in a formalized way, which can be further used to compare it with other kinds of type inference in different programming languages and which decides the theoretical boundaries of the C\# type inference.
 
-\section{Use cases}
-\change{Describe how the feature is meant to be used}
+\section{Partial type inference motivation}
+Partial type inference focuses on hinting the compiler ambigious type arguments on places, where it can't deduce them.
+On the context of C\# the only type inference which infers type arguments is method type inference mentioned in the previous chapter.
+The need of providing hints to compiler is caused by the strength of the method type inference.
+The first issue of the inference is that it uses only argument types for the inference which is unsufficient in the following use cases. 
+Figure \ref{img27:usecase1} shows a possible situation of working with databases.
+The \texttt{data} variable represents data fetched from a database.
+Since a concrete form of data is unknown, the data has type of \texttt{object}.
+There can be a hypotetical method \texttt{GetField} enabling to read the variable's field of the given name with the supposed type given as a type argument.
+Suppose, the object contains a "name" field, which is contains needed information.
+
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+object data = database.fetch();
+int name = data.GetField<int>("name");
+
+public static class Extensions {
+    public static 
+    TReturn GetField<TReturn>(this object inst, string fieldName) { 
+      ... 
+    }
+}
+\end{lstlisting}
+\caption{Target-typed inference.}
+\label{img27:usecase1}
+\end{figure}
+\par
+Concretely, we can see the weakness in cases where type arguments only depend on target type or type parameter restrictions.
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+test(new MyData()); // Error, method type inference can't infer T. We have to specify all type arguments.
+
+public void test<T, U>(U data) where T : TestCaseDefault<U> { ... }
+\end{lstlisting}
+\caption{Example.}
+\label{img28}
+\end{figure}
+\par
+The second improvement regards the "all or nothing" principle, where the method type inference infers either all of the type arguments or nothing.
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+log<, object>(new Message( ... ), null); // Error, impossible to specify just one type argument. We have to specify all of them. 
+
+public void log<T, U>(T message, U appendix) { ... }
+\end{lstlisting}
+\caption{Example.}
+\label{img29}
+\end{figure}
+\par
+The first improvement, which would improve the method type inference algorithm, has a significant disadvantage of introducing a breaking change. 
+On the other hand, the second improvement, which would enable specifying some of the method's type arguments, does not influence old code, solves problems regarding the "all or nothing" principle, and reduces the first weakness.
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+test<TestCaseDefault<MyData>, _>(new MyData()); // We can use _ to mark type arguments which should be inferred by the compiler.
+
+public void test<T, U>(U data) where T : TestCaseDefault<U> { ... }
+\end{lstlisting}
+\caption{Example.}
+\label{img30}
+\end{figure}
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+log<_, object>(new Message( ... ), null); // We can use _ to mark type arguments which should be inferred by the compiler.
+
+public void log<T, U>(T message, U appendix) { ... }
+\end{lstlisting}
+\caption{Example.}
+\label{img31}
+\end{figure}
+\par
+The next motivation is constructor type inference. 
+Method type inference is not defined on object\_creation\_expression, prohibiting taking advantage of type inference. 
+We divide use cases into the following categories, where type inference would help the programmer.
+Cases where the method type inference would succeed.
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+public static Wrapper<T> Create<T>(T item) { return new Wrapper<T>(item); }
+
+class Wrapper<T> { public Wrapper(T item) { ... } }
+\end{lstlisting}
+\caption{Example.}
+\label{img32}
+\end{figure}
+\par
+Cases where the method type inference would be weak. (Using type info from target type, or type arguments' constraints)
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+var alg = Create(new MyData()); // Method type inference can't infer TLogger because it doesn't use type constraints specified by `where` clauses
+
+public static Algorithm<TData, TLogger> Create<TData, TLogger>(TData data) where TLogger : Logger<TData> { return new Algorithm<TData, TLogger>(data); } 
+class Algorithm<TData, TLogger> where TLogger : Logger<TData> { public Algorithm(TData data) { ... }}
+\end{lstlisting}
+\caption{Example.}
+\label{img33}
+\end{figure}
+\par
+An existing solution can be seen in Create() method wrappers of constructors enabling a type inference through method type inference as you can ses in the examples above. However, we can't use it with object\_or\_collection\_initializer; we are limited by method type inference strength, and it adds unnecessary boiler code.
+
+Adding constructor type inference as we will describe in the following section would solve above mentioned examples.
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+var wrappedData = new Wrapper<_>(new MyData());
+class Wrapper<T> { public Wrapper(T item) { ... } }
+\end{lstlisting}
+\caption{Example.}
+\label{img34}
+\end{figure}
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+var alg = new Algorithm<_, _>(new MyData());
+var algWithSpecialLogger = new Algorithm<_ , SpecialLogger<_>>(new MyData());
+
+class Algorithm<TData, TLogger> where TLogger : Logger<TData> { public Algorithm(TData data) { ... }}
+\end{lstlisting}
+\caption{Example.}
+\label{img35}
+\end{figure}
+
 
 \section{Requirements}
 \change{Decribe requirements given by use cases}
@@ -35,6 +152,9 @@ Additionally, the work describes the relation to the Hindley-Millner formalizati
 \change{Divide it as in the proposal}
 \change{Explain why they sucsess the requirements}
 
+\section{Other type inference improvements}
 
+\change{Shared type inference context}
+\change{Inferring return value of methods}
 
 

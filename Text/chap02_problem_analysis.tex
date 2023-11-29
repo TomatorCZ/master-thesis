@@ -124,34 +124,41 @@ void M(long p2) {...}
 \label{img31:breakingChange2}
 \end{figure}
 \par
-\change{Possible method type inference improvement doesn't solve the third weakness}
-%However this requirement can be sometime unfilled when the use cases where the new version of compiler is not back-compatible are rare or unlikely.
-%The third scenario shows that even with the bigger context, there is still need to think about a way how to hint only amigious type arguments and let the compiler to infer rest of them.
-%\par
-\change{Partial type inference - reduces the first and second weakness}
-%On the other hand, partail type inference, which would enable specifying some of the method's type arguments, does not influence old code, solves problems regarding the \textit{all or nothing} principle, and reduces the first weakness.
-\begin{figure}
+\info{Possible method type inference improvement doesn't solve the third weakness}
+Besides the breaking change, the potential method type inference improvement to use begger context still doesn't solve our third example demonstrating a type parameter, which doesn't appear in parameter types, return type, and it is not contained the the type parameters' constraints.
+These obstacles gives the reason for introducing a way how to hint just ambigious type arguments to the compiler.
+\par
+\info{Partial type inference - reduces the first and second weakness}
+Considering partial type inference, it can sort of reduce the first two weaknesses.
+Type arguments, which can't be inferred by the method type inference, can be hinted avoiding to specify the whole type argument list.
+Let's ignore for now the reason why the underscore character is used and the way how inferred type variables are determined in the following example.
+Figure \ref{img32:sol1} shows an usage of partial type inference applied on the second presented example regarding method type inference weaknesses.
+Although the first type argument of the \texttt{Test} method call has to be still provided, the second argument is ommited by using the underscore character determining a inferred type argument.
+The reduction of first weakness is to isolate the unsuficient type inference to type arguments which are directly influenced by it and infer the rest.
+\begin{figure}[h]
 \begin{lstlisting}[style=csharp]
 test<TestCaseDefault<MyData>, _>(new MyData());
 
 void test<T, U>(U data) where T : TestCaseDefault<U> {...}
 \end{lstlisting}
 \caption{Partial type inference: Reducing method type inference weakness.}
-\label{img32}
+\label{img32:sol1}
 \end{figure}
 \par
-\change{Breaking changes - solves the third weakness}
-\begin{figure}
+\info{Breaking changes - solves the third weakness}
+The third motivation example confirms that partial type inference is not just a fix of missing type inference feature, but needed in situations where type arguments can't by inferred at all.
+Figure \ref{img33:sol2} demonstrated an usage of partial type inference where it ommits the first type argument since it can be deduced from the first argument type and specify the amigious type which can't be deduced. 
+\begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-log<_, object>(new Message( ... ), null);
+log<_, Appendix>(new Message(...), null);
 
 void log<T, U>(T message, U appendix) {...}
 \end{lstlisting}
 \caption{Partial type inference: Solving the \textit{all or nothing} problem.}
-\label{img33}
+\label{img33:sol2}
 \end{figure}
 \par
-\change{Constructor type inference - the fourth weakness}
+\change{Constructor type inference - next motivation and improvement}
 %The next motivation is \textit{constructor type inference}. 
 %Method type inference is not defined on object\_creation\_expression, prohibiting taking advantage of type inference. 
 %We divide use cases into the following categories, where type inference would help the programmer.

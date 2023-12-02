@@ -158,53 +158,74 @@ void log<T, U>(T message, U appendix) {...}
 \label{img33:sol2}
 \end{figure}
 \par
-\change{Constructor type inference - next motivation and improvement}
-%The next motivation is \textit{constructor type inference}. 
-%Method type inference is not defined on object\_creation\_expression, prohibiting taking advantage of type inference. 
-%We divide use cases into the following categories, where type inference would help the programmer.
-%Cases where the method type inference would succeed.
-\change{Constructor type inference - Factory method workaround}
-\begin{figure}
+\info{Constructor type inference - next motivation and improvement}
+Partial type inference doesn't regard only method type inference.
+It can be also introduce in other places.
+One of that places which seems to be good for that is object creation expression.
+Except already mentioned \texttt{new()} operator, there are no other type inference which would help to infer type arguments of a construing generic type.
+Since \texttt{new()} operator requires a target type to infer the construing type, the usage is limited.
+Figure \ref{img34:wrapper} shows an example of the limitation, where \texttt{new()} operator can't be used since the \texttt{IWrapper} target type is not the \texttt{Wrapper<int>} construing type.
+Hence an user has to specify the whole type with the \texttt{int} type argument wven it could be inferred using the argument type.
+\begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-static Wrapper<T> Create<T>(T item) => new Wrapper<T>(item);
+IWrapper a = new Wrapper<int>(1);
 
-class Wrapper<T> { public Wrapper(T item) {...} }
+class Wrapper<T> : IWrapper { public Wrapper(T item) {...} }
 \end{lstlisting}
-\caption{Workaround of constructor type inference.}
-\label{img34}
+\caption{C\# wrapper class.}
+\label{img34:wrapper}
 \end{figure}
 \par
-\change{Constructor type inference - strength of method type inference}
-%Cases where the method type inference would be weak. (Using type info from target type, or type arguments' constraints)
-\begin{figure}
+\info{Constructor type inference - Factory method workaround}
+In principle, the object creation can be consider as a special case of a method call with a side effect(creating the object) which aready has method type inference.
+Figure \ref{img35:workaroung} shows a workaround using \texttt{Create} method delegating the creation to construction call.
+Since the method call type arguments can be inferred, it allows to use the method type inference for inferring type arguments of construing type.
+However, this solution has disadvantages like necessary boiler-plate and prohibition of using initializers.
+\begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-var alg = Create(new MyData());
+IWrapper a = Create(1);
 
-static Algorithm<TData, TLogger> Create<TData, TLogger>(TData data) 
-    where TLogger : Logger<TData> 
-{ return new Algorithm<TData, TLogger>(data); } 
-
+static Wrapper<T> Create<T>(T item) => new Wrapper<T>(item);
+\end{lstlisting}
+\caption{Workaround of constructor type inference.}
+\label{img35:workaroung}
+\end{figure}
+\par
+\info{Constructor type inference - strength of method type inference}
+A possible solution would be to use method type inference in object creation expression.
+Although this solution would be simple to implement, class type parameters are more likely not to be used in constructor paramater types which makes the method type inference useless.
+Besides that, options for inferring type arguments of construing type is not limited by not introducing breaking changes since there is no type inference at all.
+So there is a possibility to interoduce even stronger type inference which could be one day introduce in the method type inference when there will be a way how to introduce breaking changes in the new version of compiler.
+Figure \ref{img36:cti} shows an example of such a generic class whose all type parameters are not used in the constructor.
+Because of that, potential method type inference extended to be used in object creation expressions would be useless since the \texttt{TLogger} can't be inferred only from parameter types.
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
 class Algorithm<TData, TLogger> where TLogger : Logger<TData> 
 { public Algorithm(TData data) { ... }}
 \end{lstlisting}
-\caption{Factory method's weakness.}
-\label{img35}
+\caption{Use case iusing type paraemter constraints.}
+\label{img36:cti}
 \end{figure}
 \par
-\change{Constructor type inference - the first weakness solution}
-%An existing solution can be seen in Create() method wrappers of constructors enabling a type inference through method type inference as you can ses in the examples above. However, we can't use it with object\_or\_collection\_initializer; we are limited by method type inference strength, and it adds unnecessary boiler code.
-%Adding constructor type inference as we will describe in the following section would solve above mentioned examples.
-\begin{figure}
+\info{Constructor type inference - the first weakness solution}
+Introducing improved type inference based on method type inference would solve mentioned issues.
+Figure \ref{img37:sol1} shows a potential usage of that type inference in the first case regarding the \texttt{Wrapper} class where an underscore is used to represent inferred type argument.
+The inference than uses the parameter type of the constructor to infer the \texttt{T} parameter type which is \texttt{int}.
+\begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-var wrappedData = new Wrapper<_>(new MyData());
-class Wrapper<T> { Wrapper(T item) { ... } }
+IWrapper a = new Wrapper<_>(1);
+
+class Wrapper<T> : IWrapper { public Wrapper(T item) {...} }
 \end{lstlisting}
 \caption{Constructor type inference: Wrapper.}
-\label{img36}
+\label{img37:sol1}
 \end{figure}
 \par
-\change{Constructor type inference - better method type inference}
-\begin{figure}
+\info{Constructor type inference - better method type inference}
+Figure \ref{img38:sol2} shows a potential improvements of the type inference.
+The first statement of initializing \texttt{alg} variables uses type inference levering \texttt{TLogger}'s constraint to determine its type.
+The second statement demonstrates a possibility to have a nested underscore which allow to more specify the type argument. 
+\begin{figure}[h]
 \begin{lstlisting}[style=csharp]
 var alg = new Algorithm<_, _>(new MyData());
 var algWithSpecialLogger = 
@@ -215,8 +236,10 @@ class Algorithm<TData, TLogger>
 { public Algorithm(TData data) { ... }}
 \end{lstlisting}
 \caption{Constructor type inference: stronger method type inference.}
-\label{img37}
+\label{img38:sol2}
 \end{figure}
+\par
+From now on, thesis calls \textit{constructor type inference} for introducing such a type inference.
 
 \section{Requirements}
 \change{Decribe requirements given by use cases}

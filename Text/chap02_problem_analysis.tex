@@ -240,11 +240,44 @@ class Algorithm<TData, TLogger>
 From now on, thesis calls \textit{constructor type inference} for introducing such a type inference.
 
 \section{Requirements}
-\change{Decribe requirements given by use cases}
-\change{Describe requirements given by Roslyn}
-\change{Describe requirements given by Future improvements}
-\change{Describe requirements given by back compatibility}
-\change{Describe requirements given by new language feature proposing}
+
+\info{intro}
+This section mentions requirements that have to be fulfilled by the improvement to be likely discussed by \ac{LDM}.
+\par
+\info{Describe requirements given by back compatibility}
+\textbf{Back compatibility} is one of the most important requirements for new language features. 
+The improvement shouldn’t introduce a breaking change. However, this requirement is sometimes too strict for improvements, which would be very beneficial, and its breaking change would appear in cases that seem to be rare in the code. 
+These improvements can break back compatibility by providing additional warnings or errors alerting a user of possible code behavior changes.
+Figure \ref{img39:brkCh} shows an introduced breaking change when record classes were added into the C\# language. 
+Before the change, the \texttt{B} identifier referred to a method without parameters and returning the \texttt{record} type. 
+After the change, the \texttt{B} identifier refers to a new record type declaration. 
+There is an example where the breaking change can appear when there is a type with the \texttt{record} name. 
+These situations are uncommon, and the improvement benefit was big enough to be added to the language. 
+The possible breaking change is notified to the user by a compilation error.
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+class record {}
+class A {
+    record B(){...}
+}
+\end{lstlisting}
+\caption{C\# record class breaking change.}
+\label{img39:brkCh}
+\end{figure}
+\par
+\info{Decribe requirements given by motivation}
+\textbf{Convenience} is a key requirement to make the improvement useful. 
+Regarding partial type inference, the improvement should propose a convenient way to skip ambiguous type arguments. 
+The way should also be possible to use in different places where skipping type arguments could yield an advantage, like type variable declaration or casting to a different type. 
+Constructor type inference should be advanced enough to cover the mentioned examples.
+\par
+\info{Describe requirements given by Future improvements}
+\textbf{Extensibility} would make the improvement open for new features that can be needed in future language versions. 
+The improvement should consider possible future improvements and not be a blocker for them.
+\par
+\info{Describe requirements given by Roslyn}
+\textbf{Performance} is a critical section of Roslyn, which is one of the main goals of this project.
+The time complexity added by the thesis’s improvement shouldn’t be too big in order to not slow the compilation process.
 
 \section{Language feature design}
 

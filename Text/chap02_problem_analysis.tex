@@ -281,10 +281,56 @@ The time complexity added by the thesis’s improvement shouldn’t be too big i
 
 \section{Language feature design}
 
-\change{Discuss mentioned ideas}
-\change{Choose suitable subset of them}
-\change{Divide it as in the proposal}
-\change{Explain why they sucsess the requirements}
+\info{Intro}
+This section describes the language design of the proposed improvement.
+It discusses existing ideas of the partial type inference, and combines them to form the proposed design.
+Than, it adjusts method type inference algorithm to handle partially defined type arguments and introduces constuctor type inference extending method type inference.
+\par
+\info{Discuss mentioned ideas}
+Mentioned ideas can be categorized into 3 groups.
+The first group consists of target-typed inference and type inference based on type constraints which improve method type inference algorithm.
+The second group consists of default type parameters, generic aliases, named type parameters, using char as inferred type argument, and realocation which reagrds partial type inference.
+the third group consists of constructor type inference and type inferecne of method return type which introduce type inference in new C\# constructs.
+Method return type inference is not in the scope of this work, although it is mentioned in the next section as a future improvement which will be difficult to implement.
+The first group is discussed in relation to constructor type inference where pottentially applied method type inferance can be improved without introducing breaking changes.
+The second group is discussed in relation to partial type inference which is an objective of the campioned issue.
+
+\subsection{Partial method type inference}
+
+Discussions regarding partial type inference can be further divided into two groups.
+The first group provides the hints in type parameter declarations which is done by default type parameters.
+Since it has to be done in the declaration, partial type inferenec wouldn't work with already existing code without adjusting it.
+For this reason, the work excludes the idea.
+\par
+The second group provides the hints through the usage.
+Generic aliases doesn't work for methods and also it doesn't seem to be useful when the inferred type arguments doesn't represent some common specialization of generic type which can be used example of \texttt{StringDictionary<TValue>}.
+\par
+Named type parameters are excluded since providing that woudl be uncommon new feature which has no equivalent in other well-known languages like Java, C++, Kotlin, and Rust.
+We believe it would be confusing to introduce it to the users since it is controversial change.
+\par
+Realocation doesn't sovle the problem with specifying all type arguments and it just compacts type argument lists into one.
+\par
+The last discussing regards unsing char as inferred type argument which is a core of the proposed design for the following reasons.
+It is already used in different languages like a star in Kolin and Java or an underscore in Rust and F\#.
+So it is more common and intentional then previously mentioned ideas.
+It introduces no or at least minimal syntax changes into the language which makes the usage simple.
+And it sovles the the problem with specifying all type arguments.
+
+\subsubsection*{Choosing the char}
+
+TODO
+
+\subsubsection*{Method lookup}
+
+TODO
+
+\subsubsection*{Method type algorithm change}
+
+TODO
+
+\subsection{Partial constructor type inference}
+
+\change{Explain why they fullfill the requirements}
 
 \section{Other type inference improvements}
 

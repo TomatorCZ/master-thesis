@@ -316,23 +316,252 @@ So it is more common and intentional then previously mentioned ideas.
 It introduces no or at least minimal syntax changes into the language which makes the usage simple.
 And it sovles the the problem with specifying all type arguments.
 
-\subsubsection*{Choosing the char}
+\subsubsection{Choosing the syntax}
+
+The choice of the syntax is based on five use cases where the expression of inferred type argument can be used or could be used in the future.
+Table \ref{table2:useCasesChar} shows examples of these usages which identify necessary requirements on the syntax.
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{ | l | c | } 
+  \hline
+  Generic method call & \texttt{Foo<\{SYNTAX\}>(arg1, arg2,...)}\\
+  \hline
+  Object creation expression & \texttt{new Bar<\{SYNTAX\}>(arg1, arg2,...)}\\
+  \hline
+  Variable declaration & \texttt{Bar<\{SYNTAX\}> temp = ...}\\
+  \hline
+  Array type & \texttt{\{SYNTAX\}[]}\\
+  \hline
+  Inferred type & \texttt{\{SYNTAX\}}\\
+  \hline
+\end{tabular}
+\end{center}
+\caption{Use cases containing syntax for inferred type argument.}
+\label{table2:useCasesChar}
+\end{table}
+\par
+\textbf{Generic method call} use case represents a situation where the syntax is used during a generic method call.
+\par
+\textbf{Object creation expression} represents the usage in construction of generic type.
+\par
+\textbf{Variable declaration} represents the potential usage in variable type declaration which is not in the scope of this work, however it is natural continuation of partial type inference extension where the inferred type arguments are deremined by the surrounding context.
+\par
+\textbf{Array type} has a different syntax of type argument list specifying a type of the contained elements.
+The type of the elements can be also inferred and the proposed syntax has to offer convenient way how to express an array type with the inferred element type.
+\par
+\textbf{Inferred type} doesn't have to be contained only in the type argument list.
+The previous chapter presented the \text{var} keyword used in the variable declaration whose type is determined by the type of initializing value.
+C\# also offers a discard pattern \cite{online:discard} represented by an underscore which is commonly used as placeholders for variables which are not intentionally used in the code.  
+Since type argument inference relates to that, the syntax should be at least aligned with already existing related syntax.
+The allignment will help the syntax to be naturally used without using a language documentation.
+\par
+There are several syntax which can be used for inferred type.
+The work presents the most relavent syntax which appeared in the mentioned ideas and comments on advantages and disadvantages for the each of them.
+
+\paragraph*{Diamond operator} is represened by pair of two angle brackets \texttt{<>}.
+It is used as empty type argument list determining that the type name or method name is generic.
+\par
+Figure \ref{img40:opDi1} demonstrates the usage in generic method calls of \texttt{Foo1} and \texttt{Foo2}.
+The declarations of these methods are not important for the purpouse of showing pros and cons.
+Calling the \texttt{Foo1} method with an empty argument list doesn't much make sense since method type inference is enabled by default without using angle brackets.
+Calling the \texttt{Foo2} method with nested usage of diamond operator allows limited partial type inference when the diamond operator is used inside the type argument list.
+The \texttt{Bar<>} type partially hint the compiler the generic type name without specifying the type arguments.
+However, the usage is problemeatic when there is multiple generic types with the same name since it can cause ambiguity between them.
+This problem is described in the next example.
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+Foo1<>(arg1, arg2, arg3);
+Foo2<Bar<>, int>(arg1, arg2, arg3);
+\end{lstlisting}
+\caption{Diamond operator - generic method call.}
+\label{img40:opDi1}
+\end{figure}
+\par
+Figure \texttt{img41:opDi2} shows the usage in object creation expression.
+The first statement containing \texttt{Bar<>} name has an advantage of expressing the will to infer the type's type arguments which is necessary in comparison the previous example since the object creation doesn't offer type inference.
+If the type inference would be potentially turned on by default, it would introduce a breaking change.
+Alhought, there is also an disadvantage of the usage since it doesn't specify the arity of the generic type.
+If there would be multiple generic types diferring in arity, it would complicate the already mentioned overload resolution phase since all constructors from these generic types would have to be considered.
+The process would be computationally demanding.
+Possible solution would be the following restriction. 
+Usually, there is not more than one generic type with the same name. 
+So when there will be just one type of that name, the diamond operator would be allowed to use since it determined one specific generic type.
+In the example, \texttt{Baz<>} would refer to \texttt{Baz<T1, T2>} generic type since there is no other generic type with the same name causing the ambiguity.
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+new Bar<>(...);
+new Baz<>(...);
+
+class Bar { ... }
+class Bar<T1> { ... }
+class Bar<T1, T2> { ... }
+
+class Baz<T1,T2> { ... }
+\end{lstlisting}
+\caption{Diamond operator - object creation expression.}
+\label{img41:opDi2}
+\end{figure}
+\par
+The third example is shown in Figure \ref{img42:opDi3}, where the generic \texttt{Wrapper} class is used to specify the wrapping generic type.
+However, it doesn't offer to specify any type arguments which is limiting when the compiler can't infer all of them..
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+Wrapper<> temp = ...
+\end{lstlisting}
+\caption{Diamond operator - variable declaration.}
+\label{img42:opDi3}
+\end{figure}
+\par
+Figure \ref{img43:opDi4} shows the operator as a indicator of inferred element of the array type.
+Since there isn't known popular language similar to C\# which would contain the similar construct, the usage is considered to be unintentiaonal for the most of the users.
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+<>[] temp = ...
+\end{lstlisting}
+\caption{Diamond operator - array type.}
+\label{img43:opDi4}
+\end{figure}
+\par
+The similar conslusions are made in the last example in Figure \ref{img44:opDi5} where the \texttt{<>} operator has the same functionality as already existing \texttt{var} keyword.
+\begin{figure}[h!]
+\begin{lstlisting}[style=csharp]
+<> temp = ...
+\end{lstlisting}
+\caption{Diamond operator - inferred type.}
+\label{img44:opDi5}
+\end{figure}
+
+\paragraph*{Whitespace seperated by commas} is the next proposing syntax which would allow to skip inferred type arguments and specify just the amigious.
+It would also determine the arity of type which is important for the type name look up phase of the compiler.
+Natural choice for the separator is commas since it is widely used.
+Another advantage is that this syntax is already used when working with C\# reflaction.
+An example is the following expression \texttt{typeof(Dictionary<,>)} which returns a class describing the \texttt{Dictionary} type.
+\par
+Figure \ref{img45:opW1} shows the usage when the \texttt{Foo1} generic method is called with skipping the first and the last type argument which is inferred by the compiler.
+However, the syntax seems to be messy when it is used in generic methods with many generic type parameters as can be seen in the \texttt{Foo2} method call.
+The similar thoughs regard the second and third use case.
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+Foo1<, string, List<>, >(arg1, arg2, arg3);
+Foo2<,,,int,,>(arg1, arg2, arg3);
+\end{lstlisting}
+\caption{Whitespace - generic method call.}
+\label{img45:opW1}
+\end{figure}
+\par
+The usage with array type seems to be unintantianal and would caused changes in the compiler parser. 
+Figure \ref{img46:opW4} shows the syntax to express inferred type of array's element. 
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+[] temp = ...
+Foo<, [], >(arg1, arg2)
+\end{lstlisting}
+\caption{Whitespace - array type.}
+\label{img46:opW4}
+\end{figure}
+\par
+The last use case regarding using the whitespace as a inferred type would probable caused problems with determining declarations of variables.
+Figure \ref{img47:opW5} shows a situation where the compiler can't determine if it is a variable declaration or an variable assignment.
+Although it could be solved by investigating surronding context, we consider that the code comprehension would get worse.
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+temp = ...
+\end{lstlisting}
+\caption{Whitespace - inferred type.}
+\label{img47:opW5}
+\end{figure}
+
+\paragraph*{Underscores seperated by commas} is commonly used in other programming languages like F\# or Haskell to represent inferred type arguments or as a placeholder for discarding variables wich are intentianolly not used.
+This is considered as a big advantage.
+An disadvantage is the introduction of breaking change because C\# allows the underscore as a type identifier.
+However, that seems to be rather uncommon in the code. 
+It seems to be less messy then previous syntax when a generic type contains many type parameters as it is shown in Figure \ref{img50:opU1}.
+\begin{figure}[h!]
+\begin{lstlisting}[style=csharp]
+new Bar<_, _, List<_>, _,_>(arg1, arg2, arg3);
+\end{lstlisting}
+\caption{Underscore - object creation expression.}
+\label{img50:opU1}
+\end{figure}
+\par
+The usage with array type also seems to work even it can be still considered uncommon.
+Figure \ref{img51:opU4} shows the usage where we think that the syntax intentianally express the inferred type of array's elements.
+\begin{figure}[h!]
+\begin{lstlisting}[style=csharp]
+_[] temp = ...
+\end{lstlisting}
+\caption{Underscore - array type.}
+\label{img51:opU4}
+\end{figure}
+\par
+The last use case is shown in Figure \ref{img52:opU5} where it clashes with already existing \texttt{var} keyword.
+\begin{figure}[h!]
+\begin{lstlisting}[style=csharp]
+_ temp = ...
+\end{lstlisting}
+\caption{Underscore - variable declaration.}
+\label{img52:opU5}
+\end{figure}
+
+\paragraph*{\texttt{var} keywords seperated by commas} are another natural option of the syntax.
+The big advantage of the syntax is already used \texttt{var} keyword in the variable declaration which meaining is coherent with inferred type arguments.
+However, it starts to raise the question if it brings the advantage of saving keystrokes.
+Figure \ref{img52:opV1} shows an usage of the syntax which is considered to be unnecessary long.
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp]
+Foo<var, string, List<var>, int>(arg1, arg2, arg3);
+\end{lstlisting}
+\caption{\texttt{var} - generic method call.}
+\label{img52:opV1}
+\end{figure}
+
+\paragraph*{Something else seperated by commas} doesn't make a lot of sense because it needs to assign new meaning to that character in comparison with an underscore, the \texttt{var} keyword, the \texttt{<>} operator, or \texttt{<,,,>} syntax. An asterisk can be considered, however, it can remind a pointer in the context of unmanaged C\# code.
+
+\paragraph*{Conslusion}
+TODO
+%The work prefers underscore character.
+%Additionally to that, It would prohibit using  underscore in the same places as \texttt{var}.
+
+\subsubsection{Method lookup}
 
 TODO
 
-\subsubsection*{Method lookup}
-
-TODO
-
-\subsubsection*{Method type algorithm change}
+\subsubsection{Method type inference algorithm change}
 
 TODO
 
 \subsection{Partial constructor type inference}
 
+TODO
+
+\subsubsection*{Class lookup}
+
+TODO
+
+\subsubsection*{Constructor type inference}
+
+TODO
+
+\subsubsection*{Initiliazers extension}
+
+TODO
+
+\subsubsection*{Diamond operator extension}
+
+TODO
+
 \change{Explain why they fullfill the requirements}
+
+TODO
 
 \section{Other type inference improvements}
 
+TODO
+
 \change{Shared type inference context}
+
+TODO
+
 \change{Inferring return value of methods}
+
+TODO

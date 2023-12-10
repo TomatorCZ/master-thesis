@@ -517,10 +517,12 @@ Foo<var, string, List<var>, int>(arg1, arg2, arg3);
 
 \paragraph*{Something else seperated by commas} doesn't make a lot of sense because it needs to assign new meaning to that character in comparison with an underscore, the \texttt{var} keyword, the \texttt{<>} operator, or \texttt{<,,,>} syntax. An asterisk can be considered, however, it can remind a pointer in the context of unmanaged C\# code.
 
-\paragraph*{Conslusion}
-TODO
-%The work prefers underscore character.
-%Additionally to that, It would prohibit using  underscore in the same places as \texttt{var}.
+\paragraph*{Conslusion} The thesis chooses the underscore as a placeholder for inferred type argument since the meaning of this character it related to the intention.
+It also seems to be the shortest and synoptical way how to skip inferred type arguments.
+Possible breaking change is not a obstacle in this situation since the similar decision was made for the \texttt{var} keyword and the situation where it can occurs seem to be rare.
+Problems with the potential future extension where the underscore can represent inferred type in variable declaration would be prohibit to not mix it with the \texttt{var} keyword.
+Although the diamond operator is not very useful in generic method call, it makes sence in object creation expression.
+The usage and analysis of that is covered by this work as well.
 
 \subsubsection{Method lookup}
 

@@ -320,7 +320,7 @@ It introduces no or at least minimal syntax changes into the language, which mak
 
 \subsubsection{Choosing the syntax}
 
-The choice of the syntax is based on five use cases where the expression of inferred type argument can be used or could be used in the future. 
+The choice of the syntax is based on six use cases where the expression of inferred type argument can be used or could be used in the future. 
 Table \ref{table2:useCasesChar} shows examples of these usages, which identify necessary syntax requirements.
 \begin{table}[h]
 \begin{center}
@@ -335,6 +335,8 @@ Table \ref{table2:useCasesChar} shows examples of these usages, which identify n
   Array type & \texttt{\{SYNTAX\}[]}\\
   \hline
   Inferred type & \texttt{\{SYNTAX\}}\\
+  \hline
+  Inferred nullable type & \texttt{\{SYNTAX\}?}\\
   \hline
 \end{tabular}
 \end{center}
@@ -357,6 +359,8 @@ The previous chapter presented the \text{var} keyword used in the variable decla
 C\# also offers a discard pattern \cite{online:discard} represented by an underscore, which is commonly used as a placeholder for variables that are not intentionally used in the code. 
 Since type argument inference relates to that, the syntax should be at least aligned with already existing related syntax. 
 The alignment will help the syntax to be naturally used without using language documentation.
+\par
+\textbf{Inferred nullable type} can be used to specify nullability of the inferred type which will be useful in scenarious where non-nullable and nullable code is mixed together.
 \par
 There are several syntax that can be used for inferred types. 
 The work presents the most relevant syntax that appeared in the mentioned ideas and comments on the advantages and disadvantages for each variant.
@@ -431,6 +435,9 @@ Similar conclusions are made in the last example in Figure \ref{img44:opDi5} whe
 \caption{Diamond operator - inferred type.}
 \label{img44:opDi5}
 \end{figure}
+\par
+The \texttt{?} nullable operator can be appended to the diamond operator.
+In general, each syntax introducing a placeholder which is not a whitespace is suitable for appending the \texttt{?} operator
 
 \paragraph*{Whitespace separated by commas} is the next proposed syntax, which would allow skipping inferred type arguments and specify just the ambiguous. 
 It would also determine the arity of type, which is important for the type name look-up phase of the compiler. 
@@ -472,6 +479,8 @@ temp = ...
 \caption{Whitespace - inferred type.}
 \label{img47:opW5}
 \end{figure}
+\par
+Since there is no placeholder which will be prepended to the nullable operator, this option doesn't work well in this scenario.
 
 \paragraph*{Underscores separated by commas} is commonly used in other programming languages like F\# or Haskell to represent inferred type arguments, or as a placeholder for discarding variables that are intentionally not used. 
 This is considered as a big advantage. 
@@ -505,11 +514,12 @@ _ temp = ...
 \label{img52:opU5}
 \end{figure}
 
+
 \paragraph*{\texttt{var} keywords separated by commas} are another natural option of the syntax. 
 The big advantage of the syntax is the already used var keyword in the variable declaration, whose meaning is coherent with inferred type arguments. 
 However, it starts to raise the question if it brings the advantage of saving keystrokes. 
 Figure \ref{img52:opV1} shows a usage of the syntax, which is considered to be unnecessarily long.
-\begin{figure}[h]
+\begin{figure}[h!]
 \begin{lstlisting}[style=csharp]
 Foo<var, string, List<var>, int>(arg1, arg2, arg3);
 \end{lstlisting}
@@ -529,9 +539,34 @@ Problems with the potential future extension where the underscore can represent 
 Although the diamond operator is not very useful in a generic method call, it makes sense in object creation expression. 
 The usage and analysis of that is covered by this work as well.
 
-\subsubsection{Method lookup}
+\subsubsection{Method and typename lookup}
 
-TODO
+The previous section presented the proposed syntax for skipping inferred type arguments using an underscore as a placeholder. 
+This section continues with determining what the expression containing the syntax exactly means.
+\par
+Since an underscore character is a valid type identifier in C\# and there is
+1:1 mapping of inferred type arguments to these placeholders, determining the referred generic method containing the proposed syntax is almost unchanged. 
+The change is in overload resolution where if the generic method is \textit{partially inferred}, meaning it contains the syntax, the type inference has to be done to determine the type arguments of that method.
+\par
+An underscore itself can be a nullable or non-nullable type. 
+If the inferred type argument has to be a nullable type, the metioned \texttt{?} operator can be appended to the underscore. 
+Figure \ref{img53:null} shows an example of using the nullable operator. 
+The call of \texttt{Foo} generic method has three type arguments where the first one is inferred by the compiler and which has to be nullable. 
+The second type argument is the \texttt{List} type, containing an inferred nullable type argument as well. 
+The third type argument doesn’t require the nullable type, so the inferred type can be either nullable or non-nullable.
+\begin{figure}[h!]
+\begin{lstlisting}[style=csharp]
+Foo<_?, List<_?>, _>(arg1, arg2, arg3);
+\end{lstlisting}
+\caption{Inferring nullable type argument.}
+\label{img53:null}
+\end{figure}
+\par
+The type name lookup is also almost unchanged. 
+If there is an underscore
+referring to inferred type argument, it simply ignores the binding of this identifier.
+\par
+The underscores contained in the type arguments are threatened in the changed type inference algorithm mentioned in the following section.
 
 \subsubsection{Method type inference algorithm change}
 

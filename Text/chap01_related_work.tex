@@ -341,7 +341,8 @@ The return type of the resolved method is matched with the output type of the co
 \begin{figure}[h!]
 \begin{lstlisting}[style=myAlgo, mathescape=true]
 fn InferExact(Type U, Type V):
-  if (X.any(x $\rightarrow$ V == x && F[x.idx] == null)) $B_{exact}$[i].add(U)
+  if (Type t = X.find(x $\rightarrow$ V == x && F[x.idx] == null)) 
+    $B_{exact}$[t.idx].add(U)
   switch(V) {
     V isLike '$V_1$[..]' && U isLike '$U_1$[..]' && V.rank == U.rank $\rightarrow$ 
       InferExact($U_1$, $V_1$)
@@ -351,10 +352,12 @@ fn InferExact(Type U, Type V):
                 .foreach((v, u) $\rightarrow$ InferExact(v, u)) 
   }
 fn InferLower(Type U, Type V):
-  if (X.any(x $\rightarrow$ V == x && F[x.idx] == null)) $B_{lower}[i]$.add(U)
+  if (Type t = X.find(x $\rightarrow$ V == x && F[x.idx] == null)) 
+    $B_{lower}[t.idx]$.add(U)
   switch { .... }
 fn InferUpper(Type U, Type V):
-  if (X.any(x $\rightarrow$ V == x && F[x.idx] == null)) $B_{upper}[i]$.add(U)
+  if (Type t = X.find(x $\rightarrow$ V == x && F[x.idx] == null)) 
+    $B_{upper}[t.idx]$.add(U)
   switch { ... }
 \end{lstlisting}
 \caption{\textit{Exact inference}, \textit{Upper-bound inference}, \textit{Lower-bound inference}}

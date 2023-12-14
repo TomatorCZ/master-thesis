@@ -570,7 +570,113 @@ The underscores contained in the type arguments are threatened in the changed ty
 
 \subsubsection{Method type inference algorithm change}
 
-TODO
+\begin{figure}[h!]
+\begin{lstlisting}[style=myAlgo, mathescape=true]
+Input: method call M<$S_1$,...$S_n$>($E_1$,...$E_x$) and 
+       its signature $T_e$ M<$X_1$,...,$X_n$>($T_1$ $p_1$,...,$T_x$ $p_x$)
+Output: inferred $X_1$,...$X_n$,...$X_{n+l}$
+$B_{lower}$ = $B_{upper}$ = $B_{exact}$ = $B_{shape} = $F = []
+$TV$ = getAllTypeVariables(X, S)
+FirstPhase()
+SecondPhase()
+fn FirstPhase():
+  S.foreach(s -> InferShapeBound(s, T[s.idx]))
+  /*Continuation as the former method type inference*/
+fn SecondPhase():
+  while (true):
+    $TV_{indep}$ = $TV$.filter(x $\rightarrow$ 
+      F[x.idx] == null && $TV$.any(x $\rightarrow$ 
+        dependsOn(x, y) && shapeDependsOn(x, y) 
+        && typeDependsOn(x, y)
+      )
+    )
+    $TV_{dep}$ = $TV$.filter(x $\rightarrow$
+      F[x.idx] == null && $TV$.any(y $\rightarrow$ 
+        (dependsOn(y, x) || shapeDependsOn(y, x) 
+          || typeDependsOn(y, x)) 
+        && $TV$.any(t $\rightarrow$ shapeDependsOn(x, t))
+        && ($B_{lower}$+$B_{upper}$+$B_{exact}$+$B_{shape}$).isNotEmpty
+      )
+    )
+    /*Continuation as the former method type inference*/
+\end{lstlisting}
+\caption{Phases of new Method Type Inference}
+\label{img54:mainTypeInference1}
+\end{figure}
+\begin{figure}[h!]
+\begin{lstlisting}[style=myAlgo, mathescape=true]
+fn Propagate(Type U, int typeVariable) {
+  setOf($B_{shape}$[typeVariable],
+    $B_{lower}$[typeVariable],
+    $B_{upper}$[typeVariable],
+    $B_{exact}$[typeVariable]
+  ).foreach(b $\rightarrow$
+    if (b.containsUnfixedTypeVariable) InferHelper(U, b)
+    if (U.containsUnfixedTypeVariable) InferHelper(b, U)
+  )
+}
+
+fn InferExact(Type U, Type V):
+  if (TypeVariable t = TV.find(x $\rightarrow$ V == x && F[x.idx] == null)) {
+    $B_{exact}$[t.idx].add(U)
+    Propagate(U, t.idx)
+  }
+  /*Continuation as the former method type inference*/
+fn InferLower(Type U, Type V):
+  if (TypeVariable t = TV.find(x $\rightarrow$ V == x && F[x.idx] == null)) {
+    $B_{lower}$[t.idx].add(U)
+    Propagate(U, t.idx)
+  }
+  /*Continuation as the former method type inference*/
+fn InferUpper(Type U, Type V):
+  if (TypeVariable t = TV.find(x $\rightarrow$ V == x && F[x.idx] == null)) {
+    $B_{upper}$[t.idx].add(U)
+    Propagate(U, t.idx)
+  }
+  /*Continuation as the former method type inference*/
+fn InferShape(Type U, Type V):
+  if (TypeVariable t = TV.find(x $\rightarrow$ V == x && F[x.idx] == null)) {
+    $B_{shape}$[t.idx] = U
+    Propagate(U, t.idx)
+  }
+\end{lstlisting}
+\caption{\textit{Exact inference}, \textit{Upper-bound inference}, \textit{Lower-bound inference}, \textit{Shape-bound inference}}
+\label{img55:mainTypeInference2}
+\end{figure}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{ | c | c | c | c | c | } 
+  \hline
+   & Lower & Upper & Exact & Shape\\
+  \hline
+  Lower & InferExact  &  InferUpper & InferUpper & InferLower \\
+  \hline
+  Upper & InferLower  &  InferExact & InferLower & InferLower \\
+  \hline
+  Exact & InferLower  &  InferUpper & InferExact & InferExact \\
+  \hline
+  Shape & InferLower  &  InferUpper & InferExact & InfeExact \\
+  \hline
+\end{tabular}
+\end{center}
+\caption{Matrix of InferHelper function.}
+\label{table3:InferHelper}
+\end{table}
+
+\begin{figure}[h!]
+\begin{lstlisting}[style=myAlgo, mathescape=true]
+fn Fix(TypeVariable x):
+  $U_{candidates}$ = 
+  if ($B_{shape}$[x.idx] != null)
+    setOf($B_{shape}$[x.idx])
+  else
+    $B_{lower}$[x.idx] + $B_{upper}$[x.idx] + $B_{exact}$[x.idx]
+  /*Continuation as the former method type inference*/
+\end{lstlisting}
+\caption{Fixing of type variables}
+\label{img55::mainTypeInference3}
+\end{figure}
 
 \subsection{Partial constructor type inference}
 
@@ -593,6 +699,10 @@ TODO
 TODO
 
 \change{Explain why they fullfill the requirements}
+
+TODO
+
+\subsection{Partial time inferece during dynamic member invocation}
 
 TODO
 

@@ -772,27 +772,196 @@ Since we doesn't add the same bound multiple times, the cycle can't occur.
 
 \subsection{Partial constructor type inference}
 
-TODO
+Constructor type inference was mentioned in the discussion \cite{online:CtorTInf}, which is a core of the second part of the improvement.
+The design of the partial type inference regarding underscore placeholders will be used again in order to be coherent with method type inference.
+Other alternatives like using generic aliases, default type parameters or named type parameters have the similar problems as memntioned in the previous section, so either constructor type inference will not be inspired by them.
+However, since the inference is not limited by introducing breaking changes because there is not type inference at all, the type inference can be stronger.
+The stronger type inference regards target-typed inference which will be useful because object creation is usually associated with assigning it to a target.
+It also employs type inference based on type constrains which will provide a wider context for type inference.
+Besides these features, the text mentions two additional features which extend the context of type inference and makes the syntax less boiler-plate, althought are controversial for \ac{LDT}.
+For this reason, the features are presented as an voluntary extension which can be removed from the core design.
+The first feature regards using type information from initializers which would be valuable when creating collection or objects with object initializer syntax.
+The second feature uses the diamond operator to turn on the constructor type inference in cases, when the compiler can surely determine the referring generic type whithout knowladge about the arity. 
+
+\subsubsection*{Syntax}
+
+The syntax is similar to partial method type inference.
+Figure \ref{img56:constructorTypeInferenceExample} shows a simple usage where the underscore representes the inferred type argument.
+This argument is deduced using a type received from the \texttt{t} variable declarations which determines the \texttt{int} type to be the inferred type argument.
+\begin{figure}[h!]
+\begin{lstlisting}[style=csharp, mathescape=true]
+List<int> t = new List<_>();
+\end{lstlisting}
+\caption{Syntax of constructor type inference.}
+\label{img56:constructorTypeInferenceExample}
+\end{figure}
+\par
+Similar to the partial method type inferece, the \texttt{?} nullability operator is allowed to determine the type nullability.
 
 \subsubsection*{Class lookup}
 
-TODO
+Class lookup is done in the same way as in partial method type inference.
+Binding of the underscore identifier is skipped and represents just a inferred type which has to be resolved during type inference.
+C\# allows to define nested classes which causes that the identifier can consists of several subidentifiers seperated by dot and each of them can contain a type argument list.
+The improvemenet allows to use underscore placeholders referring to inferred type arguments only in an argument list of the type containing the calling constructor(e.g. the last identifier).
+This limitation is shown in Figure \ref{img59:TypeArgList} where the first statement is invalid since it contains inferred type arguments in \texttt{GenericWrapper} identifier which doesn't contain the called costructor.
+However, the second statement is valid because type arguemnts are only in \texttt{CreatingClass} identifier which constains the called constructor.
+\begin{figure}[h!]
+\begin{lstlisting}[style=csharp, mathescape=true]
+new GenericWrapper<_>.CreatingClass<_>(arg1,...); // Not allowed
+new GenericWrapper<int>.CreatingClass<_>(arg1,...); // Allowed
+\end{lstlisting}
+\caption{Allowed inferred type arguments.}
+\label{img59:TypeArgList}
+\end{figure}
 
-\subsubsection*{Constructor type inference}
+\subsubsection*{Argument binding}
 
-TODO
+Mentioned target-typed inference complicates binding of the arguments.
+When a target is an assigned variable, or a return statemenent, the type of the target is given by the declaration of the varaible or method's return type.
+However, when the target is argument of the other method, the type don't have to be known yet if the method is generic.
+Figure \ref{img60:target} shows a scenario, when in the time of binding \texttt{Foo} creation expression the target type is not known because the order of binding is from the methods' arguments to the method call.
+Without the target type, the type argument of \texttt{Foo} can't be inferred.
+The \texttt{Bar} creation expression should be bound first which would infer the type of the first paramenter which could be used as a terget type of \texttt{Foo} creation expression.
+\begin{figure}[h!]
+\begin{lstlisting}[style=csharp, mathescape=true]
+new Bar<_>(Foo<_>(), 1);
+
+class Bar<T>{
+    public Bar(Foo<T> arg1, T arg2){}
+}
+class Foo<T>{}
+\end{lstlisting}
+\caption{Target as an argument.}
+\label{img60:target}
+\end{figure}
+\par
+This process was mentioned regarding the target-typed \texttt{new()} operator.
+Roslyn solves the operator in the following way.
+The operator is bound as unconverted bound element which needs to be converted in the future.
+When the right overload of the method is chosen, the Roslyn has to generate necessary conversions of these arguments which doent have identical type as the corresponind parameter.
+In that time, the operator is conveted by using already known target type.
+Result of the conversion is binding of creation expression which type is the target type and arguments are contained in type operator's argument list.
+\par
+The improvement is inspired by that.
+When there is a object creation expression as an argument and the contructor type inference failed, the similar unconverted bound element is created.
+After the overload resolution when the types of parameters are known and the necessary conversion is being created, the object creation expression is tried to be bound again with already known target type.
+However, the compiler has to be careful here.
+It has to try to bind the object creation expression without a target type only once to prevent exponential time of binding.
+\par
+Figure \ref{img61:exp} shows a scenario, where if the compiler would not do that, it will cause exponential time of binding the expression.
+Since the constructor of the \texttt{Bar} type is overloaded, the overload resolution has to check these two overloads.
+Each of this checking includes binding of arguments, type inference and checking of aplicability of bound arguments on the inferred constructor.
+Since the binding of arguments contains binding of the similar object creation expression, it will do the same overload resolution containing all overloads of the constructor.
+The target type can't be provided here, because the type argument is still unknown.
+When the binding of this argument is unsuccesful, the argument will be represented as unconverted bound element and will be bound later after the resolution.
+This failure will happen for each overload resolution which wastes time because it does the same computation for multiple time.
+After the outer object creation expression is inferred using the type of the second argument, it will convert the inner object creation expression be providing the target type and which will resolve in the valid object creation.
+These repeating failing is not a problem of the \texttt{new()} operator since it is cheap to automaticly express is as unvonverted bound expression.
+Although, there is an observation which will prevent it.
+If the argument can't be binded without target type in checking one overload, it also can't be binded without target type in the other overloads.
+So the improvement remembers if the argument containing the object creation expression was already bound without target type and failed. 
+If this is true, it automaticly skip the binding and return unconverted bound element which will prevent obvious failure and saves the time.  
+\begin{figure}[h!]
+\begin{lstlisting}[style=csharp, mathescape=true]
+new Bar<_>(new Bar<_>(null, null), 1);
+
+class Bar<T>{
+    public Bar(Foo<T> arg1, T arg2){}
+    public Bar(Foo<T> arg1, List<T> arg2){}
+}
+\end{lstlisting}
+\caption{Potential exponential time of binding.}
+\label{img61:exp}
+\end{figure}
+
+\subsubsection*{Constructor type inference algorithm}
+
+The previous mentioned algorithm for infering method type arguments is unchanged except collecting new bounds in the first phase of the algorithm.
+If target type is provided, an upper bound type inference is made from it to the partial inferred type containing the constructor.
+If the inferring type contains \texttt{where} clause containint type parameter constrains, for each of the type constrains which represented either inheritance constrains or interface implementation constrains is performed lower bound type inference from it to the corresponding type parameter.
+\par
+Figure \ref{img62:ctro} shows an example of constructor type inference, where both of the type arguments of the \texttt{Bar} type are inferred.
+The algorithm will contain four type variables. The first two variables represents type arguments and the second two variables represents the underscores.
+In the first phase, lower bound type inference is made from the \texttt{IBar<int>} type to the \texttt{Bar<\_,\_>} type which will yield in the \texttt{int} lower bound of the type varible representing the first underscore.
+Then, the type constrain of \texttt{T2} type parameters causes another lower bound type inference is made from the \texttt{object} type to the type variable representing \texttt{T2} type parameter.
+Shape inferences continues to relate type variables representing underscores with type variables representing type parameters.
+Then the fixation is made and it results in \texttt{Bar<int, object>} inferred type.
+\begin{figure}[h!]
+\begin{lstlisting}[style=csharp, mathescape=true]
+IBar<int> t = Bar<_, _>();
+
+
+interface IBar<T>{}
+
+class Bar<T1, T2> : IBar<T1> where T2 : object {}
+\end{lstlisting}
+\caption{Example of type inferences.}
+\label{img62:ctro}
+\end{figure}
 
 \subsubsection*{Initiliazers extension}
 
-TODO
+Initializers can be part of the creating expression which allows us to use it as an another source of type information.
+As thesis mentions in the previous chapter, initializers are a syntax sugar.
+In the case of object initializer, it represents a field assignment.
+If the field declaration contains a type parameter, it can be used to deduce the type parameter.
+Figure \ref{img58:initializer} shows an example of initializer, when the \texttt{Bar}'s type argument \texttt{int} can be deduced using type information from the initializer.
+Since the \texttt{Field} declaration type is the \texttt{T} type parameter and the \texttt{int} value is assigned to that field in the initializer, the compiler can deduce that the type argument is \text{int}.
+The improvement allows this inference by performing lower bound type inference for each item in the initializer.
+The inference is made from the type of assigning expression to the type of the field's type declaration.
+\begin{figure}[h!]
+\begin{lstlisting}[style=csharp, mathescape=true]
+new Bar<int>{ Field = 1 };
+
+class Bar<T> {
+    public T Field;
+}
+\end{lstlisting}
+\caption{Object initializer.}
+\label{img58:initializer}
+\end{figure}
+\par
+Similar deduction can be made with array initializers where the element's tpe is inferred.
+The improvement allows it by performing lower bound type inference for each item in the initializer.
+The inference is made from the type of addigning expression to the inferred type of array's element.
+\par
+However, collection initializers shown to be a little tricky.
+Since it is a syntactical sugar for calling the special \texttt{Add} method for each elemenent, the method can be overloaded.
+The previous section regarding Hindley-Millner type inference mentions that overloading can cause an exponention time of the type inference computation because it has to reason about each overload seperatedly with the rest of the inferred bounds.
+To prevent slow compilation because of this issue, the improvement allow to use the information for the intializers in the case where the \texttt{Add} method is not overloaded.
+This limitation seems to be reasonable since a lot of collections from the standard library don't overload the method.
+When there is no overload, the issue with time disappears.
+When the condition above is true, the first phase additionally does the lower bound inference for each item in the initializer.
+The inference is made from the type of the expression to the type of method paramenter.
+\par
+The last initializer regards indexers.
+Since indexers can be consider as a special case of methods which can be overloaded as well, the same process is made.
 
 \subsubsection*{Diamond operator extension}
 
-TODO
-
-\change{Explain why they fullfill the requirements}
-
-TODO
+Sinnce constructor type inference is invoked when the creating type contains inferred type arguments in its type argument list, it can felt like a boiler plate when all type arguments are infereble.
+Figure \ref{img57:diamondExample} shows an example of creating the \texttt{Dictionary} generic type whose all type arguments can be inferred using the target type.
+Althought C\# allows to define generic type with the same name and different arity, it is not very common.
+The stanard library doesn't contain another type \texttt{Dictionary} with different arity, so specifying the arity in the example is redundant in this case.
+\begin{figure}[h!]
+\begin{lstlisting}[style=csharp, mathescape=true]
+IDictionary<int, string> t = new Dictionary<_,_>();
+\end{lstlisting}
+\caption{Reduncant specification of arity.}
+\label{img57:diamondExample}
+\end{figure}
+\par
+For these use cases, where the compiler can confidently choose a generic type without looking at the arity, the diamond operator can be used to turn on the type inference. 
+Figure \ref{img58:diamondExample2} shows the usage of diamond operator with the \texttt{Dictionary} type.
+Assuming that in the rest of the program there is no other definition of \texttt{Dictionary} type with diferrent arity, the compiler can assume that the referring type is the \texttt{Dictionary} type from the standard library. 
+\begin{figure}[h!]
+\begin{lstlisting}[style=csharp, mathescape=true]
+IDictionary<int, string> t = new Dictionary<>();
+\end{lstlisting}
+\caption{Diamond operator.}
+\label{img58:diamondExample2}
+\end{figure}
 
 \subsection{Partial time inferece during dynamic member invocation}
 

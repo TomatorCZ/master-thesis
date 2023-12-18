@@ -965,7 +965,34 @@ IDictionary<int, string> t = new Dictionary<>();
 
 \subsection{Partial time inferece during dynamic member invocation}
 
-TODO
+The previous chapter mentioned that despite of the dynamic binding, the compiler is still able to do some checking of expresion containing the dynamic value.
+The compiler checks two relevant expressions containing the dynamic value as an argument.
+It is a method invocation which is static or receiver is not a dynamic value and object creation expression.
+For each candidate of this kind, a modified parameter list and argument list is created to be checked.
+If there is no candidate for which the test suceeded, an compile-time error occurs.
+\par
+Modified parameter list is created in the following way.
+If the candidate is a generic method and type arguments were provided, it substitutes them in the parameter list.
+Then all parameters that includes a type parameter are elided with corresponging arguments.
+The resulting set of parameters and arguments are checked.
+\par
+The improvement adjusts the modified parameter list of partially inferred method by substituting only these type arguments, which doesn't contain any inferred type arguments.
+The same process is made in object creation expression where the substitution is made on the type containing the constructor condidate.
+\par
+For practically reasons, it alse annonce a warning about using partial inference in late-bining which does't support it since it is handle by runtime.
+However, there are situation, where the runtime is able to infer type arguments even without partially hiniting.
+Figure \ref{img63:dinamic} shows an example where the \texttt{Foo} method is inferred by runtime because inferred type arguments are inferrable in the runtime.
+These situations are valid and hence the compiler should just warn about it.
+\begin{figure}[h!]
+\begin{lstlisting}[style=csharp, mathescape=true]
+dynamic t = ...;
+Foo<_, _>(t, 1);
+
+void Foo<T>(T arg1, T arg2) {}
+\end{lstlisting}
+\caption{Runtime type inference.}
+\label{img63:dinamic}
+\end{figure}
 
 \section{Other type inference improvements}
 

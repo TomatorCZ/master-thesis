@@ -996,12 +996,54 @@ void Foo<T>(T arg1, T arg2) {}
 
 \section{Other type inference improvements}
 
-TODO
+Besides the proposed improvement described above, the work touched surrounding areas of type inference during the choose of the improvement.
+The chapter gives a couple of thoughts about them since they were investigated as well and can be a future extension of the C\# programming language
 
-\change{Shared type inference context}
+\subsection{Shared type inference context}
 
-TODO
+C\# currently has a local type inference preventing advanced type inferences.
+The next big improvement of the type inference would be to provide global type inference using inferring context similar to Rust.
+However, since it would bring a breaking change, it would require additional tool which would patch the old code to work in the same way compiled with new type inference.
+However, this refactoring can be chalanging, so at least it should warn the user about possible change behavior in each possible change of the behavior.
 
-\change{Inferring return value of methods}
+\subsection{Inferring return value of methods}
 
-TODO
+The work already mentioned a possibility of inferring return valur of the method which can be beneficial for writing simple method whose name indicates the return value helping a reader to understand the code.
+An example of the function can be \texttt{ToString} which indicates that the return value is the \texttt{string} type.
+\par
+This language feature can be seen in the Kotlin programming language which allows to define a method without a return type if the method is exectly one expression.
+The Kotlin language is strongly-typed language  developed by Jetbrains.
+The Kotlin's main target is JVM and it's goal is to be an alternative to Java with excelent interoperability between these languages to use them almost interchangably in one project.
+Because of that, it has similat type system as Java which is not faw away from C\#.
+Figure \ref{img64:kotlin} shows an example of the \texttt{MyClass} definition containing the \texttt{toMyString} method definition.
+The signiture consists of the \texttt{fun} keyword, the name, and the equal sign followed by the one expression.
+The return type of the method is inferred based on the return value of the expression. 
+\begin{figure}[h!]
+\begin{lstlisting}[style=csharp, mathescape=true]
+class MyClass {
+    fun toMyString() = "TEXT"
+}
+\end{lstlisting}
+\caption{Kotlin return type inference.}
+\label{img64:kotlin}
+\end{figure}
+\par
+The main obstacle regarding inferred return type in method's signatures is an order of compilation and possible mutlithreaded compilation.
+The Roslyn compiler first finds all definitions in the program which allows him to compiler method's seperatdly in different threads.
+This advantage is because the method's content consists of only types and methods defined in the program which signatures are already known thanks to the previous phase.
+So the compiler knows exact return types of the used functions which allows to do type check.
+\par
+Kotlin divided the method compilation into two groups as it is describe in the video \cite{online:kotlinCompiler}.
+The first group contains methods without a return type which is compiled first in a single thread.
+This will allow to obtain all signatures of methods in the program.
+Obviously, if these methods are recursions, the compiler can't infer the return type and an error occurs.
+The second group contains methods with a return type which can be compiled in multiple threads since all method signatures are already known.
+\par
+Although this implementation would be possible in the Roslyn as well, it would require big portion of changes.
+Instead of that, C\# could allow to infer return in local function which is function defined inside a method body and can be used only inside the method.
+There are two benefits of this.
+The main architecture of Roslyn compiler doesn't have to be change since the method is compiled by one thread and the local functions can't be used outside.
+Local functions are usually tied with the method implementation and the return type is not contained in public API, so a reader shouldn't need to know the return type till the time when he/she wants to explore the inner implementation which gives him/her a context to deduce the return type.
+
+
+

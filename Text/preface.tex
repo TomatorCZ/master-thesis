@@ -9,8 +9,8 @@ The second part concerns the implementation of the improvement in the current C\
 
 A key feature of strongly typed languages is type safety, prohibiting operations on incompatible data, achieved by determining data types at compile time. 
 The easiest way for a compiler to reason about types of variables in the code is by providing type annotations determining the data type that these variables hold. 
-Figure \ref{img01:csharp_type_sef} shows an usage of type annotations given by a programmer written in the C\# programming language. 
-The type declaration of the \texttt{people} variable guarantees that the following attempt to concatenate the\texttt{"Tom"} string to that variable will be reported as an error at compile time since the operation is not defined for a pair of the \texttt{List<string>} type and \texttt{string} type.
+Figure \ref{img01:csharp_type_sef} shows an usage of type annotations written in the C\# programming language.
+The type declaration of the \texttt{people} variable guarantees that the following attempt to concatenate the \texttt{"Tom"} string to that variable will be reported as an error at compile time since the operation is not defined for a pair of the \texttt{List<string>} type and \texttt{string} type.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
 List<string> people = new List<string>() {"Joe", "Nick"};
@@ -20,7 +20,7 @@ people += "Tom"; // Error reported during compilation
 \label{img01:csharp_type_sef}
 \end{figure}
 \par
-On the other hand, the programmer has to write more code to annotate the variable declaration and object creation whose type has a long name, as we can see in the example. 
+On the other hand, types can have long names, forcing the programmer to write more code to annotate the variable declaration or object creation, as we can see in the example.
 This disadvantage of strongly typed languages can be removed by \textit{type inference} when a missing type annotation can be deduced using the context. 
 Taking the example shown above, one of the \texttt{List<string>} type annotations could be removed since the type of \texttt{people} variable declaration can be deduced from its initializing value or the type of object creation can be deduced from the type of the assigning variable.
 There is an example of C\# type inference in Figure \ref{img02:csharp_type_inf}, where the \texttt{var} keyword is used to trigger type inference determining a type of \texttt{people} variable to be the \texttt{List<string>} type.
@@ -34,7 +34,7 @@ var people = new List<string>();
 \par
 The power of type inference varies in strongly typed languages.
 An example of the difference can be seen in type arguments deduction of generic methods. 
-In the context of C\#, a generic method is a method that is parametrized by types besides common parameters, as can be found in Figure \ref{img03:csharp_gen_meth}.
+In C\#, a generic method is a method that is parametrized by types besides common parameters, as can be found in Figure \ref{img03:csharp_gen_meth}.
 There is a generic method \texttt{GetField} enabling to return a value of \texttt{o}'s field with the \texttt{fieldName} name.
 The type of returned value is generic parameter \texttt{T} since it depends on the type of object's field.
 The \texttt{name} variable is initialized by using the method to retrieve a \texttt{person}'s name, which is supposed to be a string.
@@ -66,7 +66,7 @@ let name: &str = GetField(person, "name");
 \end{figure}
 \par
 Although Rust is younger than C\# and has a different type system, it managed to make type inference more powerful in the context of strongly typed languages to significantly save type annotations typing.
-The first goal of this thesis is to investigate if the same level of type inference can be achieved in C\# and improve C\# type inference to be used in more scenarios saving type annotations typing.
+The first goal of this thesis is to investigate if the similar level of type inference can be achieved in C\# and improve C\# type inference to be used in more scenarios saving type annotations typing.
 \par
 The investigation explores type system requirements and type inference differences to achieve a desired level of type inference by formalizing Rust and C\# type inference.
 These formalizations can be partially identified as a part of the existing Hindley-Millner \cite{online:yHM} type inference formalization, which helps to reason about the inference in these languages.
@@ -83,7 +83,7 @@ The prototype is used to explore potential implementation issues which the impro
 \par
 Although the compiler is managed by the company, it has an open-source development, which makes contributions from interested people possible to be merged into the production.
 Although it is sufficient to make a \textit{pull request} containing a fix for solving compiler issues to be merged, language design improvements, similar to what the thesis proposes, require a special process of validating the actual benefit.
-The process starts by proposing new C\# features in public discussions of the C\# language repository \cite{online:langRepo}, where everyone can add his ideas or comment on others' ideas. 
+The process starts by proposing new C\# features in public discussions of the C\# language repository \cite{online:langRepo}, where everyone can add his/her ideas or comment on others' ideas. 
 It is preferred to use a predefined template \cite{online:proposalTemplate} for describing the idea proposing the feature in order to make the idea more likely to be discussed by the team responsible for accepting new language features. 
 The template includes motivation, detailed description, needed C\# language specification \cite{online:langSpec} changes, and other possible alternatives.
 The second goal of this part is to create the improvement as the language proposal, which would be presented to the team in order to have the potential to be a part of the current C\# language.

@@ -1,6 +1,6 @@
 \chapter{Related work}
 
-This chapter follows by mentioning related work regarding C\# type inference and formalizing it using Hindley-Milner type inference, which is explored in more detail with references to its modification in Rust and C\# programming languages.
+This chapter follows by mentioning related work regarding the current implementation of the C\# compiler and formalizing C\# type inference using Hindley-Milner type inference, which is explored in more detail with references to its modification in Rust and C\# programming languages.
 This knowledge is utilized as a primary source of inspiration for the improvement.
 In the end, the chapter mentions relevant C\# language issues presented on the GitHub repository, which is used later to prioritize the improvement features to make it more likely to be discussed at \ac{LDM} held by \ac{LDT}. 
 
@@ -8,22 +8,29 @@ In the end, the chapter mentions relevant C\# language issues presented on the G
 
 The implementation of C\# type inference can be found in the Roslyn compiler, as open-source C\# and VisualBasic compiler developed at the GitHub repository. 
 This section presents Roslyn’s architecture to better understand the context and restrictions that has to be cosidered to plug the improved type inference into the compiler.
-\par
-Figure \ref{img15:roslynPip} shows the compilation pipeline, described in Microsoft documentation \cite{online:roslynArchitecture}.
-The pipeline starts with loading the \texttt{.csproj} file with related C\# sources (\texttt{.cs}) and referenced libraries (\texttt{.dll}).
-C\# sources are passed to the lexer, creating tokens used by the parser forming \ac{AST}.
-\ac{AST} construction is the first phase (green boxes in Figure \ref{img56:roslynPip}) of the compiler checking syntax of C\# sources.
+Figure \ref{img15:roslynPip} is used to explain the compilation pipeline \cite{online:roslynArchitecture} which consists of four phases highlighted with different colors.
 \begin{figure}[h]
 \centering
 \includegraphics[width=120mm, height=70mm]{./img/Roslyn_Arch.png}
 \caption{Roslyn architecture}
 \label{img15:roslynPip}
 \end{figure}
-\par
+
+\subsection{Parsing C\# sources phase}
+
+The pipeline starts with loading the \texttt{.csproj} file with related C\# sources (\texttt{.cs}) and referenced libraries (\texttt{.dll}).
+C\# sources are passed to the lexer, creating tokens used by the parser forming \ac{AST}.
+\ac{AST} construction is the first phase (green boxes in Figure \ref{img15:roslynPip}) of the compiler checking syntax of C\# sources.
+
+\subsection{Loading named symbols}
+
 The second phase, marked by orange, forms \emph{named symbols} exposed by public API representing defined namespaces, classes, methods, etc., in the C\# project. 
-The declarations are received from C\# sources by traversing AST and seeking for the particular syntax. Libraries, stored in \texttt{.dll} format are parsed by \texttt{MetadataLoader}, creating the same named symbols as those received from C\# sources.
-\par
-The third phase, also called the binding phase, matches identifiers in the code with received named symbols from the previous phase. 
+The declarations are received from C\# sources by traversing \as{AST} and seeking for the particular syntax. 
+Libraries, stored in \texttt{.dll} format are parsed by \texttt{MetadataLoader}, creating the same named symbols as those received from C\# sources.
+
+\subsection{Binding phase}
+
+The third phase (represented by blue boxes), also called the binding phase, matches identifiers in the code with received named symbols from the previous phase. 
 Because the processing of a method body is not dependent on other method bodies since the code only uses already known declarations, Roslyn makes this phase concurrent. 
 The result of the phase is a \emph{bound tree} where all identifiers refer to the named symbols. 
 A method binding itself is a complicated procedure consisting of many subtasks such as \emph{overload resolution} or mentioned method type inference, which algorithm is described in detail in the previous section.
@@ -51,6 +58,11 @@ Method type inference can occur for the second time if previously mentioned null
 Nullability analysis is a kind of flow analysis that uses a bound tree to check and rewrite already created bound nodes according to nullability. 
 Because overloading and method type inference are nullable-sensitive, the whole binding process is repeated, respecting the nullability and reusing results from the previous binding. 
 The required changes are stored during the analysis, and the Bound tree is rewritten by the changes at the end of the analysis.
+
+\subsection{Emiting code phase}
+
+The last phase, marked by purple, emits \ac{CIL} code targeting the .NET virtual machine.
+The code is later loaded and executed by .NET runtime.
 
 \section{Hindley-Millner type inference}
 

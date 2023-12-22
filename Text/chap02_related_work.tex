@@ -219,7 +219,9 @@ If \ac{LDT} accepts the proposal, it is added to the \textit{proposals} folder i
 The recommended issue doesn't contain a specific idea of the improvemenet rather the scope of the improvement.
 The improvement suggests \textit{partial type inference} which would allow to hint ambigious type arguments which can't be inferred by a compiler instead of currently specifying the whole type argument list.
 Since it doesn't have any concerete way how to achive it, there are presented related discussions directly or indirectly mentioned in the issue which partially suggest a possible solution.
-\par
+
+\subsection{Default type parameters}
+
 The first discussion \cite{online:DefTypeParam} mentions \textit{default type parameters} introducing default type arguments, which are used when explicit type arguments are not used. 
 Figure \ref{img19:defTypeParam} shows a potential design of this feature where construing generic type \texttt{A} doesn’t need a type argument since it uses \texttt{int} type as a default value. 
 \begin{figure}[h]
@@ -231,7 +233,9 @@ class A<T = int> {}
 \caption{Default type parameters.}
 \label{img19:defTypeParam}
 \end{figure}
-\par
+
+\subsection{Generic aliases}
+
 The next discussion \cite{online:GenAlias} mentions \textit{generic aliases} allowing to specify default values similar to the goal of the previous discussion by defining an alias to that type with option generic parameters. 
 Figure\ref{img20:genAlias} shows an example where there is the \texttt{StringDictionary} generic alias specifying the first type argument of the \texttt{Dictionary} class to be the \texttt{string} type, which simplifies the usage of the \texttt{Dictionary} type in scenarios where there are often used dictionaries with keys of the \texttt{string} type.
 \begin{figure}[h]
@@ -243,7 +247,9 @@ using StringDictionary<TValue> = Dictionary<String, TValue>;
 \caption{Generic aliases.}
 \label{img20:genAlias}
 \end{figure}
-\par
+
+\subsection{Named type parameters}
+
 Discussion \cite{online:NamedTypeParam} mentions \textit{named type parameters}, which are similar to named parameters of methods. 
 The basic thought of this idea is being able to specify a type parameter for which an user provides a type argument by name. 
 Figure \ref{img21:NamedTParam} shows a generic method \texttt{F} with two type parameters. 
@@ -258,7 +264,9 @@ U F<T, U>(T t) { ... }
 \caption{Named type parameters.}
 \label{img21:NamedTParam}
 \end{figure}
-\par
+
+\subsection{Inferred type argument}
+
 Comments of the mentioned championed issue \cite{online:champion} propose several keywords that can be used in a type argument list for skipping type arguments, which can be inferred by the compiler and just providing the remaining ones. 
 Figure \ref{img22:CharITArg} shows the \texttt{var} keyword for skipping the first type argument since it can be inferred from the argument list, and an user just specifies the second type argument, which can’t be inferred by the compiler. 
 The comments propose other options for keywords like underscore or whitespaces.
@@ -271,7 +279,9 @@ TResult Foo<T, TResult>(T p1){ ... }
 \caption{Using char as inferred type argument.}
 \label{img22:CharITArg}
 \end{figure}
-\par
+
+\subsection{Target-typed inference}
+
 Discussion \cite{online:RetTInference} proposes \textit{Target-typed inference}, where type inference uses type information of the target assigned by the return value. 
 We can see the usage in Figure \ref{img62:RetTInf}, where type inference determines that the return type has to be \texttt{int} type and uses that to deduce the type argument \texttt{T}.
 \begin{figure}[h]
@@ -287,7 +297,9 @@ static class ObjectEx {
 \caption{Target-typed inference.}
 \label{img62:RetTInf}
 \end{figure}
-\par
+
+\subsection{Type inference based on constrains}
+
 The next idea of improving type inference is given by the discussion \cite{online:TInfConst}, where type inference utilizes type information obtained from type constraints.
 A simple example of that can be seen in Figure \ref{img23:TInfConst}, where \texttt{T1} can be deduced by using \texttt{T1}'s constraint and inferred type of \texttt{T2} forming inferred type \texttt{List<int>}.
 \begin{figure}[h!]
@@ -299,17 +311,21 @@ T1 Foo<T1,T2>(T2 item) where T1 : List<T2> {}
 \caption{Type inference based on type constraints.}
 \label{img23:TInfConst}
 \end{figure}
-\par
+
+\subsection{Inferred method return type}
+
 Discussion \cite{online:TMRetInf} mentions type inference of method return type known from Kotlin language.
 There is the usage in the following Figure \ref{img24:TMRetInf}, where the return type of the \texttt{Add} method is inferred to be \texttt{int} based on the type of the return expression.
-\begin{figure}[h]
+\begin{figure}[h!]
 \begin{lstlisting}[style=csharp]
 public static Add(int x, int y ) => x + y;
 \end{lstlisting}
 \caption{Type inference of method return type.}
 \label{img24:TMRetInf}
 \end{figure}
-\par
+
+\subsection{Realocation}
+
 An issue \cite{online:Realloc} proposes a way to compact type argument lists of identifiers containing inner identifiers with argument lists. 
 The idea is demonstrated in the example \ref{img25:Realloc}, where the argument list of \texttt{A<T1>} type and the \texttt{Foo<T2>} method are merged, and the type arguments are split by a semicolon.
 \begin{figure}[h]
@@ -323,7 +339,9 @@ static class A<T1> {
 \caption{Specifying type arguments in method calls (Realocation).}
 \label{img25:Realloc}
 \end{figure}
-\par
+
+\subsection{Constructor type inference}
+
 The last discussion \cite{online:CtorTInf}, which is mentioned here, regards \textit{constructor type inference} enabling type inference for object creation expressions. 
 The type inference can be seen in Figure \ref{img26:CtorTInf}, where the \texttt{T} type parameter of the \texttt{C<T>} generic type can be deduced by using type information from its constructor.
 \begin{figure}[h]

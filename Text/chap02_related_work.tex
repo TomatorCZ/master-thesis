@@ -138,7 +138,11 @@ fn Infer($\Gamma$, expr):
 \end{figure}
 \par
 Relations between this algorithm and C\#, Rust type inference will be discussed in detail later, although there can noticed that the unification part of this algorithm is the same as method type inference mentioned in the C\# section \ref{sect02:MTIA} where the substitution represents inferred type arguments of the method which parameter types were unified with corresponding argument types.
-\par
+
+\newpage
+
+\subsection{H-M etensions}
+
 H-M type system, doesn't allow subtyping known from Rust or overloading known from C\#.  
 \par
 A basic principle of extending H-M type inference by subtyping is described in Parreaux's work \cite{paper:Parreaux}, where instead of accumulating type equivalent constraints, it accumulates and propagates subtyping constraints.

@@ -1,13 +1,13 @@
 \chapter{Related work}
 
 This chapter follows by mentioning related work regarding the current implementation of the C\# compiler and formalizing C\# type inference using Hindley-Milner type inference, which is explored in more detail with references to its modification in Rust and C\# programming languages.
-This knowledge is utilized as a primary source of inspiration for the improvement.
-In the end, the chapter mentions relevant C\# language issues presented on the GitHub repository, which is used later to prioritize the improvement features to make it more likely to be discussed at \ac{LDM} held by \ac{LDT}. 
+This knowledge will be utilized as a primary source of inspiration for the improvement.
+In the end, it mentions relevant C\# language issues presented on the GitHub repository, which will be used later to prioritize the improvement features to make it more likely to be discussed at \ac{LDM} held by \ac{LDT}. 
 
 \section{Roslyn}
 
 The implementation of C\# type inference can be found in the Roslyn compiler, as open-source C\# and VisualBasic compiler developed at the GitHub repository. 
-This section presents Roslyn’s architecture to better understand the context and restrictions that has to be cosidered to plug the improved type inference into the compiler.
+Presented Roslyn’s architecture will help to better understand the context and restrictions that has to be cosidered to plug the improved type inference into the compiler.
 Figure \ref{img15:roslynPip} is used to explain the compilation pipeline \cite{online:roslynArchitecture} which consists of four phases highlighted with different colors.
 \begin{figure}[h]
 \centering
@@ -33,7 +33,7 @@ Libraries, stored in \texttt{.dll} format are parsed by \texttt{MetadataLoader},
 The third phase (represented by blue boxes), also called the binding phase, matches identifiers in the code with received named symbols from the previous phase. 
 Because the processing of a method body is not dependent on other method bodies since the code only uses already known declarations, Roslyn makes this phase concurrent. 
 The result of the phase is a \emph{bound tree} where all identifiers refer to the named symbols. 
-A method binding itself is a complicated procedure consisting of many subtasks such as \emph{overload resolution} or mentioned method type inference, which algorithm is described in detail in the previous section.
+A method binding itself is a complicated procedure consisting of many subtasks such as \emph{overload resolution} or mentioned method type inference, which algorithm is described in detail in the previous section \ref{sect02:MTIA}.
 \par
 The binding is divided into a chain of binders, taking care of smaller code scopes. 
 One purpose of the binders is the ability to resolve an identifier to the named symbol if the referred symbol lies in their scope. 
@@ -64,10 +64,10 @@ The required changes are stored during the analysis, and the Bound tree is rewri
 The last phase, marked by purple, emits \ac{CIL} code targeting the .NET virtual machine.
 The code is later loaded and executed by .NET runtime.
 
-\section{Hindley-Millner type inference}
+\section{Hindley-Millner type inference} \label{sect03:HM}
 
 C\# method type inference is a restricted Hindley-Millner type inference which is able to work in C\# type system.
-Since type inference in other languages like Rust or Haskell is based on the same principle, this section presents a high-level overview of Hindley-Millner type inference and its type system to formalize the C\# type inference, compare it with Rust type inference formalization and propose possible extensions of current C\# type inference based on these observations.
+Since type inference in other languages like Rust or Haskell is based on the same principle, a high-level overview of Hindley-Millner type inference is presented together with its type system to formalize the C\# type inference, compare it with Rust type inference formalization and propose possible extensions of current C\# type inference based on these observations.
 \par
 Hindley-Millner type system \cite{online:wikiHM} is a type system for \textit{lambda calculus} capable of generic functions and types.
 Lambda calculus contains four types of expressions given below which are described in the video series \cite{online:HMVideos}.
@@ -137,7 +137,7 @@ fn Infer($\Gamma$, expr):
 \label{img16:w}
 \end{figure}
 \par
-Relations between this algorithm and C\#, Rust type inference will be discussed in detail later, although there can noticed that the unification part of this algorithm is the same as method type inference mentioned in the C\# section where the substitution represents inferred type arguments of the method which parameter types were unified with corresponding argument types.
+Relations between this algorithm and C\#, Rust type inference will be discussed in detail later, although there can noticed that the unification part of this algorithm is the same as method type inference mentioned in the C\# section \ref{sect02:MTIA} where the substitution represents inferred type arguments of the method which parameter types were unified with corresponding argument types.
 \par
 H-M type system, doesn't allow subtyping known from Rust or overloading known from C\#.  
 \par
@@ -158,11 +158,6 @@ However, in the worst case, it still takes exponential time to infer types.
 Rust is a strongly typed programming language developed by Mozzila and an open community created for performance and memory safety without garbage collection. 
 Besides its specific features like traits or variable regions, it also has advanced type inference, which is now described in a high-level perspective to get inspiration for the proposed C\# improvement.
 \par
-Figure \ref{img17:rustCodeExample} shows a significant difference between C\# type inference and global Rust type inference.
-There is the \texttt{a} variable declaraction initialized by the \texttt{Vec<T>} generic type which type argument is going to be inferred.
-The second statement calls the \texttt{push} method on the \texttt{a} variable, which is also generic and takes an argument of the \texttt{T} type.
-Since \texttt{1} value is passed into this call, \texttt{T} is inferred to be the \texttt{i32} type and the type argument of the creating vector becomes \texttt{i32}.
-An interesting behavior regarding the type inference is that it infers the type of creating object used in the first statement using information obtained from the second statement.
 \begin{figure}[h]
 \begin{lstlisting}
 let mut a  = Vec::new();
@@ -171,6 +166,11 @@ a.push(1);
 \caption{Rust type inference example.}
 \label{img17:rustCodeExample}
 \end{figure}
+Figure \ref{img17:rustCodeExample} shows a significant difference between C\# type inference and global Rust type inference.
+There is the \texttt{a} variable declaraction initialized by the \texttt{Vec<T>} generic type which type argument is going to be inferred.
+The second statement calls the \texttt{push} method on the \texttt{a} variable, which is also generic and takes an argument of the \texttt{T} type.
+Since \texttt{1} value is passed into this call, \texttt{T} is inferred to be the \texttt{i32} type and the type argument of the creating vector becomes \texttt{i32}.
+An interesting behavior regarding the type inference is that it infers the type of creating object used in the first statement using information obtained from the second statement.
 \begin{figure}[h]
 \centering
 \includegraphics[width=120mm, height=45mm]{./img/RustTypeInference.png}
@@ -188,7 +188,7 @@ It uses the \texttt{sub} function which adds the \texttt{Vec<T2>} subtyping cons
 This constraint was obtained from a type of the initializing value \texttt{Vec::new()} which contains an unspecified type argument represented by a new \texttt{T2} type variable.
 Since, the initializing type can't be fully resolved because the constraint contains the \texttt{T2} unbound type variable it has to postpone the resolution. 
 It passes the context to binding the next statement, where it collects another constraint about the \texttt{T2} type argument of the initializing value.
-The \texttt{sub} function is similar to the unification seen in the previous section, where it extracts the required bounds of unbound type variables by finding substitutions for type variables in order to make matching types containing the type variables equal.
+The \texttt{sub} function is similar to the unification seen in the previous section \ref{sect03:HM}, where it extracts the required bounds of unbound type variables by finding substitutions for type variables in order to make matching types containing the type variables equal.
 When there is enough information to resolve \texttt{T1} and \texttt{T2} type variables, they are resolved by finding an appropriate type for the type variable with respect to collected bounds.
 In the given example, the bounds contain only one type, so the type variables are resolved to them.
 \par
@@ -200,11 +200,11 @@ For example, If a generic method containing a type variable in the return type i
 There is a possibility of a snapshot that records all changes and can be used for backtracking and finding the right inferred type arguments.
 Although Rust type inference is more advanced in comparison with C\#, it has to be considered language differences making type inference computation cost and difficulty relative to their features. 
 As an example, the overloading can mentioned causing exponetial time of type inference. 
-Since Rust doesn't have overloading, the type inference can be more powerful without significant slowdown, which is not the case of C\# as will be shown in the following chapter.
+Since Rust doesn't have overloading, the type inference can be more powerful without significant slowdown, which is not the case of C\# as will be shown in the following chapters.
 
 \section{Github issues}
 
-The last section describes a process of proposing new C\# language features and mentions already existing ideas, presented in the C\# language repository, which are an inspiration to the thesis's proposed improvement.
+The last section describes a process of proposing new C\# language features and mentions already existing ideas, presented in the C\# language repository, which will be an inspiration to the thesis's proposed improvement.
 \par
 The process of designing a new language feature starts with publishing an idea into discussions \cite{online:discussions}, where the C\# community can comment on it. 
 The idea contains a brief description of the feature, motivation, and design. 
@@ -314,7 +314,7 @@ T1 Foo<T1,T2>(T2 item) where T1 : List<T2> {}
 
 \subsection{Inferred method return type}
 
-Discussion \cite{online:TMRetInf} mentions type inference of method return type known from Kotlin language.
+Discussion \cite{online:TMRetInf} mentions type inference of method return type known from the Kotlin programming language.
 There is the usage in the following Figure \ref{img24:TMRetInf}, where the return type of the \texttt{Add} method is inferred to be \texttt{int} based on the type of the return expression.
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp]

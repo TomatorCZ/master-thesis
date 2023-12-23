@@ -59,7 +59,7 @@ Further chapters will mention the feature as an obstacle in designing efficient 
 \section{Relevant constructs}
 
 Many unrelated C\# constructs can use type inference or can influence the type inference algorithm.
-This section mentions the most relevant whose internals are then considered in the following chapters regarding the design of the improvement.
+There are the most relevant whose internals are then considered in the following chapters regarding the design of the improvement.
 
 \subsection*{Dynamic}
 
@@ -134,7 +134,8 @@ var indexerInit = new Dictionary<string, int>() {
 \section{Type inference} \label{sect02:typeInference}
 
 C\# type inference occurs in many contexts. 
-However, this section mentions only those that will be related to our improvement described in the following chapters.
+However, the proposed improvement will be inspired by and influence only a few of them.
+These contexts are presented below.
 
 \subsection{Keyword \texttt{var}}
 One of the simplest type inference occurrences regards the \texttt{var} keyword used in a variable declaration.

@@ -1,6 +1,6 @@
 \chapter{C\# programming language}
 
-The introduction presented the programming language C\# and its possible improvement of type inference. 
+Introduction \ref{sect01:imprv} presented the programming language C\# and its possible improvement of type inference. 
 This chapter continues by describing relevant sections of the C\# language and its type inference algorithm to understand the possible barriers to implement improved type inference. 
 Since type inference is a complicated process touching many areas of the C\# language, it firstly sorts these areas into separated groups described in necessary detail to understand all parts of the current type inference. 
 These areas concern the C\# type system, including generics and language constructs where the type inference occurs or interacts with.
@@ -58,8 +58,8 @@ Further chapters will mention the feature as an obstacle in designing efficient 
 
 \section{Relevant constructs}
 
-This section mentions unrelated C\# constructs where type inference occurs or influences the type inference algorithm.
-Their internals are then considered in the following chapters regarding the design of the improvement.
+Many unrelated C\# constructs can use type inference or can influence the type inference algorithm.
+This section mentions the most relevant whose internals are then considered in the following chapters regarding the design of the improvement.
 
 \subsection*{Dynamic}
 
@@ -74,7 +74,7 @@ Figure \ref{img06:dynamic} shows a declaration of the \texttt{a} variable of the
 Dynamic binding occurs in the \texttt{a.Foo()} expression, where the \texttt{Foo()} operation is not checked during compilation. 
 An error is reported at runtime when the actual type of the \texttt{a} variable is determined to be \texttt{string}, which doesn’t define \texttt{Foo()} operation. Despite the dynamic binding, a compiler can still little check certain kinds of expressions containing values of dynamic types to reveal possible errors at compile time. 
 An example of such checking is the \texttt{Bar()} method call, where the compiler can check the first argument, whose type is known at compile time as the type of the parameter. 
-An appropriate error occurs during the compilation because string value has the \texttt{string} type, and it is passed as the texttt{p1} parameter, which has the \texttt{int} type.
+An appropriate error occurs during the compilation because string value has the \texttt{string} type, and it is passed as the \texttt{p1} parameter, which has the \texttt{int} type.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
 dynamic a = "string";
@@ -96,7 +96,7 @@ The first type is \textit{anonymous method} shown in Figure \ref{img06:anonymous
 The \texttt{b} variable contains the second type called \textit{explicit typed anonymous function}.
 The third variable \texttt{c} contains the last type called \textit{implicit typed anonymous function}.
 As can be seen, all of them have inferred return types based on return expression inside their bodies.
-The most interesting type is the last one, where even parameter types are inferred based on a surrounding context and which is especially threatened by \textit{method type inference} algorithm mentioned in Type inference section \ref{sect02:typeInference}.
+The most interesting type is the last one, where even parameter types are inferred based on a surrounding context and which is especially threatened by \textit{method type inference} algorithm mentioned in method type inference section \ref{sect02:MTIA}.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
 Func<int, int> a = delegate(int p1) { return p1 + 1; };
@@ -134,7 +134,7 @@ var indexerInit = new Dictionary<string, int>() {
 \section{Type inference} \label{sect02:typeInference}
 
 C\# type inference occurs in many contexts. 
-However, this section mentions only these related to our improvement described in the following chapters.
+However, this section mentions only those that will be related to our improvement described in the following chapters.
 
 \subsection{Keyword \texttt{var}}
 One of the simplest type inference occurrences regards the \texttt{var} keyword used in a variable declaration.
@@ -182,7 +182,7 @@ Foo<T1, T2, T3>(T1 p1, T1 p2, IList<T2> p3, Func<T2, T3> p4) {...}
 \label{img09:methodTypeInf}
 \end{figure}
 \par
-The method type inference algorithm is detailly described in a separate section since it is a complex algorithm, and the proposed improvement will be based on that.
+The method type inference algorithm is detailly described in separate section \ref{sect02:MTIA} since it is a complex algorithm, and the proposed improvement will be based on that.
 
 \subsection{Array type inference}
 
@@ -198,13 +198,13 @@ var myArray = new[] {new object(), "string"};
 \label{img14:arrayTypeInf}
 \end{figure}
 
-\section{Method type inference algorithm}
+\section{Method type inference algorithm} \label{sect02:MTIA}
 
 Since one of the thesis's improvements is adjusting the algorithm, this section presents
 its description. 
-The thesis doesn’t show the complete algorithm described in the C\# specification \cite{online:csTypeInference} since it is complex, and some sections are unimportant for the following chapters. 
+The thesis doesn’t show the complete algorithm described in the C\# specification \cite{online:csTypeInference} since it is complex, and some parts are unimportant for the following chapters. 
 The simplified algorithm is divided into four subsections. 
-Before describing the algorithm, the section presents definitions used by the algorithm.
+The algorithm uses several definitions presented below.
 \begin{defn}[Fixed type variables, bounds]
 We call inferred type parameters \emph{type variables} which are at the beginning of the algorithm unknown, \emph{unfixed}. 
 During the algorithm, they start to be restricted by sets of type \emph{bounds}.
@@ -310,7 +310,7 @@ fn SecondPhase():
 This matching has two goals. 
 The first is to check the compatibility of matched types, and the second is to collect the mentioned bounds associated with type variables contained in parameters’ types. 
 This matching has many rules, followed by helping functions mentioned later in this section.
-The matching represents dealing with the \texttt{T2} type parameter mentioned in the example where the compatibility between \texttt{List<int>} and \texttt{IList<T2>} is firstly checked, and then the \texttt{int} type is added as a lower bound of the \texttt{T2} type parameter. 
+The matching represents dealing with the \texttt{T2} type parameter mentioned in Figure \ref{img09:methodTypeInf} where the compatibility between \texttt{List<int>} and \texttt{IList<T2>} is firstly checked, and then the \texttt{int} type is added as a lower bound of the \texttt{T2} type parameter. 
 Type variables can have dependencies between themselves, so the first phase postpones matching output types of arguments’ types with corresponding parameters’ types because the output types can contain dependent type variables.
 \par
 \texttt{SecondPhase()} happens iteratively, respecting the \textit{depends on} relation.

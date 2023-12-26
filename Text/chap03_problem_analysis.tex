@@ -7,18 +7,20 @@ Based on that motivation and information obtained from the previous sections, it
 The requirements will help to validate the thesis’s goals regarding the improvement.
 
 \section{Scope}
-\info{Describe why we choose only a small part of the C\# type inference}
-The previous chapter indicates that type inference is a complicated process, where even the current C\# method type inference is difficult to understand. 
-Hence, the thesis chooses a small part of C\# where it improves and introduces the type inference and would be possible to reason about and implement in the scope of this text. 
-The second reason for choosing a minor change is that introducing a completely new type inference in C\# would rather have an experimental result, which would have a smaller chance of getting into production, which is different from the intention of this work. 
+
+The previous section \ref{sect05:mti}, regarding method type inference, shows that type inference is a complicated process, where even the current C\# method type inference is difficult to understand. 
+Hence, the thesis will choose a small part of C\# where it will improve and introduce the type inference and will be possible to reason about and implement in the scope of this text. 
+The second reason for choosing a minor change is that introducing a completely new type inference in C\# would rather have an experimental result, which would have a smaller chance of getting into production. 
+This consequence is different from the intention of this
+work. 
 However, some more extensive changes in the type inference will also be mentioned to outline possible obstacles to introducing them in the C\#.
 \par
-\info{Specify the focus on partial type inference}
-The thesis focuses on the already-mentioned \textit{partial type inference} proposal, which was recommended by a member of \ac{LDT} and has a chance to be discussed in \ac{LDM} and potentially accepted. 
-Analysis of this improvement contains a consideration of existing ideas, their consequences on C\#, and their difficulties in implementing them in Roslyn. 
-Additionally, the work describes the relation to the Hindley-Millner formalization to express the strength of the type inference in a formalized way, which can be further used to compare it with other kinds of type inference in different programming languages and which decides the theoretical boundaries of the C\# type inference.
+The thesis will focus on the already-mentioned \textit{partial type inference} proposal \ref{sect04:github}, which was recommended by a member of \ac{LDT} and has a chance to be discussed in \ac{LDM} and potentially accepted. 
+Analysis of this improvement will contain a consideration of existing ideas, their consequences on C\#, and their difficulties in implementing them in Roslyn. 
+Additionally, the work will describe the relation to the Hindley-Millner formalization to express the strength of the type inference in a formalized way, which can be further used to compare it with other kinds of type inference in different programming languages and which decides the theoretical boundaries of the C\# type inference.
 
 \section{Motivation}
+
 \info{What is partial type inference and why it is useful}
 Partial type inference focuses on hinting to the compiler ambiguous type arguments of generic type or method in situations where it can’t deduce them. 
 In the context of C\#, the only type inference that infers type arguments is the method type inference mentioned in the previous chapter. 

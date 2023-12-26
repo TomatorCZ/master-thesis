@@ -21,20 +21,18 @@ Additionally, the work will describe the relation to the Hindley-Millner formali
 
 \section{Motivation}
 
-\info{What is partial type inference and why it is useful}
 Partial type inference focuses on hinting to the compiler ambiguous type arguments of generic type or method in situations where it can’t deduce them. 
-In the context of C\#, the only type inference that infers type arguments is the method type inference mentioned in the previous chapter. 
-The weakness of the method type inference is the need to provide hints to the compiler. 
-The following three real-world examples demonstrate common issues with method type inference weakness, which the thesis tries to solve.
+In the context of C\#, method type inference is the only type inference that infers type arguments. 
+Even though method type inference is a complex algorithm, it has several weaknesses. 
+The following three real-world examples demonstrate common issues with method type inference, which the thesis will try to solve.
 
 \subsection{Weakness - Target-typing}
-\info{Weakness of current method type inference - target typing}
-The first weakness regards target typing, which was mentioned in the previous chapter. 
+The first weakness regards target typing, which was mentioned in the previous chapter \ref{sect06:targetType}. 
 Suppose a hypothetical situation when a user queries an item from a database whose column is a point of interest. 
 Figure \ref{img27:usecase1} shows an example of code that uses the \texttt{fetch} method defined on a database type. 
 The \texttt{data} variable represents data fetched from a database. 
 Since a concrete form of data is unknown, the data has the type of \texttt{object} containing an internal representation of fetched data with the columns stored as fields. 
-The \texttt{GetField} method enables one to read the variable’s field of the given name with the supposed type given as a type argument. 
+The \texttt{GetField} method enables to read the variable’s field of the given name with the supposed type given as a type argument. 
 Suppose the fetched object contains the ”name” field containing a string value. 
 Now, a user wants to store the value in the \texttt{name} variable, which is explicitly typed. 
 Even though the return type of the \texttt{GetField} method is known from the variable declaration, which also is the \texttt{TReturn} type argument of the method, the user still has to specify the type argument in the call. 
@@ -56,13 +54,7 @@ static class Extensions {
 \end{figure}
 
 \subsection{Weakness - Constraints-based inference}
-\info{Weakness of current method type inference - Constraints-based inference}
-The second weakness is noticeable in more advanced generic APIs, like testing frameworks, using type constraints containing the type parameters. 
-Figure \ref{img28:usecase2} shows a scenario of a simple test framework that defines the \texttt{Test} method parameterized by a type of input data and test case represented as type parameters \texttt{U} and \texttt{V}, respectively. 
-The providing type argument representing the test case has to inherit the \texttt{TestCaseBase} base implementation, which is a generic type parametrized by a type of input data. 
-This constraint gives type information about the \texttt{T} type parameter, which is related to the type of input data. 
-However, the user has to specify type arguments in the \texttt{Test} call since the type inference doesn’t consider this source of type information. 
-If the compiler considers the constraint, the type arguments will be inferred, saving the type annotations.
+
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
 Test<TestCaseBase<MyData>, MyData>(new MyData());
@@ -72,10 +64,15 @@ void Test<T, U>(U data) where T : TestCaseBase<U> {...}
 \caption{Constraints-based inference.}
 \label{img28:usecase2}
 \end{figure}
+The second weakness is noticeable in more advanced generic APIs, like testing frameworks, using type constraints containing the type parameters. 
+Figure \ref{img28:usecase2} shows a scenario of a simple test framework that defines the \texttt{Test} method parameterized by a type of input data and test case represented as type parameters \texttt{U} and \texttt{V}, respectively. 
+The provided type argument representing the test case has to inherit the \texttt{TestCaseBase} base implementation, which is a generic type parametrized by a type of input data. 
+This constraint gives type information about the \texttt{T} type parameter, which is related to the type of input data. 
+However, the user has to specify type arguments in the \texttt{Test} call since the type inference doesn’t consider this source of type information. 
+If the compiler considers the constraint, the type arguments will be inferred, saving the type annotations.
 
 \subsection{Weakness - All or nothing principle}
 
-\info{Weakness of current method type inference - all or nothing principle}
 There are also situations where even strong type inference is not enough.
 Figure \ref{img29:usecase3} shows a situation where the \texttt{log} method is parametrized by two type parameters that are obtained in the parameter types and hence inferable by the compiler. 
 However, the \texttt{log} method call still has to specify type arguments because the \texttt{null} argument doesn’t have concrete type information. 
@@ -92,12 +89,12 @@ void log<T, U>(T message, U appendix) {...}
 \end{figure}
 
 \subsection{Solution - Improved method type inference}
-\info{Breaking changes - Possible improvement of method type inference}
+
 The first and the second weaknesses motivate us to extend the method type inference in order to consider a wider context for obtaining type information for the type arguments. 
 This potential improvement is a problem for the compiler's back compatibility which was mentioned in the C\# discussion \cite{online:breakingChange}. 
 New compiler versions should be back-compatible so that a new version does not change the behavior of the code compiled by the older version.
 \par
-\info{Breaking changes - target-typing}
+
 Figure \ref{img30:breakingChange1} shows the breaking change when method type inference starts to consider target types. 
 Before the improvement, the \texttt{M} method call is resolved to the non-generic version of this method because type inference can’t infer the \texttt{T} type argument. 
 After the improvement, the type inference infers \texttt{T} to be the \texttt{int} type, which is more specific to the type of \texttt{1} argument than the \texttt{long} type. 
@@ -113,7 +110,6 @@ int M(long p2) {...}
 \label{img30:breakingChange1}
 \end{figure}
 \par
-\info{Solution - Improved method type inference}
 Figure \ref{img31:breakingChange2} shows a similar situation when the method type inference starts to consider type parameter constraints. 
 Before the improvement, the \texttt{M} method call refers to the non-generic version of the method since the type inference can’t infer the type argument of a generic version. 
 After the improvement, the generic version is inferred to have the \texttt{int} type argument and becomes to be more suitable for the overload resolution. 
@@ -129,19 +125,18 @@ void M(long p2) {...}
 \label{img31:breakingChange2}
 \end{figure}
 \par
-\info{Possible method type inference improvement doesn't solve the third weakness}
-Besides the breaking change, the potential method type inference improvement to use a bigger context still doesn’t solve our third example demonstrating a type parameter, which doesn’t appear in parameter types, return type, and the type parameters’ constraints. 
+Besides the breaking change, the potential method type inference improvement to use a bigger context still doesn’t solve our third weakness demonstrating a type parameter, which doesn’t appear in parameter types, return type, and the type parameters’ constraints. 
 These obstacles give the reason for introducing a way to hint just ambiguous type arguments to the compiler.
 
 \subsection{Solution - Partial method type inference}
-\info{Partial type inference - reduces the first and second weakness}
+
 Partial type inference can reduce the first two weaknesses. 
 Type arguments, which the method type inference can’t infer, can be hinted in order to avoid specifying the whole type argument list. 
 Let’s now ignore why the underscore character is used and how inferred type variables are determined in the following example. 
 The reasons behind that will be mentioned later.
 Figure \ref{img32:sol1} shows the usage of partial type inference applied in the second presented example regarding method type inference weaknesses. 
 Although the first type argument of the \texttt{Test} method call must still be provided, the second argument is omitted by using the underscore character to determine an inferred type argument. 
-The reduction of the first weakness is to isolate the insufficient type inference to type arguments that are directly influenced by it and infer the rest.
+The reduction of the first weakness is to isolate the insufficient type inference of type arguments that are directly influenced by it and infer the rest.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
 test<TestCaseDefault<MyData>, _>(new MyData());
@@ -152,7 +147,6 @@ void test<T, U>(U data) where T : TestCaseDefault<U> {...}
 \label{img32:sol1}
 \end{figure}
 \par
-\info{Breaking changes - solves the third weakness}
 The third motivation example confirms that partial type inference is not just a fix for missing type inference features but is needed when type arguments can’t be inferred at all. 
 Figure \ref{img33:sol2} demonstrates a usage of partial type inference where it omits the first type argument since it can be deduced from the first argument type and specifies the ambiguous type that can’t be deduced.
 \begin{figure}[h]
@@ -165,8 +159,10 @@ void log<T, U>(T message, U appendix) {...}
 \label{img33:sol2}
 \end{figure}
 
+\newpage
+
 \subsection{Solution - Constructor type inference}
-\info{Constructor type inference - next motivation and improvement}
+
 Partial type inference doesn’t regard only method type inference. 
 It can also be introduced in other places. One of the places that seems to be good for that is object creation expression. 
 Except for the already mentioned \texttt{new()} operator, no other type inference infers type arguments of a construing generic type. The usage of the type inference is limited since the \texttt{new()} operator requires a target type to infer the construing type. 
@@ -182,8 +178,7 @@ class Wrapper<T> : IWrapper { public Wrapper(T item) {...} }
 \label{img34:wrapper}
 \end{figure}
 \par
-\info{Constructor type inference - Factory method workaround}
-In principle, object creation can be considered a special case of a method call with a side effect(creating the object), which already has method type inference. 
+Generally, object creation can be considered a special case of a method call with a side effect(creating the object), which already has method type inference. 
 Figure \ref{img35:workaroung} shows a workaround using the \texttt{Create} method, delegating the creation to the constructor call. 
 Since the method call type arguments can be inferred, it allows the use of method type inference for inferring type arguments of construing type. 
 However, this solution has disadvantages like the necessary boiler-plate and prohibition of using initializers.
@@ -197,23 +192,21 @@ static Wrapper<T> Create<T>(T item) => new Wrapper<T>(item);
 \label{img35:workaroung}
 \end{figure}
 \par
-\info{Constructor type inference - strength of method type inference}
 A possible solution would be to use method type inference in object creation expression. 
 Although this solution would be simple to implement, class type parameters are more likely not to be used in constructor parameter types, which makes the method type inference useless. 
 Besides that, options for inferring type arguments of construing type are not limited by not introducing breaking changes since there is no type inference at all. 
 So, there is a possibility of introducing an even stronger type inference, which could be one day introduced in the method type inference when there would be a way to make breaking changes in the new compiler version. 
-Figure \ref{img36:cti} shows an example of such a generic class whose all type parameters are not used in the constructor.
-Because of that, extending the potential method type inference to be used in object creation expressions would be useless since the \texttt{TLogger} can’t be inferred only from parameter types.
-\begin{figure}[h]
+\begin{figure}[h!]
 \begin{lstlisting}[style=csharp]
 class Algorithm<TData, TLogger> where TLogger : Logger<TData> 
 { public Algorithm(TData data) { ... }}
 \end{lstlisting}
-\caption{Use case iusing type paraemter constraints.}
+\caption{Use case using type paraemter constraints.}
 \label{img36:cti}
 \end{figure}
+Figure \ref{img36:cti} shows an example of such a generic class whose all type parameters are not used in the constructor.
+Because of that, extending the potential method type inference to be used in object creation expressions would be useless since the \texttt{TLogger} can’t be inferred only from parameter types.
 \par
-\info{Constructor type inference - the first weakness solution}
 Introducing improved type inference based on method type inference would solve the mentioned issues. 
 Figure \ref{img37:sol1} shows a potential usage of that type inference in the first case regarding the Wrapper class where an underscore is used to represent inferred type argument. 
 The inference uses the parameter type of the constructor to infer the \texttt{T} parameter type which is \texttt{int}.
@@ -227,8 +220,7 @@ class Wrapper<T> : IWrapper { public Wrapper(T item) {...} }
 \label{img37:sol1}
 \end{figure}
 \par
-\info{Constructor type inference - better method type inference}
-Figure \ref{img38:sol2} shows a potential improvement of the type inference. 
+Figure \ref{img38:sol2} shows a potential extension of the type inference. 
 The first statement of initializing the \texttt{alg} variable uses type inference, leveraging \texttt{TLogger}’s constraint to determine its type. 
 The second statement demonstrates the possibility of having a nested underscore, which allows to more specify the type argument.
 \begin{figure}[h]
@@ -249,10 +241,8 @@ From now on, thesis calls \textit{constructor type inference} for introducing su
 
 \section{Requirements}
 
-\info{intro}
-This section mentions requirements that have to be fulfilled by the improvement to be likely discussed by \ac{LDM}.
+This section mentions requirements that have to be fulfilled by the improvement to be likely discussed by \ac{LDT}.
 \par
-\info{Describe requirements given by back compatibility}
 \textbf{Back compatibility} is one of the most important requirements for new language features. 
 The improvement shouldn’t introduce a breaking change. However, this requirement is sometimes too strict for improvements, which would be very beneficial, and its breaking change would appear in cases that seem to be rare in the code. 
 These improvements can break back compatibility by providing additional warnings or errors alerting a user of possible code behavior changes.
@@ -273,16 +263,13 @@ class A {
 \label{img39:brkCh}
 \end{figure}
 \par
-\info{Decribe requirements given by motivation}
 \textbf{Convenience} is a key requirement to make the improvement useful. 
 Regarding partial type inference, the improvement should propose a convenient way to skip ambiguous type arguments. 
 The way should also be possible to use in different places where skipping type arguments could yield an advantage, like type variable declaration or casting to a different type. 
-Constructor type inference should be advanced enough to cover the mentioned examples.
+Constructor type inference should be advanced enough to cover the mentioned examples in the previous section.
 \par
-\info{Describe requirements given by Future improvements}
 \textbf{Extensibility} would make the improvement open for new features that can be needed in future language versions. 
 The improvement should consider possible future improvements and not be a blocker for them.
 \par
-\info{Describe requirements given by Roslyn}
-\textbf{Performance} is a critical section of Roslyn, which is one of the main goals of this project.
+\textbf{Performance} is a critical part of Roslyn and which is one of the main goals of this project.
 The time complexity added by the thesis’s improvement shouldn’t be too big in order to not slow the compilation process.

@@ -1,6 +1,56 @@
 \chapter{Solution}
 
+The solution consists of a proposal describing the language feature given in the previous chapter \ref{sect09:lang} and an implementation of the prototype in a separate Roslyn branch.
+
 \section{Proposal}
+
+The final version of the proposal can be found in the \texttt{attachment} folder as the \texttt{partial-type-inference.md} file. 
+The file’s format is a standard Markdown used widely in readme files for its advantage of being able to be read without specialized tools visualizing the formatting.
+
+\subsection{Creation process}
+
+The proposal had three stages of development. 
+The first version of the document was created in a personal repository \cite{online:personalRepo}, where it was reviewed by a member of Roslyn's development team. 
+The review was in the form of a pull request \cite{online:personalPull} where the member suggested several changes on how to structure the proposal and how to refer to the original C\# standard documentation and pointed out possible improvements that would be beneficial to investigate.
+\par
+After the revisions were made, the member recommended to post it as a discussion \cite{online:discussion1}, which was the first time when a wider community could comment on the proposal. 
+Besides several upvotes received from anonymous readers, another member of Roslyn's development team started to give his recommendations on how to adjust the document. 
+The main change of the improvement was to erase most of the examples taken from the tests made together with the prototype and replace them with more references to the original C\# documentation.
+\par
+The third version of the improvement was published as the next discussion \cite{online:discussion2}, where it received even more emoticons as likes or hearts, which was a good sign of progress. 
+At that time, the discussion contained just answers to the questions raised by the member of the Roslyn team, which clarified the intention of the improvement.
+\par
+After this step, the third stage was made by publishing the proposal as a pull request \cite{online:pull2}. 
+This step was done after the recommendation from the team member. 
+The pull request was continued by another round of clarifications, recommendations, and revisions from three members of Roslyn's team.
+\par
+The current stage of the proposal at the time of writing is that the pull
+request is still open, waiting for the next requirements from the \ac{LDT}.
+
+\subsection{Content}
+
+The whole document has two styles of describing the feature. 
+The first style explains the intention of the improvement and necessary relations, which helps to understand it. 
+The second style used in the detailed design section is rather a patch of C\# standard documentation, which enables improvement. 
+So, the text doesn’t contain fluent sentences but fragments of the documentation that need to be changed.
+\par
+The proposal consists of five parts. 
+The first part gives a quick overview of the proposed change, summarizing it in a few sentences.
+\par
+The second part describes the motivation why it should be done. The text
+and the used examples are similar to those in section \ref{sect10:mot}.
+\par
+The third and largest part contains a detailed design of the improvement. 
+There is a description of grammar change, where it explains a new underscore contextual keyword in the type argument list. 
+It is followed by the change of binding method invocation and object creation expressions. 
+This part describes the mentioned core design of the improvement with the changed method type inference algorithm. 
+The design ends with extending compile-time checking dynamic member invocation, which is explained in section \ref{sect11:dynamic}.
+\par
+The fourth part comments on the reason for not doing other alternatives contained in the discussions. 
+It also mentions two possible extensions of the improvement using the diamond operator \ref{sect13:ex2} and initializers \ref{sect12:ex1} in the type inference context.
+\par
+The last part suggests other potential improvements given in the future improvements section \ref{sect14:future}.
+
 
 \section{Implementation}
 

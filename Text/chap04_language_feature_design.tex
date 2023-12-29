@@ -1,4 +1,4 @@
-\chapter{Language feature design}
+\chapter{Language feature design} \label{sect09:lang}
 
 The language feature design will be based on existing ideas of the partial type inference mentioned in the previous chapter \ref{sect04:github} and will be validated by the given requirements.
 Besides the language feature design, the last section mentions type inference improvements, whose implementation and proposal is not in the scope of this text, altought their possible implementation is sketched for being inspiration of future improvements.
@@ -640,7 +640,7 @@ Then, the type constraint of \texttt{T2} type parameters causes another lower bo
 Shape inferences continue to relate type variables representing underscores with type variables representing type parameters. 
 Then, the fixation is made, and it results in \texttt{Bar<int, object>} inferred type.
 
-\subsection{Initiliazers extension}
+\subsection{Initiliazers extension} \label{sect12:ex1}
 
 Initializers can be part of the creating expression, which will allow us to use it as another source of type information. 
 As the thesis mentions in the previous chapter, initializers are syntax sugar. 
@@ -678,7 +678,7 @@ The inference is made from the type of the expression to the type of method para
 The last initializer regards indexers.
 Since indexers can be considered as a special case of methods that can be overloaded as well, the same process is made.
 
-\subsection{Diamond operator extension}
+\subsection{Diamond operator extension} \label{sect13:ex2}
 
 Since constructor type inference is invoked when the creating type contains inferred type arguments in its type argument list, it can feel like a boilerplate when all type arguments are inferable. 
 Figure \ref{img57:diamondExample} shows an example of creating the \texttt{Dictionary} generic type whose all type arguments can be inferred using the target type. 
@@ -703,7 +703,7 @@ IDictionary<int, string> t = new Dictionary<>();
 \label{img58:diamondExample2}
 \end{figure}
 
-\section{Partial time inferece during dynamic member invocation}
+\section{Partial time inferece during dynamic member invocation} \label{sect11:dynamic}
 
 The previous chapter mentioned that despite the dynamic binding, the compiler can still check an expression containing the dynamic value. 
 The compiler checks three relevant expressions containing the dynamic value as an argument. 

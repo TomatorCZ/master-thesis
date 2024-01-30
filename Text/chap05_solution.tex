@@ -61,11 +61,11 @@ Since the proposal is in the state of probing the benefits, the implementation w
 
 \subsection{Development environment}
 
-Since the compiler is a complicated program consists of many parts, the creators provide a guide \cite{online:roslynGuide} describing a common workflow including building the compiler, writting tests and the deployment.
+Since the compiler is a complicated program consisting of many parts, the creators provide a guide \cite{online:roslynGuide} describing a common workflow including building the compiler, writting tests and the deployment.
 \par
-We start with cloning the Roslyn repository \cite{online:roslynRepo} opening it in an IDE.
+We start with cloning the Roslyn repository \cite{online:roslynRepo} and opening it in an IDE.
 There are several IDEs, which can be used.
-We recommend Visual Studio 2022 \cite{online:vs} which is used to implement the contribution.
+We recommend Visual Studio 2022 \cite{online:vs} which is used to implement the proposal.
 The IDE is chosen since it is recommended by the Roslyn folks and provides helpful static code analysis and a debugger which is almost necessary in cases, when a programmer is not familiar with the code base.
 However, hardware requirements for opening the repository are quite high in terms of memory consumption when for a smooth experience with browsing and launching the code it requieres around 20 GB of RAM.
 So we recommend Visual Studio Code \cite{online:vsCode} in cases, when the hardware resources are limitted as a compensation for worse code analysis.
@@ -76,49 +76,116 @@ We use SDK \texttt{8.0.1} which can be downloaded from Microsoft original websit
 We also use Windows operating system, although the deployment should be possible on Linux or Mac OS as well.
 \par
 Since the building for large programs like a compiler can be complicated, the root folder provides three scripts which take care of it.
-The \texttt{Restore.cmd} script is run as the first to download required packages.
+The \texttt{Restore.cmd} script is run firstly to download required packages.
 The \texttt{Build.cmd} srcipt is used to build the compiler and the \texttt{Test.cmd} script is used to run tests of the compiler.
 The scripts have multiple options which modificates the workflow.
-We will mention few of them which is needed for the contribution.
+We will mention few of them which is needed for the implementation.
 
 \subsubsection{Testing}
 
-Launching the tests of compiler is done by the following Figure \ref{img65:runTests}.
+Launching the tests of compiler is done by a sequence of Windows command console commands shown in Figure \ref{img65:runTests}.
 Since the repository contains also an implemention of an C\# extension to Visual Studio, tests are divided into several groups which test indenpendent part of the compiler.
-In our case, we use \texttt{-compilerOnlyTests} to check common usage of the compiler and which will be a base line which has to be passed to complete the implementation.
-The result of \texttt{Build.cmd} command is built compiler placed in the \texttt{Roslyn/artifacts} folder.
+In our case, we use the \texttt{-testCompilerOnly} flag to run basic compiler tests.
+The tests will be a base line which has to be passed by the implementaion of the proposal.
+The result of \texttt{Build.cmd} command is built compiler placed in the \texttt{roslyn/artifacts} folder.
 Tests results are stored in the \texttt{Roslyn/artifacts/TestResults} folder as \texttt{.xml} files and \texttt{.html} files for displaying it in the browser.
 \begin{figure}[h]
 \begin{lstlisting}
 Restore.cmd
 Build.cmd
-Test.cmd -compilerOnlyTests
+Test.cmd -testCompilerOnly
 \end{lstlisting}
 \caption{Running C\# compiler tests.}
 \label{img65:runTests}
 \end{figure}
 \par
-The results of the tests when we started the implementation can be seen in the attachment folder \texttt{/Attachment/TestResults/Initial}, where two tests regarding Visual Basic were not passed.
+The results of the tests, when we started the implementation, can be seen in the attachment folder \texttt{/Attachment/TestResults/Initial}, where two tests regarding Visual Basic were not passed.
 Since our contribution is the the C\# compiler, we ignore it.
 
 \subsubsection{Deployment}
 
-Standard deployment of a new compiler version is bunding it with a new version of the SDK which would require compiling the SDk from sources.
-However, there is a possibility to inject our version of the compiler to already installed SDK created to temporary hot fix compiler problems and which will be sufficient for our scenario.
+The standard deployment of a new compiler version is bundling it with a new version of the SDK which would require compiling the SDK from sources.
+However, there is a possibility to inject own version of the compiler to already installed SDK.
+This option was created to temporary hot fix compiler problems delivered with a SDK.
+Since the implemention is a proof of concept, this option will be sufficient to check the main functionality of the proposal directly in user's code.
 \par
-The injection is done by referencing a special package generated by the compiler build in the \texttt{.csproj} file of the target C\# project.
-Before the package generation, the nuget cache containg .NET packaged needs to be modified.
-The nuget cache is usually placed in the \texttt{C://Users/\%user\%/.nuget} folder, where is required to delete the version of \texttt{Microsoft.CSharp.Net.Compiler.ToolSet} package which will be generated by the following command.
-The package is generated by \texttt{Build.cmd -publish} command which generates the \texttt{Roslyn/artifacts/publish/Shipping} folder containg the \texttt{Microsoft.CSharp.Net.Compiler.ToolSet} package which needs to be referenced.
-Then, a common \texttt{dotnet build} command uses the new compiler version instead of the bundled one.
-There is a easy check of the currently used tool set package by putting \texttt{\#error version} pragma somewhere into the compiling code.
-It will raise a compilation error annoncing current version the package which is shown in Figure \ref{img66:pragma}.
+The injection is done by referencing a special package generated by the \texttt{Build.cmd} script in a project file of a target C\# project using partial type inference.
+The nuget cache containg .NET packaged needs to be modified before the package generation.
+The nuget cache is usually placed in the \texttt{C://Users/\%user\%/.nuget} folder on Windows, where is required to delete the version of \texttt{Microsoft.CSharp.Net.Compiler.ToolSet} package which will be generated by the \texttt{Build.cmd -publish} command.
+The command generates the \texttt{roslyn/artifacts/publish/Shipping} folder containg the \texttt{Microsoft.CSharp.Net.Compiler.ToolSet} package which needs to be referenced.
+Additionally to the package reference, the project file has to define a folder containing the package which will be used for restoring the packages in the nuget cache.
+The last thing is specifying of a language version which has to be set to \texttt{preview} enabling the partial type inference. 
+Figure \ref{img68:csproj} shows a modified project file of demo application which can be found in \texttt{Attachment/Demo} folder.
+The \texttt{PropertyGroup} element contains a definition of language version and a folder for package restoration.
+The \texttt{ItemGroup} element contains a definition of the package reference injecting the locally built compiler. 
 \begin{figure}[h]
 \begin{lstlisting}
-TODO pragma
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>preview</LangVersion>
+        <RestoreSources>
+      E:\roslyn\artifacts\packages\Debug\Shipping
+    </RestoreSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference 
+      Include="Microsoft.Net.Compilers.Toolset" 
+      Version="4.9.0-dev"
+    />
+  </ItemGroup>
+</Project>
 \end{lstlisting}
-\caption{Checking the package version.}
+\caption{\texttt{Demo.csproj}}
+\label{img68:csproj}
+\end{figure}
+\par
+Then, a common \texttt{dotnet build} command can be used to compile the project using own compiler version instead of the bundled one.
+There is an easy way to check the currently used compiler by puting the \texttt{\#error version} pragma anywhere into the compiled code.
+Figure \ref{img66:pragma} shows the usage of the pragma in the demo application.
+\begin{figure}[h]
+\begin{lstlisting}
+using System;
+
+#error version
+
+class Program {
+...
+\end{lstlisting}
+\caption{Begining of \texttt{Program.cs}.}
 \label{img66:pragma}
+\end{figure}
+\par
+When the project is compiled again, it will raise a compilation error annoncing current version the package which is shown in Figure \ref{img67:output}.
+We can see, that the code was compiled by \texttt{4.9.0-dev} compiler version and the langauge version was set to \texttt{preview}. 
+\begin{figure}[h]
+\begin{lstlisting}
+E:\Demo>dotnet build
+MSBuild version 17.8.3+195e7f5a3 for .NET
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+E:\Demo\Program.cs(4,8): error CS1029: 
+  #error: 'version' [E:\Demo\Demo.csproj]
+E:\Demo\Program.cs(4,8): error CS8304: 
+  Compiler version: '4.9.0-dev (<developer build>)'. 
+  Language version: preview [E:\Demo\Demo.csproj]
+
+Build FAILED.
+
+E:\Demo\Program.cs(4,8): error CS1029: 
+  #error: 'version' [E:\Demo\Demo.csproj]
+E:\Demo\Program.cs(4,8): error CS8304: 
+  Compiler version: '4.9.0-dev (<developer build>)'. 
+  Language version: preview. [E:\Demo\Demo.csproj]
+    0 Warning(s)
+    2 Error(s)
+
+Time Elapsed 00:00:09.19
+\end{lstlisting}
+\caption{Output of building \texttt{Demo.csproj}}
+\label{img67:output}
 \end{figure}
 
 \subsection{Repository overview}

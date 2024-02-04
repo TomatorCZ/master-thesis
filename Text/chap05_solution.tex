@@ -300,11 +300,20 @@ If the method is called during binding type argument list of method invocation o
 
 \subsection{TypeInferrer}
 
-\change{Describe rewritten type inferrer}
+Replacing the \texttt{MethodTypeInference.cs} file with the \texttt{TypeInference.cs} was the biggest source code update in the code.
+Since the old algorithm for type inference was primary method focused, we rewrote it in the more generic way using a concept of type variables and relations between them and the type symbols.
+Additionally to that, we used the \texttt{\#region} syntax to divide the source code to mutliple parts referencing corresponding parts of already mentioned type inference algorithm.
+However, we also added public API which adapt the old method type inferecne API to the new one.
+This helped us to not change the other interacting parts of the codebase too much.
+There is the \texttt{InferMethod} static method which has a similar signature as the previous one and is an entry point for method type inference.
+We also added the \texttt{InferConstructor} static method as an entry point for constructor type inference.
 
 \subsection{Binding partial-inferred method}
 
-\change{Describe the binding}
+The binding affected the \texttt{Binder\_Invocation.cs} and the \texttt{OverloadResolution.cs} files.
+The changes in the binder were mostly about error recovering and raising potential warnings.
+An example of that is a warning raised during dymanic method invocation binding where if the inferred type argument is used, we notify the user about potential error in runtime, since runtime doesn't support the partial type inference.
+The change in the overload resoltuin was to analyse the method group with used inferred type arguments and use the mentioned API of type inferrer. 
 
 \subsection{Binding partial-inferred object construction}
 

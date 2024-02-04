@@ -214,7 +214,7 @@ The \texttt{Errors} folder contains definitions of all C\# errors and a list of 
 The \texttt{FlowAnalysis} contains several control flow analyzers like nullability analyzer checking the nullability state of variables.
 The \texttt{Generated} folder contains a generated nodes of \textit{bound tree} and the \texttt{Symbols} folder contains nodes of \ac{AST} tree.
 \begin{figure}[h]
-\begin{lstlisting}[xleftmargin=.2\textwidth, xrightmargin=.2\textwidth]
+\begin{lstlisting}
 +roslyn
   +src
     +Compilers
@@ -249,7 +249,46 @@ The \texttt{Generated} folder contains a generated nodes of \textit{bound tree} 
 
 \subsection{Test suite}
 
-\change{Describe test framework and testing}
+Roslyn tests use xUnit framework \cite{online:xUnit} providing wide API for testing application functionalities in various scenarious.
+We used this framework for our own tests in the \texttt{PartialTypeInferenceTests.cs} file.
+Additional helper method \texttt{TestCallSites} was made to save repeating code which initializes the compilation, compiles the provided source code as a string and verifies diagnostics representing compiler warnings and errors.
+Since we are interested in information regarding inferenced type arguments, the source code is augmented by comments representing asserts which have the augmented symbols hold.
+\par
+Figure \ref{img69:test} shows an example of a test case which tests a scenario where an inferred type argument syntax hides a typename having \texttt{\_} identifier.
+We can see that the \texttt{new F1<\_>(1)} expression is tested by the following comment describing the desired resolved call.
+The second argument of the \texttt{TestCallSites} defines which symbols we assert.
+In this case, all object creation expressions are asserted.
+The last argument describes expected dieagnostics which should compiler announce.
+This example requires a warning regarding notifying an user about possible conflicting class name with the \texttt{\_} contextual keyword.
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp, showstringspaces=false]
+[Fact]
+public void PartialConstructorTypeInference_UnderscoreClass()
+{
+  TestCallSites("""
+class P
+{
+  static void M() 
+  {
+    new F1<_>(1); //-P.F1<int>..ctor(int)
+  }
+
+  class F1<T> { public F1(T p) {} }
+}
+
+class _ {}
+""",
+    Symbols.ObjectCreation,
+    ImmutableArray.Create(
+      Diagnostic(ErrorCode.WRN_UnderscoreNamedDisallowed, "_")
+        .WithLocation(11, 7)
+    )
+  );
+}
+\end{lstlisting}
+\caption{Example of a test.}
+\label{img69:test}
+\end{figure}
 
 \subsection{Parsing inferred type arguments}
 

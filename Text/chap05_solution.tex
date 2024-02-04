@@ -209,7 +209,7 @@ So the work mentions only small part of the compiler, which is necessary to unde
 The compiler's source code is divided into multiple folders where the most of changes happend in the \texttt{Binder} folder.
 The folder contains logic for binding \ac{AST} to \textit{bound tree} mentioned in the Roslyn section \ref{sect04:roslyn}.
 The implemention of type inference algorithm can be found in the \texttt{Semantics/OverloadResolution} folder together with the whole mechanism for overload resolution of methods and contructors.
-The \texttt{BoundTree} folder contains definition of automaticly generated nodes representing \textit{bound tree}.
+The \texttt{BoundTree} folder contains an XML description of automaticly generated nodes representing \textit{bound tree}.
 The \texttt{Errors} folder contains definitions of all C\# errors and a list of features which can be disabled and which contains an item for enabling partial type inference.
 The \texttt{FlowAnalysis} contains several control flow analyzers like nullability analyzer checking the nullability state of variables.
 The \texttt{Generated} folder contains a generated nodes of \textit{bound tree} and the \texttt{Symbols} folder contains nodes of \ac{AST} tree.
@@ -292,7 +292,11 @@ class _ {}
 
 \subsection{Parsing inferred type arguments}
 
-\change{Describe change in parsing}
+We didn't change the Roslyn parser converting the source code into \ac{AST}.
+We instead created the \texttt{SourceInferredTypeSymbol} symbol representing the inferred type argument and postpone the \texttt{\_} type arguement recognition to the binding phase.
+In this phase, we changed the \texttt{BindIdentifier} method in \texttt{Binder\_Expressions.cs} which looks up the type symbol represented by provided identifier.
+The change is propagated into subsequenced calls which handles various cases of identifier binding like generic type names or fully quolified names. 
+If the method is called during binding type argument list of method invocation or object creation expression, we change the mode which enables to bind the \texttt{\_} identifier as a inferred type argument symbol.
 
 \subsection{TypeInferrer}
 

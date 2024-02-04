@@ -390,6 +390,7 @@ The argument also doesn't influence the type inference algorithm since the cores
 In this case, after the overload of the \texttt{F} method is chosen, there is a phase of applying conversions from the arguments to the parameters invoked by the \texttt{CoerceArguments} method.
 This phase bind the first argument with already known type of the parameter as a target type.
 We prohibit this behavior when the object creation expression is used in the type inference by generating a different type of the convertion for that.
+Also in this phase we add the previously saved diagnostics depending on if we bound the expression without the target.
 See \texttt{ObjectCreationConvertionWithTarget} and \texttt{ObjectCreationConvertionWithoutTarget} for this propose.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
@@ -411,4 +412,12 @@ As we can see, binding an expression with target type has complicated implementa
 
 \subsection{Nullable walker}
 
-\change{Decribe nullable walker}
+The last part of the code changes is in the \texttt{NullableWalker.cs} file, which provides a nullability analysis pass.
+The basic principle of the analysis in a flow analysis traversing the control-flow graph and rebinding the nodes of the \textit{bound tree} if it is necessary according the the nullability.
+The nodes which was rebindined are rewritten at the end of the pass.
+\par
+Important change was to modify analysis of the bound object creation expression symbol.
+Based on the stored information from the previous binding, we know if it was a target typed.
+If it was target-typed, we postpone the binding in the same way as the \texttt{new()} operator.
+Constructor type inference is added in the process of rebinding the constructor where we use saved data used in the previous binding to repeat it in the context of nullability.
+After the expression binding, we rewrite the containing type if it was changed during the type inference by storing the update to the end of the nullability analysis pass.

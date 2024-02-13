@@ -1,4 +1,120 @@
 \chapter{Evaluation}
 
-\change{Describe achieved type inference. Mention interesting capabilities.}
-\change{Mention the LDM discussion and PR}
+The implementation and proposal is evaluated using the following metrics.
+
+\section{Tests}
+
+We run the same suite case before our changes and after our changes.
+The results can be found in the \texttt{/attachment/TestResults} folder containg the \texttt{Before} folder and the \texttt{After} folder.
+These folders contains results of the \texttt{-testCompilerOnly} suite case.
+Except unimportant small changes in the compiler tests regarding adding new error messages caused by our examples, all tests which passsed before the improvement pass after the improvement,
+This result ensures that the improvement doesn't break the compiler functionality in dramatic manner. 
+
+\section{Demo examples}
+
+The capibalities of the improvement is demonstrated in the following examples.
+TODO: Describe
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp, showstringspaces=false]
+F4<_, _, string>(x => x + 1, y => y.ToString(), z => z.Length); 
+
+static void F4<T1, T2, T3>(Func<T1, T2> p12, Func<T2, T3> p23, Func<T3, T1> p31) { }
+\end{lstlisting}
+\caption{Example 1}
+\label{img73:example1}
+\end{figure}
+TODO: Describe
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp, showstringspaces=false]
+C2<int, B> temp3 = new C2<int, B>();
+
+F6<I2<_, A>>(temp3);
+
+class A {}
+class B : A{}
+interface I2<in T1, out T2> {}
+class C2<T1, T2> : I2<T1, T2> {}
+static void F6<T1>(T1 p1) {}
+\end{lstlisting}
+\caption{Example 2}
+\label{img74:example2}
+\end{figure}
+TODO: Describe
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp, showstringspaces=false]
+C2<int, string> temp7 = new C2<int, string
+
+F10<I2<_, _?>>(temp7);
+\end{lstlisting}
+\caption{Example 3}
+\label{img75:example3}
+\end{figure}
+TODO: Describe
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp, showstringspaces=false]
+new C4(
+   new C2<_>()  //C2<int>..ctor
+);
+
+class C1<T> {}
+class C2<T> : C1<T> {}
+class C4 
+{
+   public C4(C1<int> p1) {}
+}
+\end{lstlisting}
+\caption{Example 4}
+\label{img76:example4}
+\end{figure}
+TODO: Describe
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp, showstringspaces=false]
+new C5<_>(
+    new C5<_>(1) //C5<int>..ctor(int)
+);
+
+class C5<T> : C1<T>
+{
+    public C5(T p1) {}
+}
+\end{lstlisting}
+\caption{Example 5}
+\label{img77:example5}
+\end{figure}
+TODO: Describe
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp, showstringspaces=false]
+new C3<_>( //C3<int>..ctor(C1<int>, int)
+   new C2<_>(), //C2<int>..ctor()
+1
+);
+
+class C3<T>
+{
+   public C3(C1<T> p1, T p2) {}
+}
+\end{lstlisting}
+\caption{Example 6}
+\label{img78:example6}
+\end{figure}
+TODO: Describe
+\begin{figure}[h]
+\begin{lstlisting}[style=csharp, showstringspaces=false]
+F1(
+new C9<_,_,int,_>(1) //C9<int, int, int, C1<int>>..ctor(int)
+,
+1
+);
+
+static void F1<T>(I2<T> p1, T p2) {}
+
+class C9<T1, T2, T3, T4> : C1<T2> where T4 : C1<T3>
+{
+    public C9(T1 p1) {}
+}
+\end{lstlisting}
+\caption{Example 7}
+\label{img79:example7}
+\end{figure}
+
+\section{LDM meeting summary}

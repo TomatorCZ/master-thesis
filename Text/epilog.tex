@@ -1,8 +1,19 @@
 \chapter*{Conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
 
-\change{Describe issue selection.}
-\change{Describe proposed changes in the lang.}
-\change{Describe the prototype and proposal.}
-\change{Mention csharplang discussions.}
-\change{Mention observed future improvements.}
+The introduction \ref{sect:summary} setted four goals which are gradualy achieved by the thesis.
+It started by exploring C\# type inference by using the language specification and implementation in the Roslyn project.
+Then, It was comapred with Rust type inference which offers more advanced type inference in comparison to C\#.
+These differencies were explained using theory background of Hindley-Milner type inference which bounded posibilities of type inference in strongly type languages.
+\par
+Based on these observations, the work selected a subset of type inference improvements suggested in C\# langauge discussions on GitHub and explored the motivation behind it to make it likely to add into C\# language.
+The motivation was described in the created proposal which is the forth goal and which described the improvement in terms of changing the specification.
+\par
+Together with the proposal, the implementation was made in the Roslyn project fork, with unit tests checking the functionality.
+This was the last goal of the proposal.
+The implementation ensured that basic compiler tests passed to reveal possible issues with the solution.
+\par
+Additional to the mentioned goals, the thesis suceeded in presenting the proposal and implementation to \ac{LDM} responsible for approving language changes into C\#.
+The presentation was a success in the meaning that the committe agreed on continue with the change for futher discussion and generally is inclined to ship it with future language releases.
+\par
+Based on the achieved goals and additional success in \ac{LDM} meeting which was not in the scope of the work, we think that the thesis accomplished all promised goals.

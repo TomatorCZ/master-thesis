@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "NpcHPjAI0DBEOV3RCkLTNYp/bIO+gurKdwEPrFKfxKeR7y1PBem3iRxVyysJauEMPweilGgbQvbWyp1a6y0mmA==",
+  "success": true,
+  "projectFilePath": "E:\\School\\master-thesis\\Attachment\\Demo\\Demo.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\husak\\.nuget\\packages\\microsoft.net.compilers.toolset\\4.9.0-dev\\microsoft.net.compilers.toolset.4.9.0-dev.nupkg.sha512"
+  ],
+  "logs": []
+}

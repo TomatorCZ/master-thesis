@@ -1,0 +1,5 @@
+E:\School\master-thesis\Attachment\Demo\bin\Release\net8.0\publish\Demo.exe
+E:\School\master-thesis\Attachment\Demo\bin\Release\net8.0\publish\Demo.dll
+E:\School\master-thesis\Attachment\Demo\bin\Release\net8.0\publish\Demo.deps.json
+E:\School\master-thesis\Attachment\Demo\bin\Release\net8.0\publish\Demo.runtimeconfig.json
+E:\School\master-thesis\Attachment\Demo\bin\Release\net8.0\publish\Demo.pdb

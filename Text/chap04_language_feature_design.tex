@@ -619,6 +619,10 @@ class Bar<T>{
 The previously mentioned algorithm for inferring method type arguments is unchanged except for collecting new bounds in the first phase of the algorithm. 
 If a target type is provided, an upper bound type inference is made from it to the partially inferred type containing the constructor. 
 If the inferring type contains \texttt{where} clause containing type parameter constraints, for each of the type constraints which represented either inheritance constraints or interface implementation constraints is performed lower bound type inference from it to the corresponding type parameter.
+\par
+Figure \ref{img62:ctro} shows an example of constructor type inference, where both of the type arguments of the \texttt{Bar} type are inferred. 
+The algorithm will contain four type variables. 
+The first two variables represent type arguments, and the second two variables represent the underscores.
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp, mathescape=true]
 IBar<int> t = Bar<_, _>();
@@ -631,10 +635,6 @@ class Bar<T1, T2> : IBar<T1> where T2 : object {}
 \caption{Example of type inferences.}
 \label{img62:ctro}
 \end{figure}
-\par
-Figure \ref{img62:ctro} shows an example of constructor type inference, where both of the type arguments of the \texttt{Bar} type are inferred. 
-The algorithm will contain four type variables. 
-The first two variables represent type arguments, and the second two variables represent the underscores.
 In the first phase, lower bound type inference is made from the \texttt{IBar<int>} type to the \texttt{Bar<\_,\_>} type, which will yield in the \texttt{int} lower bound of the type variable representing the first underscore. 
 Then, the type constraint of \texttt{T2} type parameters causes another lower bound type inference from the \texttt{object} type to the type variable representing the \texttt{T2} type parameter. 
 Shape inferences continue to relate type variables representing underscores with type variables representing type parameters. 

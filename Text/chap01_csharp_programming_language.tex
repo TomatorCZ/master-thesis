@@ -15,7 +15,7 @@ These areas concern the C\# type system, including generics and language constru
 \end{figure}
 C\# data types are defined in the C\# type system, which also defines relations between them. 
 The most fundamental relation is type inheritance, where every type inherits another type, forming a tree with \texttt{System.Object} as a root node that doesn’t inherit any type.
-Types are divided into value and reference types, shown in Figure 2.1, where an arrow means \textit{is inherited by} relation. 
+Types are divided into value and reference types, shown in Figure \ref{img04:typeSys}, where an arrow means \textit{is inherited by} relation. 
 Value types consist of built-in numeric types referred to as \textit{simple types}, and enumerations referred to as \textit{enum types}, structures referred to as \textit{struct types}, and nullable types. 
 Compared to reference types, value types are implicitly sealed, meaning that they can’t be inherited by other types. 
 Reference types consist of interfaces, classes, arrays, and delegates. 
@@ -23,7 +23,7 @@ An interface introduces a new relation to the type system by defining a list of 
 The relation forms an acyclic graph, meaning a type can implement multiple interfaces, but the implementation relations can’t form a cycle. 
 Delegates represent typed pointers to methods describing its signature, including generic parameters, parameters, and a return type.
 \par
-The type system implicitly allows to assign \texttt{null}, indicating an invalid value, to reference types. Since C\# 2.0 \cite{online:csHist}, it allows to assign \texttt{null} value to nullable types, which are equivalents of the rest of value types prohibiting it. Because assigning \texttt{null} value is referred to as a billion-dollar mistake, C\# 8.0 \cite{online:csHist}, introduced optional settings warning about assigning null values and created nullable reference types, which, together with nullable types, explicitly allows \texttt{null} assignment as a way of interaction with legacy code not using the feature.
+The type system implicitly allows to assign \texttt{null}, indicating an invalid value, to reference types. Since C\# 2.0 \cite{online:csHist}, it allows to assign \texttt{null} value to nullable types, which are equivalents of the rest of value types prohibiting it. Because assigning \texttt{null} value is referred to as a billion-dollar mistake \cite{online:billionDolarMistake}, C\# 8.0 \cite{online:csHist}, introduced optional settings warning about assigning null values and created nullable reference types, which, together with nullable types, explicitly allows \texttt{null} assignment as a way of interaction with legacy code not using the feature.
 \par
 A big part of the type system is C\# \textit{generics}, allowing the parameterization of types and methods by arbitrary types. 
 A specific generic method or type is \textit{constructed} by providing required type arguments, where \textit{construction} means replacing all occurrences of type parameters with the type arguments. 
@@ -188,12 +188,13 @@ The method type inference algorithm is detailly described in separate section \r
 \subsection{Array type inference}
 
 The last mentioned type inference happens in array initializers when the array type should be deduced from the initializer list. 
-Figure \ref{img14:arrayTypeInf} shows an example of a situation when the type inference is used for determining the \texttt{object[]} type of the \texttt{myArray} array. 
-The C\# specification calls it \textit{common type inference}, which finds the most specialized common type between given types. 
+Figure \ref{img14:arrayTypeInf} shows an example of a situation when the type inference is used for determining the element type of the constructing array. 
+The C\# specification calls it \textit{common type inference}, which finds the most specialized common type between given types.
+In this case, it is the \texttt{object} type.
 From one point of view, it is just adjusted the method type inference algorithm where there is just one type variable, and all initializer items are lower bounds of that type variable.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-var myArray = new[] {new object(), "string"};
+new[] {new object(), "string"};
 \end{lstlisting}
 \caption{Array type inference.}
 \label{img14:arrayTypeInf}
@@ -201,7 +202,7 @@ var myArray = new[] {new object(), "string"};
 
 \section{Method type inference algorithm} \label{sect02:MTIA}
 
-Since one of the thesis's improvements is adjusting the algorithm, this section presents
+Since one of the thesis's improvements is adjusting the method type inference algorithm, this section presents
 its description. 
 The thesis doesn’t show the complete algorithm described in the C\# specification \cite{online:csTypeInference} since it is complex, and some parts are unimportant for the following chapters. 
 The simplified algorithm is divided into four subsections. 
@@ -256,7 +257,7 @@ The pseudocode describing the algorithm uses custom helper functions explained i
 
 Figure \ref{img10:methodTypeInference1} shows the initial phases of the algorithm. 
 The method type inference process starts with receiving arguments of a method call and the method’s signature, which type parameters have to be deduced. 
-The algorithm has two phases, where the first phase initializes initial bounds’ sets of type variables(inferred type arguments), and the second phase repeats until all type variables are fixed or fail if there is insufficient information to deduce them. 
+The algorithm has two phases, where the first phase initializes initial bounds’ sets of type variables (inferred type arguments), and the second phase repeats until all type variables are fixed or fail if there is insufficient information to deduce them. 
 Each type variable has three types of bounds. 
 The exact bound consists of types, which have to be identical to the type variable, meaning that they can be converted to each other. 
 The lower bound contains types that have to be convertible to the type variable, and the upper bound is opposite to it.
@@ -365,6 +366,11 @@ fn InferOutputType(Argument E, Type T):
 \newpage
 \subsection{Collecting Type bounds}
 
+Figure \ref{img12:methodTypeInference3} shows three functions that add new bounds to type variables’
+bound sets. 
+Basically, all of them have similar behavior. 
+It traverses the given \texttt{U} type contained in the argument type with the \texttt{V} type contained in the corresponding parameter type using the conditions contained in the \texttt{switch} statement and adds the \texttt{U} type to the type variable’s bound when the \texttt{V} type is a type variable. 
+Since the branching conditions in \texttt{InferLower} and \texttt{InferUpper} are similar to those in \texttt{InferExact} and unimportant for the proposed improvement, the thesis omits it.
 \begin{figure}[h!]
 \begin{lstlisting}[style=myAlgo, mathescape=true]
 fn InferExact(Type U, Type V):
@@ -392,11 +398,6 @@ fn InferUpper(Type U, Type V):
 \caption{\textit{Exact inference}, \textit{Upper-bound inference}, \textit{Lower-bound inference}}
 \label{img12:methodTypeInference3}
 \end{figure}
-Figure \ref{img12:methodTypeInference3} shows three functions that add new bounds to type variables’
-bound sets. 
-Basically, all of them have similar behavior. 
-It traverses the given \texttt{U} type contained in the argument type with the \texttt{V} type contained in the corresponding parameter type using the conditions contained in the \texttt{switch} statement and adds the \texttt{U} type to the type variable’s bound when the \texttt{V} type is a type variable. 
-Since the branching conditions in \texttt{InferLower} and \texttt{InferUpper} are similar to those in \texttt{InferExact} and unimportant for the proposed improvement, the thesis omits it.
 \par
 \begin{obs}
 There is no need to check possible contradictions because they are checked in the type variable fixation. 

@@ -55,6 +55,9 @@ static class Extensions {
 
 \subsection{Weakness - Constraints-based inference}
 
+The second weakness is noticeable in more advanced generic APIs, like testing frameworks, using type constraints containing the type parameters. 
+Figure \ref{img28:usecase2} shows a scenario of a simple test framework that defines the \texttt{Test} method parameterized by a type of input data and test case represented as type parameters \texttt{U} and \texttt{V}, respectively. 
+The provided type argument representing the test case has to inherit the \texttt{TestCaseBase} base implementation, which is a generic type parametrized by a type of input data. 
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
 Test<TestCaseBase<MyData>, MyData>(new MyData());
@@ -64,10 +67,7 @@ void Test<T, U>(U data) where T : TestCaseBase<U> {...}
 \caption{Constraints-based inference.}
 \label{img28:usecase2}
 \end{figure}
-The second weakness is noticeable in more advanced generic APIs, like testing frameworks, using type constraints containing the type parameters. 
-Figure \ref{img28:usecase2} shows a scenario of a simple test framework that defines the \texttt{Test} method parameterized by a type of input data and test case represented as type parameters \texttt{U} and \texttt{V}, respectively. 
-The provided type argument representing the test case has to inherit the \texttt{TestCaseBase} base implementation, which is a generic type parametrized by a type of input data. 
-This constraint gives type information about the \texttt{T} type parameter, which is related to the type of input data. 
+This constraint gives type information about the \texttt{T} type parameter, which is related to the type of input data.
 However, the user has to specify type arguments in the \texttt{Test} call since the type inference doesn’t consider this source of type information. 
 If the compiler considers the constraint, the type arguments will be inferred, saving the type annotations.
 
@@ -94,7 +94,6 @@ The first and the second weaknesses motivate us to extend the method type infere
 This potential improvement is a problem for the compiler's back compatibility which was mentioned in the C\# discussion \cite{online:breakingChange}. 
 New compiler versions should be back-compatible so that a new version does not change the behavior of the code compiled by the older version.
 \par
-
 Figure \ref{img30:breakingChange1} shows the breaking change when method type inference starts to consider target types. 
 Before the improvement, the \texttt{M} method call is resolved to the non-generic version of this method because type inference can’t infer the \texttt{T} type argument. 
 After the improvement, the type inference infers \texttt{T} to be the \texttt{int} type, which is more specific to the type of \texttt{1} argument than the \texttt{long} type. 
@@ -196,6 +195,8 @@ A possible solution would be to use method type inference in object creation exp
 Although this solution would be simple to implement, class type parameters are more likely not to be used in constructor parameter types, which makes the method type inference useless. 
 Besides that, options for inferring type arguments of construing type are not limited by not introducing breaking changes since there is no type inference at all. 
 So, there is a possibility of introducing an even stronger type inference, which could be one day introduced in the method type inference when there would be a way to make breaking changes in the new compiler version. 
+\par
+Figure \ref{img36:cti} shows an example of such a generic class whose all type parameters are not used in the constructor.
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp]
 class Algorithm<TData, TLogger> where TLogger : Logger<TData> 
@@ -204,7 +205,6 @@ class Algorithm<TData, TLogger> where TLogger : Logger<TData>
 \caption{Use case using type paraemter constraints.}
 \label{img36:cti}
 \end{figure}
-Figure \ref{img36:cti} shows an example of such a generic class whose all type parameters are not used in the constructor.
 Because of that, extending the potential method type inference to be used in object creation expressions would be useless since the \texttt{TLogger} can’t be inferred only from parameter types.
 \par
 Introducing improved type inference based on method type inference would solve the mentioned issues. 

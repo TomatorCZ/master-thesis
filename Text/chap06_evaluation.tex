@@ -25,6 +25,7 @@ static void F4<T1, T2, T3>(Func<T1, T2> p12, Func<T2, T3> p23, Func<T3, T1> p31)
 \caption{Example 1}
 \label{img73:example1}
 \end{figure}
+\par
 Figure \ref{img74:example2} shows advenced scenario containing which uses nested inferred type argument.
 The \texttt{temp3} variable and the type argument's hint (\texttt{I2<\_, A>}) is used to determine the inferred nested type argument which is \texttt{int}.
 During the process, there are applied multiple rules for inference like inheritance and variance.
@@ -42,6 +43,7 @@ static void F6<T1>(T1 p1) {}
 \caption{Example 2}
 \label{img74:example2}
 \end{figure}
+\par
 Figure \ref{img75:example3} shows an example where nullability inference is a part of the type argument deduction.
 Since the callsite \texttt{F10} has one of the nested inferred type agrument with appended quoation mark determining the nullability of inferred type argument.
 Without the question mark, the inferred type argument would be \texttt{string}.
@@ -55,6 +57,7 @@ F10<I2<_, _?>>(temp7);
 \caption{Example 3}
 \label{img75:example3}
 \end{figure}
+\par
 Figure \ref{img76:example4} shows an example of constructor type inference which uses a target type to infer type argumens on \texttt{new C2<\_>()} expression.
 The target type is a type of the \texttt{C4} constructor parameter resulting in inferred \texttt{int} type argument.
 \begin{figure}[h]
@@ -73,6 +76,7 @@ class C4
 \caption{Example 4}
 \label{img76:example4}
 \end{figure}
+\par
 Figure \ref{img77:example5} shows an example of advanced binding order of arguments.
 The top-level obejct creation needs type of contructor's argument to determine its type parameter.
 For this porpose, the nested object creation expression is bound without the target to provide this type information.
@@ -90,6 +94,7 @@ class C5<T> : C1<T>
 \caption{Example 5}
 \label{img77:example5}
 \end{figure}
+\par
 Figure \ref{img77:example5} is advanced scenario of previous use case where although the first argument can't by bound because of type inference failed.
 The failure is caused by lack of type information.
 However, the second argument provides enough type information to infer a type parameter of \texttt{C3} class.
@@ -110,6 +115,7 @@ class C3<T>
 \caption{Example 6}
 \label{img78:example6}
 \end{figure}
+\par
 Figure \ref{img79:example7} shows the most advanced scenario where type the binding order and type inference uses several things to infer the \texttt{new C9<\_,\_,int,\_>(1)} expression.
 We will focus on how the type paraters of \texttt{C9} class is gradually inferred.
 The \texttt{T3} type paremeter is inferred by using the provided hint in the type argument list, which is \texttt{int}.

@@ -77,11 +77,11 @@ An example of such checking is the \texttt{Bar()} method call, where the compile
 An appropriate error occurs during the compilation because string value has the \texttt{string} type, and it is passed as the \texttt{p1} parameter, which has the \texttt{int} type.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
+void Bar<T>(int p1, T p2, long p3) { ... }
+...
 dynamic a = "string";
 a.Foo();
 Bar("string", 1, a); \\ Compilation error reported
-
-void Bar<T>(int p1, T p2, long p3) {...}
 \end{lstlisting}
 \caption{C\# dynamic type.}
 \label{img06:dynamic}
@@ -174,10 +174,11 @@ The type inference has first to infer types of input parameters of this delegate
 Then, it can match the inferred return type with the \texttt{T3} type parameter, resulting in the \texttt{System.Int32} type.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
+Foo<T1, T2, T3>(T1 p1, T1 p2, IList<T2> p3, Func<T2, T3> p4)
+{ ... }
+...
 List<int> myList = ...
 Foo((long)1, (int)1, myList, (p1) => p1 + 1);
-
-Foo<T1, T2, T3>(T1 p1, T1 p2, IList<T2> p3, Func<T2, T3> p4) {...}
 \end{lstlisting}
 \caption{Method type inference.}
 \label{img09:methodTypeInf}
@@ -194,7 +195,7 @@ In this case, it is the \texttt{object} type.
 From one point of view, it is just adjusted the method type inference algorithm where there is just one type variable, and all initializer items are lower bounds of that type variable.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-new[] {new object(), "string"};
+new[] { new object(), "string" };
 \end{lstlisting}
 \caption{Array type inference.}
 \label{img14:arrayTypeInf}

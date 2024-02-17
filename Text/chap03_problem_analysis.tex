@@ -1,6 +1,6 @@
 \chapter{Problem analysis}
 
-The previous section \ref{sect04:github} introduced the championed issue recommended by \ac{LDT}. 
+The previous section \ref{sect04:github} introduced the championed issue, accompanied by several ideas for improvement.
 Since the description of the issue is not well defined, the work will continue to set the scope of the issue, which will bound the proposed improvement of this thesis. 
 In that scope, it will identify a concrete motivation that should be solved by the improvement and which would be a real-world missing feature, making the proposal promising to become a potential future extension of C\# language. 
 Based on that motivation and information obtained from the previous sections, it will determine requirements that should be fulfilled by the improvement. 
@@ -26,69 +26,65 @@ In the context of C\#, method type inference is the only type inference that inf
 Even though method type inference is a complex algorithm, it has several weaknesses. 
 The following three real-world examples demonstrate common issues with method type inference, which the thesis will try to solve.
 
-\subsection{Weakness - Target-typing}
+\subsection{Weakness -- Target-typing}
 The first weakness regards target typing, which was mentioned in the previous chapter \ref{sect06:targetType}. 
 Suppose a hypothetical situation when a user queries an item from a database whose column is a point of interest. 
 Figure \ref{img27:usecase1} shows an example of code that uses the \texttt{fetch} method defined on a database type. 
 The \texttt{data} variable represents data fetched from a database. 
 Since a concrete form of data is unknown, the data has the type of \texttt{object} containing an internal representation of fetched data with the columns stored as fields. 
 The \texttt{GetField} method enables to read the variable’s field of the given name with the supposed type given as a type argument. 
-Suppose the fetched object contains the ”name” field containing a string value. 
+Suppose the fetched object contains the ``name'' field containing a string value. 
 Now, a user wants to store the value in the \texttt{name} variable, which is explicitly typed. 
 Even though the return type of the \texttt{GetField} method is known from the variable declaration, which also is the \texttt{TReturn} type argument of the method, the user still has to specify the type argument in the call. 
 Generally, this problem consists of all type inferences, which depend on the target type. The target can be an argument of another method call or an assigning field. 
 If the method type inference considers the target type, the user will not have to specify the \texttt{string} type argument in the \texttt{GetField} call.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-object data = database.fetch();
-string name = data.GetField<string>("name");
+TReturn GetField<TReturn>(object inst, string fieldName) { ... }
 ...
-static class Extensions {
-    static 
-    TReturn GetField<TReturn>(this object inst, string fieldName) 
-    {...}
-}
+object data = database.fetch();
+string name = GetField<string>(data, "name");
 \end{lstlisting}
-\caption{Target-typed inference.}
+\caption{No target-typed inference.}
 \label{img27:usecase1}
 \end{figure}
 
-\subsection{Weakness - Constraints-based inference}
+\subsection{Weakness -- Constraints-based inference}
 
 The second weakness is noticeable in more advanced generic APIs, like testing frameworks, using type constraints containing the type parameters. 
 Figure \ref{img28:usecase2} shows a scenario of a simple test framework that defines the \texttt{Test} method parameterized by a type of input data and test case represented as type parameters \texttt{U} and \texttt{V}, respectively. 
 The provided type argument representing the test case has to inherit the \texttt{TestCaseBase} base implementation, which is a generic type parametrized by a type of input data. 
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-Test<TestCaseBase<MyData>, MyData>(new MyData());
+void Test<T, U>(U data) where T : TestCaseBase<U> { ... }
 ...
-void Test<T, U>(U data) where T : TestCaseBase<U> {...}
+Test<TestCaseBase<MyData>, MyData>(new MyData());
 \end{lstlisting}
-\caption{Constraints-based inference.}
+\caption{No constraints-based inference.}
 \label{img28:usecase2}
 \end{figure}
 This constraint gives type information about the \texttt{T} type parameter, which is related to the type of input data.
 However, the user has to specify type arguments in the \texttt{Test} call since the type inference doesn’t consider this source of type information. 
 If the compiler considers the constraint, the type arguments will be inferred, saving the type annotations.
 
-\subsection{Weakness - All or nothing principle}
+\subsection{Weakness -- All or nothing principle}
 
 There are also situations where even strong type inference is not enough.
-Figure \ref{img29:usecase3} shows a situation where the \texttt{log} method is parametrized by two type parameters that are obtained in the parameter types and hence inferable by the compiler. 
-However, the \texttt{log} method call still has to specify type arguments because the \texttt{null} argument doesn’t have concrete type information. 
+Figure \ref{img29:usecase3} shows a situation where the \texttt{Log} method is parametrized by two type parameters that are obtained in the parameter types and hence inferable by the compiler. 
+However, the \texttt{Log} method call still has to specify type arguments because the \texttt{null} argument doesn’t have concrete type information. 
 In this case, the user always has to specify the second type argument, but the compiler can infer the first type argument. 
 The thesis refers to this problem as \textit{all or nothing} principle, which regards the obligation to specify all type arguments or none of them.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-log<Message, Appendix>(new Message(...), null);
+void Log<T, U>(T message, U appendix) { ... }
 ...
-void log<T, U>(T message, U appendix) {...}
+Log<Message, Appendix>(new Message(...), null);
 \end{lstlisting}
 \caption{Uninferable type argument.}
 \label{img29:usecase3}
 \end{figure}
 
-\subsection{Solution - Improved method type inference}
+\subsection{Solution -- Improved method type inference}
 
 The first and the second weaknesses motivate us to extend the method type inference in order to consider a wider context for obtaining type information for the type arguments. 
 This potential improvement is a problem for the compiler's back compatibility which was mentioned in the C\# discussion \cite{online:breakingChange}. 
@@ -100,10 +96,10 @@ After the improvement, the type inference infers \texttt{T} to be the \texttt{in
 So now, the \texttt{M} method call refers to the generic version of this method and executes different code without any warning or error.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-int name = M(1);
+T M<T>(int p1) { ... }
+int M(long p2) { ... }
 ...
-T M<T>(int p1) {...}
-int M(long p2) {...}
+int name = M(1);
 \end{lstlisting}
 \caption{Breaking change: Target-typed inference.}
 \label{img30:breakingChange1}
@@ -115,10 +111,10 @@ After the improvement, the generic version is inferred to have the \texttt{int} 
 So, the code behavior changed again because of compiling it with a different compiler's version.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-M(1);
+void M<T>(int p1) where T : List<int> { ... }
+void M(long p2) { ... }
 ...
-void M<T>(int p1) where T : List<int> {...}
-void M(long p2) {...}
+M(1);
 \end{lstlisting}
 \caption{Breaking change: Constraints-based inference.}
 \label{img31:breakingChange2}
@@ -127,20 +123,20 @@ void M(long p2) {...}
 Besides the breaking change, the potential method type inference improvement to use a bigger context still doesn’t solve our third weakness demonstrating a type parameter, which doesn’t appear in parameter types, return type, and the type parameters’ constraints. 
 These obstacles give the reason for introducing a way to hint just ambiguous type arguments to the compiler.
 
-\subsection{Solution - Partial method type inference}
+\subsection{Solution -- Partial method type inference}
 
 Partial type inference can reduce the first two weaknesses. 
 Type arguments, which the method type inference can’t infer, can be hinted in order to avoid specifying the whole type argument list. 
 Let’s now ignore why the underscore character is used and how inferred type variables are determined in the following example. 
 The reasons behind that will be mentioned later.
 Figure \ref{img32:sol1} shows the usage of partial type inference applied in the second presented example regarding method type inference weaknesses. 
-Although the first type argument of the \texttt{Test} method call must still be provided, the second argument is omitted by using the underscore character to determine an inferred type argument. 
+Although the first type argument of the \texttt{DoTest} method call must still be provided, the second argument is omitted by using the underscore character to determine an inferred type argument. 
 The reduction of the first weakness is to isolate the insufficient type inference of type arguments that are directly influenced by it and infer the rest.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-test<TestCaseDefault<MyData>, _>(new MyData());
-
-void test<T, U>(U data) where T : TestCaseDefault<U> {...}
+void DoTest<T, U>(U data) where T : TestCaseDefault<U> { ... }
+...
+DoTest<TestCaseDefault<MyData>, _>(new MyData());
 \end{lstlisting}
 \caption{Partial type inference: Reducing method type inference weakness.}
 \label{img32:sol1}
@@ -150,9 +146,9 @@ The third motivation example confirms that partial type inference is not just a 
 Figure \ref{img33:sol2} demonstrates a usage of partial type inference where it omits the first type argument since it can be deduced from the first argument type and specifies the ambiguous type that can’t be deduced.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-log<_, Appendix>(new Message(...), null);
-
-void log<T, U>(T message, U appendix) {...}
+void Log<T, U>(T message, U appendix) { ... }
+...
+Log<_, Appendix>(new Message(...), null);
 \end{lstlisting}
 \caption{Partial type inference: Solving the \textit{all or nothing} problem.}
 \label{img33:sol2}
@@ -160,7 +156,7 @@ void log<T, U>(T message, U appendix) {...}
 
 \newpage
 
-\subsection{Solution - Constructor type inference}
+\subsection{Solution -- Constructor type inference}
 
 Partial type inference doesn’t regard only method type inference. 
 It can also be introduced in other places. One of the places that seems to be good for that is object creation expression. 
@@ -169,9 +165,9 @@ Figure \ref{img34:wrapper} shows an example of the limitation, where the \texttt
 Hence, the user has to specify the whole type with the \texttt{int} type argument, despite the fact that it could be inferred using method type inference.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
+class Wrapper<T> : IWrapper { public Wrapper(T item) { ... } }
+...
 IWrapper a = new Wrapper<int>(1);
-
-class Wrapper<T> : IWrapper { public Wrapper(T item) {...} }
 \end{lstlisting}
 \caption{C\# wrapper class.}
 \label{img34:wrapper}
@@ -183,9 +179,9 @@ Since the method call type arguments can be inferred, it allows the use of metho
 However, this solution has disadvantages like the necessary boiler-plate and prohibition of using initializers.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-IWrapper a = Create(1);
-
 static Wrapper<T> Create<T>(T item) => new Wrapper<T>(item);
+...
+IWrapper a = Create(1);
 \end{lstlisting}
 \caption{Workaround of constructor type inference.}
 \label{img35:workaroung}
@@ -200,7 +196,7 @@ Figure \ref{img36:cti} shows an example of such a generic class whose all type p
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp]
 class Algorithm<TData, TLogger> where TLogger : Logger<TData> 
-{ public Algorithm(TData data) { ... }}
+{ public Algorithm(TData data) { ... } }
 \end{lstlisting}
 \caption{Use case using type paraemter constraints.}
 \label{img36:cti}
@@ -208,30 +204,31 @@ class Algorithm<TData, TLogger> where TLogger : Logger<TData>
 Because of that, extending the potential method type inference to be used in object creation expressions would be useless since the \texttt{TLogger} can’t be inferred only from parameter types.
 \par
 Introducing improved type inference based on method type inference would solve the mentioned issues. 
-Figure \ref{img37:sol1} shows a potential usage of that type inference in the first case regarding the Wrapper class where an underscore is used to represent inferred type argument. 
+Figure \ref{img37:sol1} shows a potential usage of that type inference in the first case regarding the \texttt{Wrapper} class where an underscore is used to represent inferred type argument. 
 The inference uses the parameter type of the constructor to infer the \texttt{T} parameter type which is \texttt{int}.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
+class Wrapper<T> : IWrapper { public Wrapper(T item) { ... } }
+...
 IWrapper a = new Wrapper<_>(1);
-
-class Wrapper<T> : IWrapper { public Wrapper(T item) {...} }
 \end{lstlisting}
 \caption{Constructor type inference: Wrapper.}
 \label{img37:sol1}
 \end{figure}
 \par
 Figure \ref{img38:sol2} shows a potential extension of the type inference. 
-The first statement of initializing the \texttt{alg} variable uses type inference, leveraging \texttt{TLogger}’s constraint to determine its type. 
-The second statement demonstrates the possibility of having a nested underscore, which allows to more specify the type argument.
+There is the \texttt{Algorithm} class definition containing two type parameters representing the type of data and logger used by the class.
+The first statement of initializing the \texttt{alg} variable uses type inference, leveraging \texttt{TLogger}’s constraint to determine its type.
+Now imagine that there is the \texttt{SpecialLogger} class that is intended to be used as a logger.
+The second statement demonstrates the possibility of having a nested underscore, which allows to specify the type of logger without providing its type argument.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
+class Algorithm<TData, TLogger> where TLogger : Logger<TData> 
+{ public Algorithm(TData data) { ... } }
+...
 var alg = new Algorithm<_, _>(new MyData());
 var algWithSpecialLogger = 
-    new Algorithm<_ , SpecialLogger<_>>(new MyData());
-
-class Algorithm<TData, TLogger> 
-    where TLogger : Logger<TData> 
-{ public Algorithm(TData data) { ... }}
+  new Algorithm<_ , SpecialLogger<_>>(new MyData());
 \end{lstlisting}
 \caption{Constructor type inference: stronger method type inference.}
 \label{img38:sol2}
@@ -241,13 +238,13 @@ From now on, thesis calls \textit{constructor type inference} for introducing su
 
 \section{Requirements}
 
-This section mentions requirements that have to be fulfilled by the improvement to be likely discussed by \ac{LDT}.
+The following requirements should be fulfilled by the solution to make it more likely to be discussed by \ac{LDT}.
 \par
 \textbf{Back compatibility} is one of the most important requirements for new language features. 
 The improvement shouldn’t introduce a breaking change. However, this requirement is sometimes too strict for improvements, which would be very beneficial, and its breaking change would appear in cases that seem to be rare in the code. 
 These improvements can break back compatibility by providing additional warnings or errors alerting a user of possible code behavior changes.
 Figure \ref{img39:brkCh} shows an introduced breaking change when record classes were added into the C\# language. 
-Before the change, the \texttt{B} identifier referred to a method without parameters and returned the \texttt{record} type. 
+Before the change, the \texttt{B} identifier referred to a method without parameters and returned the type named \texttt{record}. 
 After the change, the \texttt{B} identifier refers to a new record type declaration. 
 There is an example where the breaking change can appear when there is a type with the \texttt{record} name. 
 These situations are uncommon, and the improvement benefit was big enough to be added to the language. 
@@ -256,7 +253,7 @@ The possible breaking change is notified to the user by a compilation error.
 \begin{lstlisting}[style=csharp]
 class record {}
 class A {
-    record B(){...}
+  record B() { ... }
 }
 \end{lstlisting}
 \caption{C\# record class breaking change.}
@@ -273,3 +270,10 @@ The improvement should consider possible future improvements and not be a blocke
 \par
 \textbf{Performance} is a critical part of Roslyn and which is one of the main goals of this project.
 The time complexity added by the thesis’s improvement shouldn’t be too big in order to not slow the compilation process.
+
+\section{Summary}
+
+Three possible improvements of type inference were introduced based on the mentioned motivation, where was identified main weaknesses of current type inference. 
+Then, several requirements were created to achieve the fourth goal of the thesis, which is to make the proposal likely to be discussed by \ac{LDT}. 
+Based on the requirement, the first improvement introducing breaking change was excluded. 
+The remaining two improvements seem to fulfill the requirements, and they will be further proceeded in the following section with focusing on not breaking any requirement.

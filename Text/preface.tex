@@ -43,7 +43,7 @@ However, the current version of C\# type inference fails to deduce it.
 \begin{figure}
 \begin{lstlisting}[style=csharp]
 T GetField<T>(object o, string fieldName) { ... }
-
+...
 object person = ...
 string name = GetField<string>(person, "name");
 \end{lstlisting}
@@ -57,8 +57,8 @@ There is an equivalent initialization of \texttt{name} variable declaration star
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
 fn GetField<T>(o: &object, fieldName: &str) -> T { ... }
-
-let person: &object = ...;
+...
+let person: &object = ...
 let name: &str = GetField(person, "name");
 \end{lstlisting}
 \caption{Rust Type inference of generic methods.}

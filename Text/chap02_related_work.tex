@@ -169,7 +169,7 @@ Since \texttt{1} value is passed into this call, \texttt{T} is inferred to be th
 An interesting behavior regarding the type inference is that it infers the type of creating object used in the first statement using information obtained from the second statement.
 \begin{figure}[h]
 \begin{lstlisting}
-let mut a  = Vec::new();
+let mut a = Vec::new();
 a.push(1);
 \end{lstlisting}
 \caption{Rust type inference example.}
@@ -229,9 +229,9 @@ The first discussion \cite{online:DefTypeParam} mentions \textit{default type pa
 Figure \ref{img19:defTypeParam} shows a potential design of this feature where construing generic type \texttt{A} doesn’t need a type argument since it uses \texttt{int} type as a default value. 
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-var temp = new A();
-
 class A<T = int> {}
+...
+var temp = new A();
 \end{lstlisting}
 \caption{Default type parameters.}
 \label{img19:defTypeParam}
@@ -243,9 +243,9 @@ The next discussion \cite{online:GenAlias} mentions \textit{generic aliases} all
 Figure \ref{img20:genAlias} shows an example where there is the \texttt{StringDictionary} generic alias specifying the first type argument of the \texttt{Dictionary} class to be the \texttt{string} type, which simplifies the usage of the \texttt{Dictionary} type in scenarios where there are often used dictionaries with keys of the \texttt{string} type.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-var temp = new StringDictionary<int>();
-
 using StringDictionary<TValue> = Dictionary<String, TValue>;
+...
+var temp = new StringDictionary<int>();
 \end{lstlisting}
 \caption{Generic aliases.}
 \label{img20:genAlias}
@@ -260,9 +260,9 @@ The current type inference forces to specify all type arguments in the \texttt{F
 Named type parameters offer a way how to tell the compiler specific type parameters for which an user provides type arguments, \texttt{U} in this case, and letting the compiler infer the rest of the type parameters.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-var x = F<U:short>(1);
-
 U F<T, U>(T t) { ... }
+...
+var x = F<U:short>(1);
 \end{lstlisting}
 \caption{Named type parameters.}
 \label{img21:NamedTParam}
@@ -275,9 +275,9 @@ Figure \ref{img22:CharITArg} shows the \texttt{var} keyword for skipping the fir
 The comments propose other options for keywords like underscore or whitespaces.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
+TResult Foo<T, TResult>(T p1) { ... }
+...
 Foo<var, int>("string");
-
-TResult Foo<T, TResult>(T p1){ ... }
 \end{lstlisting}
 \caption{Using char as inferred type argument.}
 \label{img22:CharITArg}
@@ -289,13 +289,10 @@ Discussion \cite{online:RetTInference} proposes \textit{Target-typed inference},
 We can see the usage in Figure \ref{img62:RetTInf}, where type inference determines that the return type has to be \texttt{int} type and uses that to deduce the type argument \texttt{T}.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
+T Field<T>(this object target, string fieldName) { ... }
+...
 object row = ...
-int id = row.Field("id")
-
-static class ObjectEx {
-	T Field<T>(this object target, string fieldName) 
-	{ ... }
-}
+int id = Field(row, "id")
 \end{lstlisting}
 \caption{Target-typed inference.}
 \label{img62:RetTInf}
@@ -304,16 +301,18 @@ static class ObjectEx {
 \subsection{Type inference based on constrains} \label{sect11:is6}
 
 The next idea of improving type inference is given by the discussion \cite{online:TInfConst}, where type inference utilizes type information obtained from type constraints.
-A simple example of that can be seen in Figure \ref{img23:TInfConst}, where \texttt{T1} can be deduced by using \texttt{T1}'s constraint and inferred type of \texttt{T2} forming inferred type \texttt{List<int>}.
-\begin{figure}[h!]
+\begin{figure}[b!]
 \begin{lstlisting}[style=csharp]
-var temp = Foo(1);
-
 T1 Foo<T1,T2>(T2 item) where T1 : List<T2> {}
+...
+var temp = Foo(1);
 \end{lstlisting}
 \caption{Type inference based on type constraints.}
 \label{img23:TInfConst}
 \end{figure}
+A simple example of that can be seen in Figure \ref{img23:TInfConst}, where \texttt{T1} can be deduced by using \texttt{T1}'s constraint and inferred type of \texttt{T2} forming inferred type \texttt{List<int>}.
+
+\newpage
 
 \subsection{Inferred method return type} \label{sect12:is7}
 
@@ -333,11 +332,11 @@ An issue \cite{online:Realloc} proposes a way to compact type argument lists of 
 The idea is demonstrated in the example \ref{img25:Realloc}, where the argument list of \texttt{A<T1>} type and the \texttt{Foo<T2>} method are merged, and the type arguments are split by a semicolon.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-A.Foo<int;string>();
-
 static class A<T1> {
-    public static void Foo<T2>(){}
+  public static void Foo<T2>() {}
 }
+...
+A.Foo<int;string>();
 \end{lstlisting}
 \caption{Specifying type arguments in method calls (Realocation).}
 \label{img25:Realloc}
@@ -349,9 +348,9 @@ The last discussion \cite{online:CtorTInf}, which is mentioned here, regards \te
 The type inference can be seen in Figure \ref{img26:CtorTInf}, where the \texttt{T} type parameter of the \texttt{C<T>} generic type can be deduced by using type information from its constructor.
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp]
+class C<T> { public C(T p1) {} }
+...
 var temp = new C<_>(1); // T = int
-
-class C<T> { public C(T p1) {}}
 \end{lstlisting}
 \caption{Constructor type inference.}
 \label{img26:CtorTInf}

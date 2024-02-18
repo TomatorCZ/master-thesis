@@ -9,7 +9,7 @@ The second group consists of \textit{Default type parameters} \ref{sect07:is1}, 
 The third group consists of \textit{Constructor type inference} \ref{sect14:is9} and \textit{Inferred method return type} \ref{sect12:is7}, which introduce type inference in new C\# constructs. 
 Inferred method return type is not in the scope of this work, although it is mentioned in the last section as a future improvement that will be difficult to implement. 
 The first group is discussed in relation to constructor type inference, where potentially applied method type inference can be improved without introducing breaking changes. 
-The second group is discussed in relation to partial type inference, which is an objective of the championed issue.
+The second group is discussed in relation to partial type inference, which is an main objective of the championed issue.
 
 \section{Partial method type inference}
 
@@ -82,7 +82,7 @@ The work presents the most relevant variants that appeared in the mentioned idea
 
 \subsubsection{Diamond operator} 
 
-Syntax consists of a pair of two angle brackets \texttt{<>}.
+Diamond operator syntax consists of a pair of two angle brackets \texttt{<>}.
 It is used as an empty type argument list determining that the type name or method name is generic.
 \par
 Figure \ref{img40:opDi1} demonstrates the usage in generic method calls of \texttt{Foo1} and \texttt{Foo2}. 
@@ -101,27 +101,33 @@ Foo2<Bar<>, int>(arg1, arg2, arg3);
 \label{img40:opDi1}
 \end{figure}
 \par
-Figure \ref{img41:opDi2} shows the usage in object creation expression. 
+Figure \ref{img41a:opDi2} shows the usage in object creation expression. 
 The first statement containing the \texttt{Bar<>} name has the advantage of expressing the will to infer the type’s type arguments, which is necessary in comparison to the previous example since the object creation doesn’t offer type inference. 
 If the type inference were potentially turned on by default, it would introduce a breaking change. 
 However, there is also a disadvantage of the usage since it doesn’t specify the arity of the generic type. If there were multiple generic types differing in arity, it would complicate the already mentioned overload resolution phase since all constructors from these generic types would have to be considered. The process would be computationally demanding. 
 A possible solution would be the following restriction. 
 Usually, there is not more than one generic type with the same name. 
-So when there is just one type of that name, the diamond operator would be allowed to use it since the name determined one specific generic type. 
-In the example, \texttt{Baz<>} would refer to the \texttt{Baz<T1, T2>} generic type since there is no other generic type with the same name, causing the ambiguity.
-\begin{figure}[h]
+\begin{figure}[h!]
 \begin{lstlisting}[style=csharp]
-new Bar<>(...);
-new Baz<>(...);
-
 class Bar { ... }
 class Bar<T1> { ... }
 class Bar<T1, T2> { ... }
-
+...
+new Bar<>(...);
+\end{lstlisting}
+\caption{Diamond operator - object creation expression ambiguity.}
+\label{img41a:opDi2}
+\end{figure}
+So when there is just one type of that name, the diamond operator would be allowed to use it since the name determined one specific generic type. 
+In Example \ref{img41b:opDi2}, \texttt{Baz<>} would refer to the \texttt{Baz<T1, T2>} generic type since there is no other generic type with the same name, causing the ambiguity.
+\begin{figure}[h!]
+\begin{lstlisting}[style=csharp]
 class Baz<T1,T2> { ... }
+...
+new Baz<>(...);
 \end{lstlisting}
 \caption{Diamond operator - object creation expression.}
-\label{img41:opDi2}
+\label{img41b:opDi2}
 \end{figure}
 \par
 The third example is shown in Figure \ref{img42:opDi3}, where the generic \texttt{Wrapper} class is used to specify the wrapping generic type. 
@@ -168,7 +174,7 @@ Figure \ref{img45:opW1} shows the usage when the \texttt{Foo1} generic method is
 skipping the first and the last type argument, which is inferred by the compiler. 
 However, the syntax seems to be messy when it is used in generic methods with many generic type parameters, as can be seen in the \texttt{Foo2} method call. 
 Similar thoughts regard the second and third use case.
-\begin{figure}[h]
+\begin{figure}[h!]
 \begin{lstlisting}[style=csharp]
 Foo1<, string, List<>, >(arg1, arg2, arg3);
 Foo2<,,,int,,>(arg1, arg2, arg3);
@@ -264,7 +270,7 @@ It also seems to be the shortest and synoptical way to skip inferred type argume
 The possible breaking change is not an obstacle in this situation since a similar decision was made for the \texttt{var} keyword, and the situation where it can occur seems to be rare. 
 Problems with the potential future extension where the underscore can represent inferred type in the variable declaration would be prohibited to not mix it with the \texttt{var} keyword. 
 Although the diamond operator is not very useful in a generic method call, it makes sense in object creation expression. 
-The usage and analysis of that is covered by later in this work.
+The usage and analysis of that is covered later in this work.
 
 \subsection{Method and typename lookup}
 
@@ -328,13 +334,13 @@ void Foo<T1, T2>(T1 p1, T2 p2)
 
 The proposed algorithm uses two new definitions of dependendencies which are given below.
 \begin{defn}[Shape dependence]
-An unfixed type variable \texttt{$X_i$} \emph{shape-depends directly} on an unfixed type variable \texttt{$X_e$} if \texttt{$X_e$} represents \textit{inferred\_type\_argument} and it is contained in shape bound of the type variable \texttt{$X_i$}.
-\texttt{$X_e$} \textit{shape-depends on} \texttt{$X_i$} if \texttt{$X_e$} \textit{shape-depends directly on} \texttt{$X_i$} or if \texttt{$X_i$} \textit{shape-depends directly on} \texttt{$X_v$} and \texttt{$X_v$} \textit{shape-depends on} \texttt{$X_e$}. Thus \textit{shape-depends on} is the transitive but not reflexive closure of \textit{shape-depends directly on}.
+An unfixed type variable \texttt{$X_i$} \emph{shape-depends directly on} an unfixed type variable \texttt{$X_e$} if \texttt{$X_e$} represents \textit{inferred\_type\_argument} and it is contained in shape bound of the type variable \texttt{$X_i$}.
+\texttt{$X_e$} \emph{shape-depends on} \texttt{$X_i$} if \texttt{$X_e$} \emph{shape-depends directly on} \texttt{$X_i$} or if \texttt{$X_i$} \emph{shape-depends directly on} \texttt{$X_v$} and \texttt{$X_v$} \emph{shape-depends on} \texttt{$X_e$}. Thus \emph{shape-depends on} is the transitive but not reflexive closure of \emph{shape-depends directly on}.
 \end{defn}
 \begin{defn}[Type dependence]
-An unfixed type variable \texttt{$X_i$} \textit{type-depends directly on} an unfixed type variable \texttt{$X_e$} if \texttt{$X_e$} occurs in any bound of type variable \texttt{$X_i$}.
-\texttt{$X_e$} \textit{type-depends on} \texttt{$X_i$} if \texttt{$X_e$} \textit{type-depends directly on} \texttt{$X_i$} or if \texttt{$X_i$} \textit{type-depends directly on} \texttt{$X_v$} and \texttt{$X_v$} \textit{type-depends on} \texttt{$X_e$}. 
-Thus \textit{type-depends on} is the transitive but not reflexive closure of \textit{type-depends directly on}.
+An unfixed type variable \texttt{$X_i$} \emph{type-depends directly on} an unfixed type variable \texttt{$X_e$} if \texttt{$X_e$} occurs in any bound of type variable \texttt{$X_i$}.
+\texttt{$X_e$} \emph{type-depends on} \texttt{$X_i$} if \texttt{$X_e$} \emph{type-depends directly on} \texttt{$X_i$} or if \texttt{$X_i$} \emph{type-depends directly on} \texttt{$X_v$} and \texttt{$X_v$} \emph{type-depends on} \texttt{$X_e$}. 
+Thus \emph{type-depends on} is the transitive but not reflexive closure of \emph{type-depends directly on}.
 \end{defn}
 
 \subsection{Algorithm phases}
@@ -345,14 +351,16 @@ The first step is to identify all type variables, which would be an objective of
 This is done by the \texttt{getAllTypeVariables} function, which replaces the underscore placeholders in the provided type arguments (If the type arguments were provided) with new type variables and joins them with type variables representing type parameters of
 the method.
 Besides the already known three types of bound, the algorithm adds \textit{shape-bound} representing a type argument given in the type argument list.
+\par
 The reason for a new type of bound is the following. 
-When a user provides the type argument, the algorithm should infer the exact same type(not containing any unfixed type variables). 
+When a user provides the type argument, the algorithm should infer the exact same type. 
 None of the already introduced type bounds offers this feature. 
-An example of this need is described by a potential scenario when there is the \texttt{IList<\_>} type as a type argument. 
-When the compiler treats nullability, it wants the hinted type parameter to be non-nullable(not \texttt{IList<\_>?}). 
-It can happen, that other bounds would infer the nullable version, and although \texttt{IList<\_>} can be
-converted to \texttt{IList<\_>?}, it is not the user’s intention. 
-However, the exact bound would allow this.
+An example of this need is described by a potential scenario when there is the \texttt{string?} type as a type argument. 
+When the compiler treats nullability, it should infer the nullable type(not \texttt{string}). 
+Imagine that the provided type argument would be added as an exact bound.
+It can happen that the type variable will contain another exact bound, which will be the non-nullable version of the type.
+The current implementation will infer the \texttt{string} type although it should fail since these types are not equivalent in nullable-aware code.
+The behavior of the exact bound can’t be changed because of breaking changes, so we have to add a new bound to reflect this need.
 \par
 \texttt{FirstPhase} collects shape bounds from the provided type argument list before the initial  collection of bounds from the argument list.
 The referring \texttt{InferShapeBound} is described later with the rest of inferring methods.
@@ -360,7 +368,7 @@ The referring \texttt{InferShapeBound} is described later with the rest of infer
 \texttt{SecondPhase} now respects newly added dependencies, which forces to infer type variables in the correct order. 
 If there are no type variables that are independent, the algorithm relaxes the condition for type variable fixation to break the possible circular dependency, which still has a chance to be resolved. 
 In comparison to the former algorithm, the relaxation still has to respect \textit{shape-depends on} relation. 
-The reason for that is to prohibit inferred type from being different from the provided ”shape” in the type argument list. 
+The reason for that is to prohibit inferred type from being different from the provided ``shape'' in the type argument list. 
 The next condition is that at least one bound can’t contain an unfixed type variable. 
 This requirement ensures at least one candidate, which could be the inferred type argument.
 \begin{figure}[h!]
@@ -516,7 +524,8 @@ Problems regarding using generic aliases, default type parameters, or named type
 However, since the inference is not limited by introducing breaking changes because there is no type inference at all, the type inference can be stronger. 
 The stronger type inference regards target-typed inference, which will be useful because object creation is usually associated with assigning it to a target. 
 It will also employ type inference based on type constraints, which will provide a wider context for type inference. 
-Besides this functionality, the text will mention two additional features that will extend the context of type inference and will make the syntax less boilerplate, although they are controversial for \ac{LDT}. 
+Besides this functionality, the text will mention two additional features that will extend the context of type inference and will make the syntax less boilerplate.
+After a discussion with a member of \ac{LDT}, the additional features were considered to be controversial. 
 For this reason, the features will be presented as a voluntary extension that can be removed from the core design. 
 The first feature will regard using type information from initializers, which would be valuable when creating collections or objects with object initializer syntax. 
 The second feature will use the diamond operator to turn on the constructor type inference in cases when the compiler can surely determine the referring generic type without knowledge about the arity.
@@ -559,17 +568,17 @@ new GenericWrapper<int>.CreatingClass<_>(arg1,...); // Allowed
 The mentioned target-typed inference complicates the binding of the arguments. 
 When a target is an assigned variable or a return statement, the type of the target is given by the declaration of the variable or method’s return type. 
 However, when the target is an argument of the other method, the type doesn’t have to be known yet if the method is generic. 
-Figure \ref{img60:target} shows a scenario when, at the time of binding the \texttt{Foo} creation expression, the target type is unknown because the binding order is from the methods’ arguments to the method call. 
+Figure \ref{img60:target} shows a scenario when, at the time of binding the \texttt{Foo} creation expression, the target type is unknown because the binding order is from the constructor’s arguments to the constructor call. 
 Without the target type, \texttt{Foo}'s type argument can’t be inferred. 
 The \texttt{Bar} creation expression should be bound first, which would infer the type of the first parameter, which could be used as a target type of the \texttt{Foo} creation expression.
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp, mathescape=true]
-new Bar<_>(Foo<_>(), 1);
-
-class Bar<T>{
-    public Bar(Foo<T> arg1, T arg2){}
+class Bar<T> {
+    public Bar(Foo<T> arg1, T arg2) {}
 }
-class Foo<T>{}
+class Foo<T> {}
+...
+new Bar<_>(new Foo<_>(), 1);
 \end{lstlisting}
 \caption{Target as an argument.}
 \label{img60:target}
@@ -582,33 +591,35 @@ At that time, the operator is converted by using an already-known target type.
 The result of the conversion is the binding of the creation expression, which type is the target type, and arguments are contained in the type operator’s argument list.
 \par
 The improvement is inspired by that. 
-When there is an object creation expression as an argument, and the constructor type inference fails, a similar unconverted bound element is created. 
-After the overload resolution, when the types of parameters are known, and the necessary conversion is started to be created, the object creation expression is tried to be bound again with the already known target type. 
-However, the compiler has to be careful here. 
-It has to try to bind the object creation expression without a target type only once to prevent exponential time of binding.
+When there is an object creation expression as an argument, and the argument is not needed for the inference success, a similar unconverted bound element is created.
+Otherwise the argument is bound without the target type.
+After the overload resolution, when the types of parameters are known, and the necessary conversion is started to be created, the unconverted object creation expression is tried to be bound with the already known target type. 
+The compiler has to be careful here. 
+It has to bind the object creation expression with and without a target type no more than once to prevent exponential time of binding.
 \par
 Figure \ref{img61:exp} shows a scenario where if the compiler does not do that, it will cause an exponential time of binding the expression. 
 Since the constructor of the \texttt{Bar} type is overloaded, the overload resolution has to check these two overloads. 
 Each of these checks includes binding of arguments, type inference, and checking of the applicability of bound arguments on the inferred constructor. 
-Since the binding of arguments contains binding of the similar object creation expression, it will make the
-same overload resolution containing all overloads of the constructor. 
+Since the binding of arguments contains binding of the similar object creation expression, it will make the same overload resolution containing all overloads of the constructor. 
 The target type can’t be provided here because the type argument is still unknown. 
 When the binding of this argument is unsuccessful, the argument will be represented as an unconverted bound element and will be bound later after the resolution. 
 This failure will happen for each overload resolution, which wastes time because it does the same computation multiple times. 
 After the outer object creation expression is inferred using the type of the second argument, it will convert the inner object creation expression by providing the target type, which will resolve the valid object creation. 
-This repeating failure is not a problem for the \texttt{new()} operator since it is cheap to express it automatically as an unconverted bound expression. 
-However, the following observation offers a way to avoid it. 
-If the argument can’t be bound without the target type in checking one overload, it also can’t be bound without the target type in the other overloads. 
-So, the improvement remembers if the argument containing the object creation expression was already bound without the target type and failed. 
-If this is true, it automatically skips the binding and returns an unconverted bound element, which will prevent obvious failure and save time.
+This repeating failure would not be problem for the \texttt{new()} operator since it is cheap to express it automatically as an unconverted bound expression.
+However, it is a problem for binding the object creation expression which can take long time.
+\par
+The following observation offers a way to avoid it.
+The arguments can be bound before the overload resolution without target types.
+The arguments' bindings, which will fail due to missing target type information will be bound after the overload resolution when a final used overload will be choose.
+This strategy binds each expression no more than twice. 
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp, mathescape=true]
-new Bar<_>(new Bar<_>(null, null), 1);
-
 class Bar<T>{
     public Bar(Foo<T> arg1, T arg2){}
     public Bar(Foo<T> arg1, List<T> arg2){}
 }
+...
+new Bar<_>(new Bar<_>(null, null), 1);
 \end{lstlisting}
 \caption{Potential exponential time of binding.}
 \label{img61:exp}
@@ -625,12 +636,11 @@ The algorithm will contain four type variables.
 The first two variables represent type arguments, and the second two variables represent the underscores.
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp, mathescape=true]
-IBar<int> t = Bar<_, _>();
-
-
 interface IBar<T> {}
-
 class Bar<T1, T2> : IBar<T1> where T2 : object {}
+...
+
+IBar<int> t = Bar<_, _>();
 \end{lstlisting}
 \caption{Example of type inferences.}
 \label{img62:ctro}
@@ -638,7 +648,7 @@ class Bar<T1, T2> : IBar<T1> where T2 : object {}
 In the first phase, lower bound type inference is made from the \texttt{IBar<int>} type to the \texttt{Bar<\_,\_>} type, which will yield in the \texttt{int} lower bound of the type variable representing the first underscore. 
 Then, the type constraint of \texttt{T2} type parameters causes another lower bound type inference from the \texttt{object} type to the type variable representing the \texttt{T2} type parameter. 
 Shape inferences continue to relate type variables representing underscores with type variables representing type parameters. 
-Then, the fixation is made, and it results in \texttt{Bar<int, object>} inferred type.
+Then, the fixation is made, and it results in the \texttt{Bar<int, object>} inferred type.
 
 \subsection{Initiliazers extension} \label{sect12:ex1}
 
@@ -652,11 +662,11 @@ The improvement allows this inference by performing lower bound type inference f
 The inference is made from the type of assigning expression to the type of the field’s type declaration.
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp, mathescape=true]
-new Bar<int>{ Field = 1 };
-
 class Bar<T> {
     public T Field;
 }
+...
+new Bar<int>{ Field = 1 };
 \end{lstlisting}
 \caption{Object initializer.}
 \label{img58:initializer}
@@ -725,10 +735,10 @@ Figure \ref{img63:dinamic} shows an example where the \texttt{Foo} method is inf
 These situations are valid, and hence, the compiler should just warn about them.
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp, mathescape=true]
-dynamic t = ...;
-Foo<_, _>(t, 1);
-
 void Foo<T>(T arg1, T arg2) {}
+...
+dynamic t = ...
+Foo<_, _>(t, 1);
 \end{lstlisting}
 \caption{Runtime type inference.}
 \label{img63:dinamic}

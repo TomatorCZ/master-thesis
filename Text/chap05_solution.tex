@@ -4,7 +4,7 @@ The solution consists of a proposal describing the language feature given in the
 
 \section{Proposal}
 
-The final version of the proposal can be found in the \texttt{attachment} folder as the \texttt{partial-type-inference.md} file. 
+The final version of the proposal can be found in the attachment as the \texttt{Attachment/Proposal/partial-type-inference.md} file. 
 The file’s format is a standard Markdown used widely in readme files for its advantage of being able to be read without specialized tools visualizing the formatting.
 
 \subsection{Creation process}
@@ -49,75 +49,73 @@ The design ends with extending compile-time checking dynamic member invocation, 
 The fourth part comments on the reason for not doing other alternatives contained in the discussions. 
 It also mentions two possible extensions of the improvement using the diamond operator \ref{sect13:ex2} and initializers \ref{sect12:ex1} in the type inference context.
 \par
-The last part suggests other potential improvements given in the future improvements section \ref{sect14:future}.
-
+The last part suggests other potential improvements.
 
 \section{Implementation}
 
 The already mentioned proposal will be tested by the implementation described in this section. 
 The goal of the implementation is to observe the consequences of the proposed feature in a practical way, which can be tried by C\# communitity. 
-The goal will be achieved by contributing to the forked Roslyn project on GitHub, which is public. 
+The goal will be achieved by contributing to the forked Roslyn project on GitHub \cite{online:roslynFork}, which is public.
+The copy can be also found in the attachment in the \texttt{Attachment/Source/roslyn} folder. 
 Since the proposal is in the state of probing the benefits, the implementation will be rather a proof of concept than a ready-to-production code.
 
 \subsection{Development environment}
 
-Since the compiler is a complicated program consisting of many parts, the creators provide a guide \cite{online:roslynGuide} describing a common workflow including building the compiler, writting tests and the deployment.
+Since the compiler is a complicated program consisting of many parts, the creators provide a guide \cite{online:roslynGuide} describing a common workflow, including building the compiler, writing tests, and deployment.
 \par
-We start with cloning the Roslyn repository \cite{online:roslynRepo} and opening it in an IDE.
-There are several IDEs, which can be used.
-We recommend Visual Studio 2022 \cite{online:vs} which is used to implement the proposal.
-The IDE is chosen since it is recommended by the Roslyn folks and provides helpful static code analysis and a debugger which is almost necessary in cases, when a programmer is not familiar with the code base.
-However, hardware requirements for opening the repository are quite high in terms of memory consumption when for a smooth experience with browsing and launching the code it requieres around 20 GB of RAM.
-So we recommend Visual Studio Code \cite{online:vsCode} in cases, when the hardware resources are limitted as a compensation for worse code analysis.
+We started cloning the Roslyn repository \cite{online:roslynRepo} and opening it in an IDE.
+Several IDEs can be used. We recommend Visual Studio 2022 \cite{online:vs}, which was used to implement the proposal. 
+The IDE was chosen since the Roslyn folks have recommended it, and it has provided helpful static code analysis and a debugger, which is almost necessary when a programmer is unfamiliar with the code base. 
+However, hardware requirements for opening the repository were quite high regarding memory consumption, as it required around 20 GB of RAM for a smooth experience with browsing and launching the code. 
+So we recommend Visual Studio Code \cite{online:vsCode} in cases when the hardware resources are
+limited as compensation for worse code analysis.
 \par
-However, the IDE is not required for launching or deploying the compiler.
-The first thing which is necassary for building is a correct version of .NET SDK specified in \texttt{global.json} placed in the rool project.
-We use SDK \texttt{8.0.1} which can be downloaded from Microsoft original websites \cite{online:sdk}.
-We also use Windows operating system, although the deployment should be possible on Linux or Mac OS as well.
+However, the IDE is not required to launch or deploy the compiler.
+The first necessary thing for the building is a correct version of the .NET SDK specified in \texttt{global.json} placed in the project root. 
+We used SDK \texttt{8.0.1}, which can be downloaded from Microsoft's original websites \cite{online:sdk}. 
+We also use the Windows operating system, although the deployment should also be possible on Linux or MacOS.
 \par
-Since the building for large programs like a compiler can be complicated, the root folder provides three scripts which take care of it.
-The \texttt{Restore.cmd} script is run firstly to download required packages.
-The \texttt{Build.cmd} srcipt is used to build the compiler and the \texttt{Test.cmd} script is used to run tests of the compiler.
-The scripts have multiple options which modificates the workflow.
-We will mention few of them which is needed for the implementation.
+Since building large programs like compilers can be complicated, the root folder provides three scripts that take care of it. 
+The \texttt{Restore.cmd} script is run to download the required packages. 
+The \texttt{Build.cmd} script is used to build the compiler, and the \texttt{Test.cmd} script is used to run tests of the compiler. 
+The scripts have multiple options that modify the workflow. We will mention a few of them that were used during the implementation.
 
 \subsubsection{Testing}
 
-Launching the tests of compiler is done by a sequence of Windows command console commands shown in Figure \ref{img65:runTests}.
-Since the repository contains also an implemention of an C\# extension to Visual Studio, tests are divided into several groups which test indenpendent part of the compiler.
-In our case, we use the \texttt{-testCompilerOnly} flag to run basic compiler tests.
-The tests will be a base line which has to be passed by the implementaion of the proposal.
-The result of \texttt{Build.cmd} command is built compiler placed in the \texttt{roslyn/artifacts} folder.
-Tests results are stored in the \texttt{Roslyn/artifacts/TestResults} folder as \texttt{.xml} files and \texttt{.html} files for displaying it in the browser.
+Launching the compiler tests is done by a sequence of Windows command console commands, as shown in Figure \ref{img65:runTests}. 
+Since the repository also contains an implementation of a C\# extension to Visual Studio, tests are divided into several groups that test the independent parts of the compiler. 
+In our case, we used the \texttt{-testCompilerOnly} flag to run basic compiler tests. 
+The tests will be a baseline, which has to be passed by the implementation of the proposal. 
+The result of \texttt{Build.cmd} command is a built compiler placed in the \texttt{roslyn/artifacts} folder. 
+Test results is stored in the \texttt{roslyn/artifacts/TestResults} folder as \texttt{.xml} files and \texttt{.html} files for displaying in the browser.
 \begin{figure}[h]
 \begin{lstlisting}
 Restore.cmd
 Build.cmd
 Test.cmd -testCompilerOnly
 \end{lstlisting}
-\caption{Running C\# compiler tests.}
+\caption{Running C\# compiler tests on Windows.}
 \label{img65:runTests}
 \end{figure}
 \par
-The results of the tests, when we started the implementation, can be seen in the attachment folder \texttt{/Attachment/TestResults/Initial}, where two tests regarding Visual Basic were not passed.
-Since our contribution is the the C\# compiler, we ignore it.
+The results of the tests, when we started the implementation, can be seen in the attachment in the \texttt{Attachment/TestResults/Tests-Master} folder, where two tests regarding Visual Basic were not passed. 
+Since our contribution is the C\# compiler, we ignore it.
 
 \subsubsection{Deployment}
 
-The standard deployment of a new compiler version is bundling it with a new version of the SDK which would require compiling the SDK from sources.
-However, there is a possibility to inject own version of the compiler to already installed SDK.
-This option was created to temporary hot fix compiler problems delivered with a SDK.
-Since the implemention is a proof of concept, this option will be sufficient to check the main functionality of the proposal directly in user's code.
+The standard deployment of a new compiler version is bundling it with a new version of the SDK, which would require compiling the SDK from sources. 
+However, there is a possibility of injecting a custom version of the compiler into an already installed SDK. 
+This option was created to temporarily hot-fix compiler problems delivered with an SDK. 
+Since the implementation is a proof of concept, this option will be sufficient to check the main functionality of the proposal directly in the user’s code.
 \par
-The injection is done by referencing a special package generated by the \texttt{Build.cmd} script in a project file of a target C\# project using partial type inference.
-The nuget cache containg .NET packaged needs to be modified before the package generation.
-The nuget cache is usually placed in the \texttt{C://Users/\%user\%/.nuget} folder on Windows, where is required to delete the version of \texttt{Microsoft.CSharp.Net.Compiler.ToolSet} package which will be generated by the \texttt{Build.cmd -publish} command.
-The command generates the \texttt{roslyn/artifacts/publish/Shipping} folder containg the \texttt{Microsoft.CSharp.Net.Compiler.ToolSet} package which needs to be referenced.
-Additionally to the package reference, the project file has to define a folder containing the package which will be used for restoring the packages in the nuget cache.
-The last thing is specifying of a language version which has to be set to \texttt{preview} enabling the partial type inference. 
-Figure \ref{img68:csproj} shows a modified project file of demo application which can be found in \texttt{Attachment/Demo} folder.
-The \texttt{PropertyGroup} element contains a definition of language version and a folder for package restoration.
-The \texttt{ItemGroup} element contains a definition of the package reference injecting the locally built compiler. 
+The injection is done by referencing a special package generated by the\\ \texttt{Build.cmd} script in a project file of a target C\# project using partial type inference. The Nuget cache containing .NET packages needs to be modified before the package generation. 
+The Nuget cache is usually placed in the\\ \texttt{C://Users/\%user\%/.nuget} folder on Windows, where it is required to delete the version of the \texttt{Microsoft.CSharp.Net.Compiler.ToolSet} package, which will be generated by the \texttt{Build.cmd -publish} command. 
+The command generates the \texttt{roslyn/artifacts/publish/Shipping} folder containing the\\ \texttt{Microsoft.CSharp.Net.Compiler.ToolSet} package, which needs to be referenced. 
+Additionally, the project file has to define a folder containing the package that will be used to restore the packages in the Nuget cache. 
+The last thing is specifying a language version, which has to be set to \texttt{preview}, enabling the partial type inference. 
+Figure \ref{img68:csproj} shows a modified project file of the demo application, which can be found in the \texttt{Attachment/Demo} folder. 
+The \texttt{PropertyGroup} element contains a definition of the language version and a folder for package restoration. 
+The \texttt{ItemGroup} element contains a definition of the package reference injecting the locally built compiler.
 \begin{figure}[h]
 \begin{lstlisting}
 <Project Sdk="Microsoft.NET.Sdk">
@@ -142,8 +140,8 @@ The \texttt{ItemGroup} element contains a definition of the package reference in
 \label{img68:csproj}
 \end{figure}
 \par
-Then, a common \texttt{dotnet build} command can be used to compile the project using own compiler version instead of the bundled one.
-There is an easy way to check the currently used compiler by puting the \texttt{\#error version} pragma anywhere into the compiled code.
+Then, a common \texttt{dotnet build} command can be used to compile the project using a custom compiler version instead of the bundled one. 
+An easy way to check the currently used compiler is by putting the \texttt{\#error version} pragma anywhere in the compiled code. 
 Figure \ref{img66:pragma} shows the usage of the pragma in the demo application.
 \begin{figure}[h]
 \begin{lstlisting}
@@ -158,8 +156,8 @@ class Program {
 \label{img66:pragma}
 \end{figure}
 \par
-When the project is compiled again, it will raise a compilation error annoncing current version the package which is shown in Figure \ref{img67:output}.
-We can see, that the code was compiled by \texttt{4.9.0-dev} compiler version and the langauge version was set to \texttt{preview}. 
+When the project is compiled again, it will raise a compilation error announcing the current package version, as shown in Figure \ref{img67:output}. 
+We can see that the code was compiled by the \texttt{4.9.0-dev} compiler version, and the language version was set to \texttt{preview}.
 \begin{figure}[h]
 \begin{lstlisting}
 E:\Demo>dotnet build
@@ -190,29 +188,29 @@ Time Elapsed 00:00:09.19
 
 \subsection{Repository overview}
 
-Roslyn's repository contains several projects besides C\# compiler like Visual Basic compiler or Visual Studio extension.
-Figure \ref{img68:roslynFolder} shows relevant files and folders of the \texttt{roslyn} directory, which are adjusted or used by the implementation.
-The root directory contains already mentioned helper scripts for building and deploying the compiler, the \texttt{src} folder containg the code and the \texttt{artifacts} folder generated by a build system.
-It also contains the \texttt{Roslyn.sln} solution which can be opened in Visual Studio enabling better user experience during the code browsing.
+Roslyn’s repository contains several projects besides the C\# compiler, like the Visual Basic compiler or Visual Studio extension. 
+Figure \ref{img68:roslynFolder} shows relevant files and folders of the \texttt{roslyn} directory, which have been adjusted or are used by the implementation. 
+The root directory contains already mentioned helper scripts for building and deploying the compiler, the \texttt{src} folder containing the code, and the \texttt{artifacts} folder generated by a build system.
+It also contains the \texttt{Roslyn.sln} solution, which can be opened in Visual Studio, enabling a better user experience during code browsing.
 \par
-The artifacts contains the \texttt{TestResults} folder containing already mentioned test reports and the \texttt{bin} folder containing compiled code and packages.
-The mentioned package required for injecting the compiled compiler can be found in the nested \texttt{Shipping} folder.
+The artifacts contain the \texttt{TestResults} folder, which contains the already-mentioned test reports, and the \texttt{bin} folder, which contains compiled code and packages. 
+The package required to inject the compiled compiler can be found in the nested \texttt{Shipping} folder.
 \par
-There are three important folders nested in the \texttt{src} folder.
-The \texttt{Test} folder contains compiler tests which can be run by using the \texttt{testCompilerOnly} flag.
-The \texttt{Core} folder contains a common code used by Visual Basic and C\# compiler.
-It provides public API used to compile and analyse code.
-The last \texttt{CSharp/Portable} folder contains sources of C\# compiler which is modified by proposal's implementation.
+There are three important folders nested in the \texttt{src} folder. 
+The \texttt{Test} folder contains compiler tests that can be run using the \texttt{testCompilerOnly} flag. 
+The \texttt{Core} folder contains a common Visual Basic and C\# compiler code. 
+It provides a public API used to compile and analyze code. 
+The \texttt{CSharp/Portable} folder contains the C\# compiler sources, modified by the proposal’s implementation.
 \par
-Desribing all parts of C\# compiler sources is out of the of this work since it is extensive program and most of the parts are not influenced by the implementaion.
-So the work mentions only small part of the compiler, which is necessary to understand implementaion internals.
-The compiler's source code is divided into multiple folders where the most of changes happend in the \texttt{Binder} folder.
-The folder contains logic for binding \ac{AST} to \textit{bound tree} mentioned in the Roslyn section \ref{sect04:roslyn}.
-The implemention of type inference algorithm can be found in the \texttt{Semantics/OverloadResolution} folder together with the whole mechanism for overload resolution of methods and contructors.
-The \texttt{BoundTree} folder contains an XML description of automaticly generated nodes representing \textit{bound tree}.
-The \texttt{Errors} folder contains definitions of all C\# errors and a list of features which can be disabled and which contains an item for enabling partial type inference.
-The \texttt{FlowAnalysis} contains several control flow analyzers like nullability analyzer checking the nullability state of variables.
-The \texttt{Generated} folder contains a generated nodes of \textit{bound tree} and the \texttt{Symbols} folder contains nodes of \ac{AST} tree.
+Describing all parts of C\# compiler sources is out of the scope of this work since it is an extensive program, and most of the parts are not influenced by the implementation. 
+So, the work mentions only a small part of the compiler, which is necessary to understand implementation internals. 
+The compiler’s source code is divided into multiple folders where most of the changes are in the \texttt{Binder} folder. 
+The folder contains logic for binding \ac{AST} to \textit{bound tree} mentioned in the Roslyn section \ref{sect04:roslyn}. 
+The implementation of the type inference algorithm can be found in the \texttt{Semantics/OverloadResolution} folder, together with the whole mechanism for overload resolution of methods and constructors. 
+The \texttt{BoundTree} folder contains an XML description of automatically generated nodes representing \textit{bound tree}. 
+The \texttt{Errors} folder contains definitions of all C\# errors and a list of features that can be disabled and which contain an item for enabling partial type inference. 
+The \texttt{FlowAnalysis} contains several control flow analyzers, such as a nullability analyzer that checks the nullability state of variables. 
+The \texttt{Generated} folder contains generated nodes of \textit{bound tree}, and the \texttt{Symbols} folder contains nodes of the \ac{AST} tree.
 \begin{figure}[h]
 \begin{lstlisting}
 +roslyn
@@ -243,23 +241,22 @@ The \texttt{Generated} folder contains a generated nodes of \textit{bound tree} 
   -Restore.cmd
   -Test.cmd
 \end{lstlisting}
-\caption{Simplified view of \texttt{roslyn} directory content.}
+\caption{Simplified view of the \texttt{roslyn} directory content.}
 \label{img68:roslynFolder}
 \end{figure}
 
 \subsection{Test suite}
 
-Roslyn tests use xUnit framework \cite{online:xUnit} providing wide API for testing application functionalities in various scenarious.
-We used this framework for our own tests in the \texttt{PartialTypeInferenceTests.cs} file.
-Additional helper method \texttt{TestCallSites} was made to save repeating code which initializes the compilation, compiles the provided source code as a string and verifies diagnostics representing compiler warnings and errors.
-Since we are interested in information regarding inferenced type arguments, the source code is augmented by comments representing asserts which have the augmented symbols hold.
+Roslyn tests use the xUnit framework \cite{online:xUnit}, providing wide API for testing application functionalities in various scenarios. 
+We used this framework for our own tests in the \texttt{PartialTypeInferenceTests.cs} file. 
+An additional helper method, \texttt{TestCallSites}, was made to save repeating code, which initializes the compilation, compiles the provided source code as a string, and verifies diagnostics representing compiler warnings and errors. 
+Since we are interested in information regarding inferenced type arguments, the source code is augmented by comments representing asserts that have the augmented symbols hold.
 \par
-Figure \ref{img69:test} shows an example of a test case which tests a scenario where an inferred type argument syntax hides a typename having \texttt{\_} identifier.
-We can see that the \texttt{new F1<\_>(1)} expression is tested by the following comment describing the desired resolved call.
-The second argument of the \texttt{TestCallSites} defines which symbols we assert.
-In this case, all object creation expressions are asserted.
-The last argument describes expected dieagnostics which should compiler announce.
-This example requires a warning regarding notifying an user about possible conflicting class name with the \texttt{\_} contextual keyword.
+Figure \ref{img69:test} shows an example of a test case that tests a scenario where an inferred type argument syntax hides a typename having the \texttt{\_}  identifier. 
+We can see that the \texttt{new F1<\_>(1)} expression is tested by the following comment describing the desired resolved call. 
+The second argument of the \texttt{TestCallSites} defines which symbols we assert. 
+In this case, all object creation expressions are asserted. The last argument describes expected diagnostics, which the compiler should announce. 
+This example requires a warning regarding notifying a user about possible conflicting class names with the \texttt{\_} contextual keyword.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
 [Fact]
@@ -292,47 +289,48 @@ class _ {}
 
 \subsection{Parsing inferred type arguments}
 
-We didn't change the Roslyn parser converting the source code into \ac{AST}.
-We instead created the \texttt{SourceInferredTypeSymbol} symbol representing the inferred type argument and postpone the \texttt{\_} type arguement recognition to the binding phase.
-In this phase, we changed the \texttt{BindIdentifier} method in \texttt{Binder\_Expressions.cs} which looks up the type symbol represented by provided identifier.
-The change is propagated into subsequenced calls which handles various cases of identifier binding like generic type names or fully quolified names. 
-If the method is called during binding type argument list of method invocation or object creation expression, we change the mode which enables to bind the \texttt{\_} identifier as a inferred type argument symbol.
+We didn’t change the Roslyn parser by converting the source code into \ac{AST}. 
+Instead, we created the \texttt{SourceInferredTypeSymbol} symbol representing the inferred type argument and postponed the \texttt{\_} type argument recognition to the binding phase. 
+In this phase, we changed the \texttt{BindIdentifier} method in\\ \texttt{Binder\_Expressions.cs}, which looks up the type symbol represented by the provided identifier. 
+The change is propagated into subsequent calls, which handle various cases of identifier binding, such as generic type names or fully qualified names. 
+If the method is called during the binding type argument list of a method invocation or object creation expression, we change the mode, which enables the binding of the \texttt{\_} identifier as an inferred type argument symbol.
 
 \subsection{TypeInferrer}
 
-Replacing the \texttt{MethodTypeInference.cs} file with the \texttt{TypeInference.cs} was the biggest source code update in the code.
-Since the old algorithm for type inference was primary method focused, we rewrote it in the more generic way using a concept of type variables and relations between them and the type symbols.
-Additionally to that, we used the \texttt{\#region} syntax to divide the source code to mutliple parts referencing corresponding parts of already mentioned type inference algorithm.
-However, we also added public API which adapt the old method type inferecne API to the new one.
-This helped us to not change the other interacting parts of the codebase too much.
-There is the \texttt{InferMethod} static method which has a similar signature as the previous one and is an entry point for method type inference.
+Replacing the \texttt{MethodTypeInference.cs} file with the \texttt{TypeInference.cs} was the biggest source code update in the code. 
+Since the old algorithm for type inference was primarily focused on generic method type inference, we rewrote it in a more generic way using a concept of type variables and the relations between them and the type symbols. 
+Additionally, we used the \texttt{\#region} syntax to divide the source code into multiple parts referencing corresponding parts of the already mentioned type inference algorithm. 
+However, we also added a public API, which adapts the old method type inference API to the new one. 
+This helped us to not change the other interacting parts of the codebase too much. 
+There is the \texttt{InferMethod} static method, which has a signature similar to the previous one and is an entry point for method type inference. 
 We also added the \texttt{InferConstructor} static method as an entry point for constructor type inference.
 
 \subsection{Binding partial-inferred method}
 
-The binding affected the \texttt{Binder\_Invocation.cs} and the \texttt{OverloadResolution.cs} files.
-The changes in the binder were mostly about error recovering and raising potential warnings.
-An example of that is a warning raised during dymanic method invocation binding where if the inferred type argument is used, we notify the user about potential error in runtime, since runtime doesn't support the partial type inference.
-The change in the overload resoltuin was to analyse the method group with used inferred type arguments and use the mentioned API of type inferrer. 
+The partial-inferred method binding is contained in the \texttt{Binder\_Invocation.cs} and the \texttt{OverloadResolution.cs} files. 
+The changes in the binder were mostly about error recovery and raising potential warnings. 
+An example of that is a warning raised during dynamic method invocation binding where if the inferred type argument is used, we notify the user about a potential error in runtime since runtime doesn’t support the partial type inference. 
+The change in the overload resolution was to analyze the method group with used inferred type arguments and to use the mentioned API of type inferrer.
 
 \subsection{Binding partial-inferred object construction}
 
-This was the most tricky in the implementation since there was no preparation for the type inference as in the previous case.
-Moreover getting type information from the target is complicated since the order of the binding is reversed to the this direction.
+Binding partial-inferred object construction was the most tricky in the implementation since there was no preparation for the type inference as in the previous case. 
+Moreover getting type information from the target is complicated since the binding order is reversed to the this direction.
 \par
-As the first step was to change the \texttt{OverloadResoltuin.cs} file to use the type inferred when the type defining the candidate contructor contains inferred type arguments.
-Then, we had to substitute the constructor signature by inferred type arguments and choose the best fitting contructor.
+The first step was to change the \texttt{OverloadResolution.cs} file to use the
+type inferred when the type defining the constructor candidate contains inferred type arguments. 
+Then, we had to substitute the constructor signature with inferred type arguments and choose the constructor that best fits.
 \par
-During the implementation the following problem occurred.
-Figure \ref{img70:alpha} show a definition of the \texttt{M} class containing two constructors.
-The second constructor's body contains an expression creating an object of the same type.
-The inferred type argument of this expression should be the \texttt{T} type parameter of the class.
-However, to be able to do that, alpha renaming has to be applied on the provided type variables since the type parameter of \texttt{p1} is the \texttt{T} type symbol and the type variable representing the inferred type argument is also the \texttt{T} type symbol.
-So the type inference failed since the algorithm thought that it didn't find the exact type symbol for that type variable.
-From the type inference prespective, these two symbols are different, so we had to distiguish these cases by replacing the type parameters represented by type variables with alpha-renamed type symbol representing the same symbol.
-The alpha-renamed symbol is different from that one received from the argument list and type contstraints.
-This prevented the mentioned problem and the expression was properly bound.
-Note that this problem also occured in the binding of method invocation when there are a recursive generic method which recursion call is inferred and uses the same type arguments. 
+During the implementation, the following problem occurred. 
+Figure \ref{img70:alpha} shows a definition of the \texttt{M} class containing two constructors. 
+The second constructor’s body contains an expression creating an object of the same type. 
+The inferred type argument of this expression should be the \texttt{T} type parameter of the class. 
+However, to be able to do that, alpha renaming has to be applied to the provided type variables since the type parameter of \texttt{p1} is the \texttt{T} type symbol, and the type variable representing the inferred type argument is also the \texttt{T} type symbol. 
+So, the type inference failed since the algorithm thought that it could not find the exact type symbol for that type variable. 
+From the type inference perspective, these two symbols are different, so we had to distinguish these cases by replacing the type parameters represented by type variables with an alpha-renamed type symbol representing the same symbol. 
+The alpha-renamed symbol is different from the one received from the argument list and type constraints. 
+This prevented the mentioned problem, and the expression was properly bound. 
+Note that this problem also occurs in the binding of method invocation when there is a recursive generic method in which a recursion call is inferred and uses the same type of arguments.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
 class M<T> 
@@ -349,26 +347,26 @@ class M<T>
 \label{img70:alpha}
 \end{figure}
 \par
-The second step was to add additional type information received from the type parameter contrains of the containing type.
+The second step was to add additional type information received from the type parameter constraints of the containing type.
 \par
-The last step was to enable a target-typed inferenced.
-We used a similar way as in the \texttt{new()} operator.
-We created a new \texttt{BoundUnconvertedInferredClassCreationExpression} representing a object creation expression containing the inferred type.
-This expression is bound lately, when a target type is known be using conversions defined in the \texttt{Conversions.cs} file.
-Every time when an expression is assigned to somewhere, these conversions are used to check if it is possible to convert the expression to the target and generetes appoprite conversion for that if is is necessary.
-In our case, the appropriete conversion was to invoke the binding of object creation expression again with already known target type which is used in the type inference.
-Also the expression doesn't have to be assigned to somewhere, for these situations, the \texttt{BindToNaturalType} method is called to invoke the conversions in these scenarios to make additional processing of the expression.
-In our case, it is binding the expression without the target type.
-The conversions is a bottleneck for this propouse and every assignment or a statement uses it to invoke the additional necessary operation on expressions.
+The last step was to enable a target-typed inference. 
+We used a similar way as in the \texttt{new()} operator. We created a new\\ \texttt{BoundUnconvertedInferredClassCreationExpression} representing an object creation expression containing the inferred type. 
+This expression is bound lately when a target type is known to be using conversions defined in the \texttt{Conversions.cs} file. 
+Whenever an expression is assigned somewhere, these conversions are used to check if it is possible to convert the expression to the target and generate appropriate conversion if necessary. 
+In our case, the appropriate conversion was to invoke the binding of the object creation expression again with the already known target type, which is used in the type inference. 
+Also, the expression doesn’t have to be assigned to somewhere. 
+For these situations, the \texttt{BindToNaturalType} method is called to invoke the conversions in these scenarios to make additional expression processing. 
+In our case, it is binding the expression without the target type. 
+The conversions are a bottleneck for this process, and every assignment or a statement uses it to invoke the additional necessary operation on expressions.
 \par
-The previous paragraph was not completly true in the order of binding the expression without target.
-At the time of creating the unconverted inferred class creation expression, we bind the expression without the target and save the diagnostics obtatained during that.
-This prevent us to bind the same expression it without target multiple times as we can see in the following Figure \ref{img71:binding}.
-There is the \texttt{F(new M<\_>(1))} which calls a generic method with an inferred object creation expression.
-In the time of binding the object creation expression, we bind it without the target, but still represent it as unconverted inferred class creation expression.
-In the time of binding the \texttt{F} method, overload resoltion invokes the inference for each overload.
-Since the inference is influenced by a type of the argument, we have to use the type  of that expression.
-In this case, we use already bound object creation expression without a target which enables to type inference to infer the type argument of the \texttt{F} function call.
+The previous paragraph was not completely true in the binding order of the expression without a target. 
+At the time of creating the unconverted inferred class creation expression, we bind the expression without the target and save the diagnostics obtained during that. 
+This prevents us from binding the same expression without targeting multiple times, as we can see in Figure \ref{img71:binding}. 
+There is the \texttt{F(new M<\_>(1))}, which calls a generic method with an inferred object creation expression. 
+At the time of binding the object creation expression, we bind it without the target but still represent it as an unconverted inferred class creation expression. 
+In the time of binding the \texttt{F} method, overload resolution invokes the inference for each overload.
+Since the inference is influenced by a type of argument, we have to use the type of that expression.
+In this case, we use an already bound object creation expression without a target, which enables type inference to infer the type argument of the \texttt{F} function call. 
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
 F(new M<_>(1))
@@ -384,14 +382,14 @@ class M<T>
 \caption{Preventing multiple binding.}
 \label{img71:binding}
 \end{figure}
-Also there is an opposire scenario.
-Figure \ref{img72:targetBinding} shows an example, where the first argument needs the target type to infer the expression.
-The argument also doesn't influence the type inference algorithm since the coresponding parameter doesn't contain the inferred type argument.
-In this case, after the overload of the \texttt{F} method is chosen, there is a phase of applying conversions from the arguments to the parameters invoked by the \texttt{CoerceArguments} method.
-This phase bind the first argument with already known type of the parameter as a target type.
-We prohibit this behavior when the object creation expression is used in the type inference by generating a different type of the convertion for that.
-Also in this phase we add the previously saved diagnostics depending on if we bound the expression without the target.
-See \texttt{ObjectCreationConvertionWithTarget} and \texttt{ObjectCreationConvertionWithoutTarget} for this propose.
+Also, there is an opposite scenario. 
+Figure \ref{img72:targetBinding} shows an example where the first argument needs the target type to infer the expression. 
+The argument also doesn’t influence the type inference algorithm since the corresponding parameter doesn’t contain the inferred type argument. 
+In this case, after the overload of the \texttt{F} method is chosen, there is a phase of applying conversions from the arguments to the parameters invoked by the \texttt{CoerceArguments} method. 
+This phase binds the first argument with the already known type of the parameter as a target type.
+We prohibit this behavior when the object creation expression is used in the type inference by generating a different type of conversion for that. 
+Also, in this phase, we add the previously saved diagnostics depending on whether we bound the expression without the target. 
+See \texttt{ObjectCreationConvertionWithTarget} and \texttt{ObjectCreationConvertionWithoutTarget} conversions, which were created for this purpose.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
 F(new M<_>(), 1)
@@ -408,16 +406,16 @@ class M<T>
 \label{img72:targetBinding}
 \end{figure}
 \par
-As we can see, binding an expression with target type has complicated implementation in the Roslyn.
+As we can see, binding an expression with the target type has complicated implementation in Roslyn.
 
 \subsection{Nullable walker}
 
-The last part of the code changes is in the \texttt{NullableWalker.cs} file, which provides a nullability analysis pass.
-The basic principle of the analysis in a flow analysis traversing the control-flow graph and rebinding the nodes of the \textit{bound tree} if it is necessary according the the nullability.
-The nodes which was rebindined are rewritten at the end of the pass.
+The last part of the code changes is in the \texttt{NullableWalker.cs} file, which provides a nullability analysis pass. 
+The basic principle of the analysis is traversing the control-flow graph and rebinding the nodes of \textit{bound tree}, if necessary, according to the nullability. 
+The rebound nodes are rewritten at the end of the pass.
 \par
-Important change was to modify analysis of the bound object creation expression symbol.
-Based on the stored information from the previous binding, we know if it was a target typed.
-If it was target-typed, we postpone the binding in the same way as the \texttt{new()} operator.
-Constructor type inference is added in the process of rebinding the constructor where we use saved data used in the previous binding to repeat it in the context of nullability.
+An important change was to modify the analysis of the bound object creation expression symbol. 
+Based on the information stored in the previous binding, we know if it was target-typed. 
+If it was target-typed, we postpone the binding in the same way as the \texttt{new()} operator. 
+Constructor type inference is added in the process of rebinding the constructor, where we use saved data from the previous binding to repeat it in the context of nullability. 
 After the expression binding, we rewrite the containing type if it was changed during the type inference by storing the update to the end of the nullability analysis pass.

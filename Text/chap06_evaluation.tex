@@ -1,154 +1,160 @@
 \chapter{Evaluation}
 
-The implementation and proposal is evaluated using the following metrics.
+The implementation and proposal are evaluated using the following metrics.
 
 \section{Tests}
 
-We run the same suite case before our changes and after our changes.
-The results can be found in the \texttt{/attachment/TestResults} folder containg the \texttt{Before} folder and the \texttt{After} folder.
-These folders contains results of the \texttt{-testCompilerOnly} suite case.
-Except unimportant small changes in the compiler tests regarding adding new error messages caused by our examples, all tests which passsed before the improvement pass after the improvement,
-This result ensures that the improvement doesn't break the compiler functionality in dramatic manner. 
+We run the same suite case before and after our changes. 
+The results can be found in the \texttt{/Attachment/TestResults} folder containing the \texttt{Test-Master} folder and the \texttt{Test-Feature} folder corresponding to test results before and after the change. 
+These folders contain the results of the \texttt{-testCompilerOnly} suite case. 
+Except for unimportant small changes in the compiler tests regarding adding new error messages caused by our changes, all tests that passed before the improvement also passed after the improvement. 
+This result ensures that the improvement doesn’t break the compiler functionality significantly.
 
 \section{Demo examples}
 
-The capibalities of the improvement is demonstrated in the following examples.
-Figure \ref{img73:example1} shows the \texttt{F4} generic method containing 3 function parameters.
-The parameters are assambled in the way that is required to infer \texttt{T1} to infer \texttt{T2} which is required to infer \texttt{T3} which is required to infer \texttt{T1}.
-The callsite uses the partial type inference to hint the compiler one of the type argument which will break this circular dependency and enable to infer the rest of type parameters.
+The capabilities of the improvement are demonstrated in the following examples. 
+\par
+Figure \ref{img73:example1} shows the \texttt{F4} generic method containing three function parameters. 
+The parameters and arguments are assembled in the way that is required to infer \texttt{T1} to infer \texttt{T2}, which is required to infer \texttt{T3}, which is required to infer \texttt{T1}. 
+The call site uses the partial type inference to hint to the compiler one of the type arguments, which will break this circular dependency and enable the inference of the rest of the type parameters.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
+void F4<T1, T2, T3>(
+  Func<T1, T2> p12, 
+  Func<T2, T3> p23, 
+  Func<T3, T1> p31) 
+{}
+...
 F4<_, _, string>(x => x + 1, y => y.ToString(), z => z.Length); 
-
-static void F4<T1, T2, T3>(Func<T1, T2> p12, Func<T2, T3> p23, Func<T3, T1> p31) { }
 \end{lstlisting}
-\caption{Example 1}
+\caption{Circular type inference dependency of type parameters}
 \label{img73:example1}
 \end{figure}
 \par
-Figure \ref{img74:example2} shows advenced scenario containing which uses nested inferred type argument.
-The \texttt{temp3} variable and the type argument's hint (\texttt{I2<\_, A>}) is used to determine the inferred nested type argument which is \texttt{int}.
-During the process, there are applied multiple rules for inference like inheritance and variance.
+Figure \ref{img74:example2} shows an advanced scenario containing a nested inferred type argument.
+There is the \texttt{F6} generic method call containing one type parameter.
+The \texttt{temp} variable and the type argument’s hint (\texttt{I2<\_, A>}) are used to determine the inferred nested type argument, which is \texttt{int}.
+During the process, multiple rules for inference, such as inheritance and variance, are applied.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
-C2<int, B> temp3 = new C2<int, B>();
-F6<I2<_, A>>(temp3);
-
 class A {}
-class B : A{}
-interface I2<in T1, out T2> {}
+class B : A {}
+interface I2<T1, out T2> {}
 class C2<T1, T2> : I2<T1, T2> {}
-static void F6<T1>(T1 p1) {}
+void F6<T1>(T1 p1) {}
+...
+C2<int, B> temp = new C2<int, B>();
+F6<I2<_, A>>(temp);
 \end{lstlisting}
-\caption{Example 2}
+\caption{Nested inferred type argument}
 \label{img74:example2}
 \end{figure}
 \par
 Figure \ref{img75:example3} shows an example where nullability inference is a part of the type argument deduction.
-Since the callsite \texttt{F10} has one of the nested inferred type agrument with appended quoation mark determining the nullability of inferred type argument.
-Without the question mark, the inferred type argument would be \texttt{string}.
-However, the quostion mark is used here to hint the compiler to infer \texttt{string?}.
+The \texttt{F10} call site has an inferred type argument with an appended question mark determining the nullability of the inferred type argument. 
+The inferred type argument would be \texttt{string} if there wouldn't be the appended question mark. 
+However, the question mark is used to hint to infer \texttt{string?}.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
-C2<int, string> temp7 = new C2<int, string
+void F10<T>(T p1) {}
 
-F10<I2<_, _?>>(temp7);
+string temp = "";
+F10<_?>(temp);
 \end{lstlisting}
-\caption{Example 3}
+\caption{Inferred type argument nullability hint}
 \label{img75:example3}
 \end{figure}
 \par
-Figure \ref{img76:example4} shows an example of constructor type inference which uses a target type to infer type argumens on \texttt{new C2<\_>()} expression.
-The target type is a type of the \texttt{C4} constructor parameter resulting in inferred \texttt{int} type argument.
+Figure \ref{img76:example4} shows an example of constructor type inference, which uses a target type to infer type arguments of the new \texttt{new C2<\_>()} expression. 
+The target type is a type of the \texttt{C4} constructor parameter resulting in the inferred \texttt{int} type argument.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
-new C4(
-   new C2<_>()  //C2<int>..ctor
-);
-
 class C1<T> {}
 class C2<T> : C1<T> {}
 class C4 
 {
-   public C4(C1<int> p1) {}
+  public C4(C1<int> p1) {}
 }
+...
+new C4(
+  new C2<_>()  //C2<int>..ctor
+);
 \end{lstlisting}
-\caption{Example 4}
+\caption{Target-typed object creation expression}
 \label{img76:example4}
 \end{figure}
 \par
-Figure \ref{img77:example5} shows an example of advanced binding order of arguments.
-The top-level obejct creation needs type of contructor's argument to determine its type parameter.
-For this porpose, the nested object creation expression is bound without the target to provide this type information.
+Figure \ref{img77:example5} shows an example of an advanced binding order of arguments. 
+The top-level object creation needs the type of the constructor’s argument to determine its type parameter. 
+For this purpose, the nested object creation expression is bound without the target to provide this type of information.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
-new C5<_>(
-    new C5<_>(1) //C5<int>..ctor(int)
-);
-
+class C1<T> {}
 class C5<T> : C1<T>
 {
     public C5(T p1) {}
 }
+...
+new C5<_>(
+    new C5<_>(1) //C5<int>..ctor(int)
+);
 \end{lstlisting}
-\caption{Example 5}
+\caption{Advanced arguments binding -- Without target type}
 \label{img77:example5}
 \end{figure}
 \par
-Figure \ref{img77:example5} is advanced scenario of previous use case where although the first argument can't by bound because of type inference failed.
-The failure is caused by lack of type information.
-However, the second argument provides enough type information to infer a type parameter of \texttt{C3} class.
-After the bound, the \texttt{new C2<\_>()} expression is tried to bound again with inferred target type.
-Both of inferred type arguments are resolved to the \texttt{int} type.
+Figure \ref{img78:example6} is the advanced scenario of a previous use case where the first argument can’t be bound because type inference failed during the attempt to bind it without a target type.
+The failure is caused by a lack of type information. 
+However, the second argument provides enough type information to infer a type parameter of the \texttt{C3} class. 
+After the bound, the new \texttt{new C2<\_>()} expression is tried to bound again with the inferred target type.
+After that, both inferred type arguments are resolved to the \texttt{int} type.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
-new C3<_>(
-   new C2<_>(),
-    1
-);
-
+class C1<T> {}
+class C2<T> : C1<T> {}
 class C3<T>
 {
    public C3(C1<T> p1, T p2) {}
 }
+...
+new C3<_>(new C2<_>(), 1);
 \end{lstlisting}
-\caption{Example 6}
+\caption{Advanced arguments binding -- With target type}
 \label{img78:example6}
 \end{figure}
 \par
-Figure \ref{img79:example7} shows the most advanced scenario where type the binding order and type inference uses several things to infer the \texttt{new C9<\_,\_,int,\_>(1)} expression.
-We will focus on how the type paraters of \texttt{C9} class is gradually inferred.
-The \texttt{T3} type paremeter is inferred by using the provided hint in the type argument list, which is \texttt{int}.
-The \texttt{T1} type paraemeter is inferred by using a type of constructor'a argument \texttt{p1}, which is \texttt{int}.
-The \texttt{T4} type parameter is inferred by using the type parameter's dependency which using the \texttt{T3} type parameter.
-The type parameter is resolved to \texttt{int}.
-The \texttt{T2} type parameter is resolved bu using the target type given by \texttt{F1} method parameter \texttt{p1}.
-This type information is received in the second try of binding the argument using the target type.
-The \texttt{T1} type parameter of \texttt{F1} method is determined based on it's second parameter type which is the \texttt{int} type.
+Figure \ref{img79:example7} shows the most advanced scenario where type the binding order and type inference uses several things to infer the \texttt{new C9<\_,\_,int,\_>(1)} expression. 
+We will focus on how the type parameters of the \texttt{C9} class are gradually inferred. 
+The \texttt{T3} type parameter is inferred by using the provided hint in the type argument list, which is \texttt{int}. 
+The \texttt{T1} type parameter is inferred by using a type of constructor’s argument \texttt{p1}, which is \texttt{int}.
+The \texttt{T4} type parameter is inferred by using the type parameter’s dependency using the \texttt{T3} type parameter. 
+The type parameter is resolved to \texttt{int}. 
+The \texttt{T2} type parameter is resolved by using the target type given by the \texttt{F1} method parameter \texttt{p1}. 
+This type information is received in the second try of binding the argument using the target type. 
+The \texttt{T1} type parameter of the \texttt{F1} method is determined based on its second parameter type, which is the \texttt{int} type.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
-F1(
-new C9<_,_,int,_>(1) //C9<int, int, int, C1<int>>..ctor(int)
-,
-1
-);
-
-static void F1<T>(I2<T> p1, T p2) {}
+class C1<T> {}
+void F1<T>(C1<T> p1, T p2) {}
 
 class C9<T1, T2, T3, T4> : C1<T2> where T4 : C1<T3>
 {
     public C9(T1 p1) {}
 }
+...
+F1(
+  new C9<_,_,int,_>(1), //C9<int, int, int, C1<int>>..ctor(int)
+  1);
 \end{lstlisting}
-\caption{Example 7}
+\caption{Constructor type inference -- All in one}
 \label{img79:example7}
 \end{figure}
 \par
-Based on the previous examples, the solution can be considered rebust enough to solve complicated examples.
+Based on the previous examples, the solution can be considered robust enough to solve complicated examples.
 
 \section{LDM meeting summary}
 
-\ac{LDM} discussed the proposal on 7th February 2024.
-Besides overall summary of the proposal with additional questions, the \ac{LDT} agreed on the contrinue with moving the proposal forward.
-Although it is not going to present the change in upcomming C\# 13, it is planned to ship this feature with some modification in the followiwng releases.
-The summary \cite{online:mettingSummary} and discussion \cite{online:mettingSummaryDisc} is published on C\# GitHub repository.
+\ac{LDM} discussed the proposal on 7th February 2024. 
+Besides the overall summary of the proposal with additional questions, the \ac{LDT} agreed to continue with moving the proposal forward. 
+Although it is not going to present the change in the upcoming C\# 13, it is planned to ship this feature with some modifications in the following releases. 
+The summary \cite{online:mettingSummary} and discussion \cite{online:mettingSummaryDisc} are published on the C\# GitHub repository.

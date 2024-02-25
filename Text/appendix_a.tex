@@ -1,8 +1,7 @@
 \chapter{Attachments}
 
-Table \ref{img80:attachment} describes content of the attachment.
-Although the attachment contains most of the thesis outcomes, part of the outcome is placed on public GitHub repository where futher discussions regarding the change, made by C\# community members and \ac{LDT}, continues.
-
+Table \ref{img80:attachment} describes the content of the attachment. 
+Although the attachment contains most of the thesis outcomes, part of the outcome is placed on a public GitHub repository where further discussions regarding the change, made by C\# community members and \ac{LDT}, continue.
 \begin{table}[h]
 \centering
 \begin{tabular}{ | m{11em} | m{22em}| } 
@@ -22,18 +21,18 @@ Folder & Description \\
 
 \section{Build and run Demo}
 
-Thesis contains demo which can be used as a playground for testing the change.
-.NET SDK is needed to be able to compile and run demo.
-We used version 8.0.100 which can be downloaded from Microsoft offical websites.
+The thesis contains a demo that can be used as a playground for testing the change. 
+The .NET SDK is needed to be able to compile and run the demo. We used version 8.0.100, which can be downloaded from Microsoft's offical websites
 \par
-After the download, make sure that you don't have \texttt{Microsoft.Net.Compilers.Toolset.4.9.0-dev} package in your nuget packages cache.
-The cache is usually placed in \texttt{C:\\Users\\\%user\%\\.nuget} folder.
-Then, navigate to the \texttt{Demo} folder and run \texttt{dotnet build} which builds demo example.
+After the download, make sure that you don't have the\\ \texttt{Microsoft.Net.Compilers.Toolset.4.9.0-dev} package in your nuget packages cache.
+The cache is usually placed in the \texttt{C://Users/\%user\%/.nuget} folder.
+Then, navigate to the \texttt{Demo} folder and run \texttt{dotnet build} which builds the demo example.
 
 \section{Build your applications}
 
-You can try to build already existing C\# projects by modified compiler by adding following code fragment to \texttt{.csproj} file.
-\begin{figure}[h]
+You can try to build already existing C\# projects by the modified compiler by adding the following code fragment \ref{img81:usage} to the \texttt{.csproj} file. 
+Then, you can again use a common dotnet build to build your application.
+\begin{figure}[h!]
 \begin{lstlisting}
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
@@ -52,4 +51,3 @@ You can try to build already existing C\# projects by modified compiler by addin
 \caption{\texttt{.csproj} project}
 \label{img81:usage}
 \end{figure}
-Then, you can again use common \texttt{dotnet build} to build your application.

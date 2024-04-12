@@ -257,7 +257,7 @@ The pseudocode describing the algorithm uses custom helper functions explained i
 \subsection{Algorithm Phases}
 
 Figure \ref{img10:methodTypeInference1} shows the initial phases of the algorithm. 
-The method type inference process starts with receiving arguments of a method call and the method’s signature, which type parameters have to be deduced. 
+The method type inference process starts with receiving arguments of a method call and the method’s signature, whose type parameters have to be deduced. 
 The algorithm has two phases, where the first phase initializes initial bounds’ sets of type variables (also called \textit{inferred type arguments}), and the second phase repeats until all type variables are fixed or fails if there is insufficient information to deduce them. 
 Each type variable has three types of bounds. 
 The exact bound consists of types, which have to be identical to the type variable, meaning that they can be converted to each other. 

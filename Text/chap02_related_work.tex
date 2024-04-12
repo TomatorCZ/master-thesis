@@ -33,7 +33,7 @@ Libraries, stored in the \texttt{.dll} format are parsed by \texttt{MetadataLoad
 The third phase (represented by blue boxes), also called the binding phase, matches identifiers in the code with received named symbols from the previous phase. 
 Because the processing of a method body is not dependent on other method bodies since the code only uses already known declarations, Roslyn makes this phase concurrent. 
 The result of the phase is a \emph{bound tree} where all identifiers refer to the named symbols. 
-A method binding itself is a complicated procedure consisting of many subtasks such as \emph{overload resolution} or mentioned method type inference, which algorithm is described in detail in the previous section \ref{sect02:MTIA}.
+A method binding itself is a complicated procedure consisting of many subtasks such as \emph{overload resolution} or mentioned method type inference, whose algorithm is described in detail in the previous section \ref{sect02:MTIA}.
 \par
 The binding is divided into a chain of binders, taking care of smaller code scopes. 
 One purpose of the binders is the ability to resolve an identifier to the named symbol if the referred symbol lies in their scope. 
@@ -108,7 +108,7 @@ The two last rules allow to convert Poly types to Mono types and vice-versa.
 \par
 H-M type inference is able to find the type of every expression of a completely untyped program using only these type rules.
 Although, there exist several algorithms for the inference Figure \ref{img16:w} shows only the W algorithm since it is closely related to C\# and Rust type inference.
-Inputs are the context $\Gamma$ and an expression which type has to be inferred.
+Inputs are the context $\Gamma$ and an expression whose type has to be inferred.
 The process consists of systematic traversing the expression from bottom to top and deducing the type of sub-expressions following the mentioned rules.
 The algorithm contains the \texttt{Instantiate} method which replaces quantified type variables in the expression with new type variables, the \texttt{Generelize} method replacing free type variables in the expression with quantified type variables, and the \texttt{Unify} method, also known as \textit{unification} in \textit{logic}.
 Unification is an algorithm finding a substitution of type variables whose application on the unifying types makes them identical. 
@@ -137,7 +137,7 @@ fn Infer($\Gamma$, expr):
 \label{img16:w}
 \end{figure}
 \par
-We can notice that the unification part of this algorithm is similar to the method type inference mentioned in the C\# section \ref{sect02:MTIA} where the substitution represents inferred type arguments of the method which parameter types were unified with corresponding argument types.
+We can notice that the unification part of this algorithm is similar to the method type inference mentioned in the C\# section \ref{sect02:MTIA} where the substitution represents inferred type arguments of the method whose parameter types were unified with corresponding argument types.
 The same concept of the unification is also used in Rust type inference.
 
 \newpage
@@ -164,7 +164,7 @@ Rust is a strongly typed programming language developed by Mozilla and an open c
 Besides its specific features like traits or variable regions, it also has advanced type inference \cite{online:rustTypeInference}, which is now described in a high-level perspective to get an inspiration for the proposed C\# improvement.
 \par
 Figure \ref{img17:rustCodeExample} shows a significant difference between C\# type inference and global Rust type inference.
-There is the \texttt{a} variable declaraction initialized by the \texttt{Vec<T>} generic type which type argument is going to be inferred.
+There is the \texttt{a} variable declaraction initialized by the \texttt{Vec<T>} generic type whose type argument is going to be inferred.
 The second statement calls the \texttt{push} method on the \texttt{a} variable, which is also generic and takes an argument of the \texttt{T} type.
 Since the \texttt{1} value is passed into this call, \texttt{T} is inferred to be the \texttt{i32} type and the type argument of the creating vector becomes \texttt{i32}.
 An interesting behavior regarding the type inference is that it infers the type of creating object used in the first statement using information obtained from the second statement.

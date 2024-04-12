@@ -1,11 +1,11 @@
-\chapter{C\# programming language}
+\chapter{C\# Programming Language}
 
 Introduction \ref{sect01:imprv} presented the programming language C\# and its possible improvement of type inference. 
 This chapter continues by describing relevant sections of the C\# language and its type inference algorithm to understand the possible barriers to implement improved type inference. 
 Since type inference is a complicated process touching many areas of the C\# language, it firstly sorts these areas into separated groups described in necessary detail to understand all parts of the current type inference. 
 These areas concern the C\# type system, including generics and language constructs where the type inference occurs or interacts with.
 
-\section{Type system}
+\section{Type System}
 
 \begin{figure}[b]
 \centering
@@ -16,18 +16,18 @@ These areas concern the C\# type system, including generics and language constru
 C\# data types are defined in the C\# type system, which also defines relations between them. 
 The most fundamental relation is type inheritance, where every type inherits another type, forming a tree with \texttt{System.Object} as a root node that doesn’t inherit any type.
 Types are divided into value and reference types, shown in Figure \ref{img04:typeSys}, where an arrow means \textit{is inherited by} relation. 
-Value types consist of built-in numeric types referred to as \textit{simple types}, and enumerations referred to as \textit{enum types}, structures referred to as \textit{struct types}, and nullable types. 
+Value types consist of built-in numeric types referred to as \textit{simple types}, enumerations referred to as \textit{enum types}, structures referred to as \textit{struct types}, and nullable types. 
 Compared to reference types, value types are implicitly sealed, meaning that they can’t be inherited by other types. 
 Reference types consist of interfaces, classes, arrays, and delegates. 
 An interface introduces a new relation to the type system by defining a list of methods, called a contract, which has to be implemented by a type that implements the interface.
 The relation forms an acyclic graph, meaning a type can implement multiple interfaces, but the implementation relations can’t form a cycle. 
 Delegates represent typed pointers to methods describing its signature, including generic parameters, parameters, and a return type.
 \par
-The type system implicitly allows to assign \texttt{null}, indicating an invalid value, to reference types. Since C\# 2.0 \cite{online:csHist}, it allows to assign \texttt{null} value to nullable types, which are equivalents of the rest of value types prohibiting it. Because assigning \texttt{null} value is referred to as a billion-dollar mistake \cite{online:billionDolarMistake}, C\# 8.0 \cite{online:csHist}, introduced optional settings warning about assigning null values and created nullable reference types, which, together with nullable types, explicitly allows \texttt{null} assignment as a way of interaction with legacy code not using the feature.
+The type system implicitly allows to assign \texttt{null}, indicating an invalid value, to reference types. Since C\# 2.0 \cite{online:csHist}, it allows to assign the \texttt{null} value to nullable types, which are equivalents of the rest of value types prohibiting it. Because assigning the \texttt{null} value is referred to as a billion-dollar mistake \cite{online:billionDolarMistake}, C\# 8.0 \cite{online:csHist}, introduced optional settings warning about assigning \texttt{null} values and created nullable reference types, which, together with nullable types, explicitly allows \texttt{null} assignment as a way of interaction with legacy code not using the feature.
 \par
 A big part of the type system is C\# \textit{generics}, allowing the parameterization of types and methods by arbitrary types. 
 A specific generic method or type is \textit{constructed} by providing required type arguments, where \textit{construction} means replacing all occurrences of type parameters with the type arguments. 
-Since type argument can be arbitrary type, the type parameter is considered to be the most general type in the type system, \texttt{System.Object}. 
+Since the type argument can be an arbitrary type, the type parameter is considered to be the most general type in the type system, \texttt{System.Object}. 
 Assuming additional API from the type parameter is achieved by restricting a set of types, which can replace the type parameter, enabling a specific interface of this set. 
 The restriction is described by type constraints, which can be applied to type parameters. 
 There are several kinds of constraints that can be combined together, forcing the type argument to fulfill all of them. 
@@ -56,7 +56,7 @@ The last relevant feature of the type system is method overloading, which
 allows definitions of multiple methods with the same name, return type, and count of type parameters having different types of parameters. 
 Further chapters will mention the feature as an obstacle in designing efficient type inference.
 
-\section{Relevant constructs}
+\section{Relevant Constructs}
 
 Many unrelated C\# constructs can use type inference or can influence the type inference algorithm.
 There are the most relevant whose internals are then considered in the following chapters regarding the design of the improvement.
@@ -72,22 +72,22 @@ The majority of the C\# binding happens statically at compile time. Expressions 
 This behavior can lead to possible bugs regarding invalid operations on the dynamic data types, which will be reported during runtime. 
 Figure \ref{img06:dynamic} shows a declaration of the \texttt{a} variable of the dynamic type.
 Dynamic binding occurs in the \texttt{a.Foo()} expression, where the \texttt{Foo()} operation is not checked during compilation. 
-An error is reported at runtime when the actual type of the \texttt{a} variable is determined to be \texttt{string}, which doesn’t define \texttt{Foo()} operation. Despite the dynamic binding, a compiler can still little check certain kinds of expressions containing values of dynamic types to reveal possible errors at compile time. 
+An error is reported at runtime when the actual type of the \texttt{a} variable is determined to be \texttt{string}, which doesn’t define the \texttt{Foo()} operation. Despite the dynamic binding, a compiler can still little check certain kinds of expressions containing values of dynamic types to reveal possible errors at compile time. 
 An example of such checking is the \texttt{Bar()} method call, where the compiler can check the first argument, whose type is known at compile time as the type of the parameter. 
-An appropriate error occurs during the compilation because string value has the \texttt{string} type, and it is passed as the \texttt{p1} parameter, which has the \texttt{int} type.
+An appropriate error occurs during the compilation because the \texttt{"text"} value has the \texttt{string} type, and it is passed as the \texttt{p1} parameter, which has the \texttt{int} type.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
 void Bar<T>(int p1, T p2, long p3) { ... }
 ...
 dynamic a = "string";
 a.Foo();
-Bar("string", 1, a); \\ Compilation error reported
+Bar("text", 1, a); // Compilation error reported
 \end{lstlisting}
 \caption{C\# dynamic type.}
 \label{img06:dynamic}
 \end{figure}
 
-\subsection*{Anonymous function}
+\subsection*{Anonymous Function}
 
 C\# allows to define a function without a name, called \textit{anonymous function}.
 The function is represented as an expression that can be called or stored in a variable.
@@ -95,8 +95,8 @@ There are three types of anonymous function.
 The first type is \textit{anonymous method} shown in Figure \ref{img06:anonymousF} where it is stored in the \texttt{a} variable.
 The \texttt{b} variable contains the second type called \textit{explicit typed anonymous function}.
 The third variable \texttt{c} contains the last type called \textit{implicit typed anonymous function}.
-As can be seen, all of them have inferred return types based on return expression inside their bodies.
-The most interesting type is the last one, where even parameter types are inferred based on a surrounding context and which is especially threatened by \textit{method type inference} algorithm mentioned in method type inference section \ref{sect02:MTIA}.
+As can be seen, all of them have inferred return types based on the return expression inside their bodies.
+The most interesting type is the last one, where even parameter types are inferred based on a surrounding context and which is especially threatened by \textit{method type inference} algorithm mentioned in the Method Type Inference section \ref{sect02:MTIA}.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
 Func<int, int> a = delegate(int p1) { return p1 + 1; };
@@ -107,15 +107,15 @@ Func<int, int> c = (p1) => { return p1 + 1; };
 \label{img06:anonymousF}
 \end{figure}
 
-\subsection*{Object creation expression and initializer}
+\subsection*{Object Creation Expression and Initializer}
 
 Initializers are used as a shortcut during an object instantiation.
 The simplest one is \textit{object initializer} allowing to assign values to the object's fields pleasantly instead of assigning them separately after the initialization.
 The second type of initializers regards arrays and collections.
-\textit{Array initializers} are used to create fixed-size arrays with predefined content.
+\textit{Array initializers} are used to create fixed-size arrays with a predefined content.
 Figure \ref{img07:initializer} shows the \texttt{arrayInit} variable initialized by an array of \texttt{int} with two items using the initializer.
 Under the hood, each item in the initializer is assigned to the corresponding index of the array after the array creation.
-\textit{Collection initializers} are similar to array initializers defined on collections, which are created by implementing \texttt{ICollection<T>} interface.
+\textit{Collection initializers} are similar to array initializers defined on collections, which are created by implementing the \texttt{ICollection<T>} interface.
 One of the interface's declaring methods is \texttt{void Add<T>(T)} with adding semantics.
 Each type implementing this interface is allowed to use an initializer list in the same manner as an array initializer.
 It's just a sugar code hiding to call the \textit{Add} method for each item in the initializer list.
@@ -131,7 +131,7 @@ var indexerInit = new Dictionary<string, int>() {
 \label{img07:initializer}
 \end{figure}
 
-\section{Type inference} \label{sect02:typeInference}
+\section{Type Inference} \label{sect02:typeInference}
 
 C\# type inference occurs in many contexts. 
 However, the proposed improvement will be inspired by and influence only a few of them.
@@ -152,8 +152,8 @@ var a = "str";
 \subsection{Operator \texttt{new()}}
 
 There is also an opposite way of deducting types from a target to a source.
-An example is the \texttt{new()} operator, which can be called with arbitrary arguments and represents object creation of a type that is determined by a type of the target. 
-An example of these situations can be seen in Figure \ref{img08:new} where the target-typed \texttt{new(1)} operator allows to skip the specification of creating type in the object creation expression since the \texttt{myList} variable type gives it. After the type inference, the operator represents the new \texttt{new List<int>(1)} object creation expression.
+An example is the \texttt{new()} operator, which can be called with arbitrary arguments and represents an object creation of a type that is determined by a type of the target. 
+An example of these situations can be seen in Figure \ref{img08:new} where the target-typed \texttt{new(1)} operator allows to skip the specification of creating type in the object creation expression since the \texttt{myList} variable type gives it. After the type inference, the operator represents the \texttt{new List<int>(1)} object creation expression.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
 List<int> myList = new(1);
@@ -162,13 +162,13 @@ List<int> myList = new(1);
 \label{img08:new}
 \end{figure}
 
-\subsection{Method type inference} \label{sect05:mti}
+\subsection{Method Type Inference} \label{sect05:mti}
 
-Method type inference is the most complex C\# type inference used during generic method call binding when type arguments are not given.
-Figure \ref{img09:methodTypeInf} shows a situation when the method type inference deduces \texttt{System.String}, \texttt{System.Int32} and \texttt{System.Int32} as type arguments of the \texttt{Foo} method. 
+Method type inference is the most complex C\# type inference used during the generic method call binding when type arguments are not given.
+Figure \ref{img09:methodTypeInf} shows a situation when the method type inference deduces \texttt{System.String},\\ \texttt{System.Int32} and \texttt{System.Int32} as type arguments of the \texttt{Foo} method. 
 There is a multi-step process that the type inference has to do to be able to infer it. 
 Regarding the \texttt{T1} type parameter, the inference has to find a common type between the \texttt{(long)1} argument and the \texttt{(int)1} argument. 
-Regarding the \texttt{T2} type parameter, the type inference has to go into type arguments of the generic type of the \texttt{p3} parameter and the \texttt{myList} argument, check if the types are compatible, and then match the \texttt{T2} type parameter against the \texttt{int} type argument of the \texttt{List<int>}. 
+Regarding the \texttt{T2} type parameter, the type inference has to go into the type arguments of the generic type of the \texttt{p3} parameter and the \texttt{myList} argument, check if the types are compatible, and then match the \texttt{T2} type parameter against the \texttt{int} type argument of \texttt{List<int>}. 
 The \texttt{T3} type parameter is the most challenging since it occurs as a return type of the delegate. 
 The type inference has first to infer types of input parameters of this delegate to be able to infer the implicit anonymous function’s return type. 
 Then, it can match the inferred return type with the \texttt{T3} type parameter, resulting in the \texttt{System.Int32} type.
@@ -186,7 +186,7 @@ Foo((long)1, (int)1, myList, (p1) => p1 + 1);
 \par
 The method type inference algorithm is detailly described in separate section \ref{sect02:MTIA} since it is a complex algorithm, and the proposed improvement will be based on that.
 
-\subsection{Array type inference}
+\subsection{Array Type Inference}
 
 The last mentioned type inference happens in array initializers when the array type should be deduced from the initializer list. 
 Figure \ref{img14:arrayTypeInf} shows an example of a situation when the type inference is used for determining the element type of the constructing array. 
@@ -201,7 +201,7 @@ new[] { new object(), "string" };
 \label{img14:arrayTypeInf}
 \end{figure}
 
-\section{Method type inference algorithm} \label{sect02:MTIA}
+\section{Method Type Inference Algorithm} \label{sect02:MTIA}
 
 Since one of the thesis's improvements is adjusting the method type inference algorithm, this section presents
 its description. 
@@ -254,11 +254,11 @@ An unfixed type variable \texttt{$X_i$} \emph{depends directly on} an unfixed ty
 \par
 The pseudocode describing the algorithm uses custom helper functions explained in Table \ref{table1:algorithmLegen}.
 
-\subsection{Algorithm phases}
+\subsection{Algorithm Phases}
 
 Figure \ref{img10:methodTypeInference1} shows the initial phases of the algorithm. 
 The method type inference process starts with receiving arguments of a method call and the method’s signature, which type parameters have to be deduced. 
-The algorithm has two phases, where the first phase initializes initial bounds’ sets of type variables (inferred type arguments), and the second phase repeats until all type variables are fixed or fail if there is insufficient information to deduce them. 
+The algorithm has two phases, where the first phase initializes initial bounds’ sets of type variables (also called \textit{inferred type arguments}), and the second phase repeats until all type variables are fixed or fails if there is insufficient information to deduce them. 
 Each type variable has three types of bounds. 
 The exact bound consists of types, which have to be identical to the type variable, meaning that they can be converted to each other. 
 The lower bound contains types that have to be convertible to the type variable, and the upper bound is opposite to it.
@@ -323,17 +323,17 @@ If there is no type variable to fix because either all type variables are fixed 
 The sets \texttt{$X_{indep}$} and \texttt{$X_{dep}$} refer to type variables, which can be fixed in the current iteration.
 Line 31 contains the ending condition of the algorithm when all type variables are fixed, or there is no way to infer the next ones.
 The second goal is to match postponed matching of output types of arguments' types with output types of corresponding parameters' types where all type variables in the output type of a parameter type don't depend on unfixed variable types contained in input types of the parameter type.
-The second goal is to match postponed matching of output types of arguments' types with output types of corresponding parameters' types where all type variables in the output type of a parameter type don't depend on unfixed variable types contained in input types of the parameter type.
+The second goal is to match postponed matching of output types of arguments' types with output types of corresponding parameters' types where all type variables in the output type of a parameter type don't depend on unfixed variable types contained in the input types of the parameter type.
 Line 32 describes this process using the pseudocode.
 This goal represents dealing with implicit anonymous functions mentioned in Figure \ref{img09:methodTypeInf} where \texttt{T3} depends on \texttt{T2}.
 The algorithm first infers the \texttt{T2} input type of the anonymous function, then infers the function's output type, which is then used to match the output type of \texttt{Func<T2, T3>} parameter type with the output type of the inferred anonymous function's type.
 The match yields the \texttt{int} upper bound of the \texttt{T3} type parameter.
 
-\subsection{Function type inference}
+\subsection{Function Type Inference}
 
 Figure \ref{img11:methodTypeInference2} contains definitions of two helper functions used in the first and second phases. 
 The \texttt{ExplicitParameterType()} function is used to match an argument type, which is an explicit typed anonymous function. 
-This function has typed parameters, so the algorithm matches them with input types of the corresponding parameter type.
+This anonymous function type has typed parameters, so the algorithm matches them with input types of the corresponding parameter type.
 \par
 The \texttt{InferOutputType()} function is used in the second phase when postponed
 matching of output types happens. 
@@ -365,7 +365,8 @@ fn InferOutputType(Argument E, Type T):
 \label{img11:methodTypeInference2}
 \end{figure}
 \newpage
-\subsection{Collecting Type bounds}
+
+\subsection{Collecting Type Bounds}
 
 Figure \ref{img12:methodTypeInference3} shows three functions that add new bounds to type variables’
 bound sets. 
@@ -401,7 +402,7 @@ fn InferUpper(Type U, Type V):
 \end{figure}
 \par
 \begin{obs}
-There is no need to check possible contradictions because they are checked in the type variable fixation. 
+There is no need to check possible contradictions between already collected bounds and the currently adding bound because It is checked in the type variable fixation. 
 \end{obs}
 \begin{obs}
 Bound sets don't contain unfixed type variables, which makes the algorithm simpler and which will be important for the following chapters.
@@ -440,5 +441,5 @@ fn Fix(TypeParameter x):
 \end{figure}
 \par
 An important observation of the method type inference is an obligation of infering all type arguments of the method.
-If the compiler is not able to infer all type arguments, an user has to specify all type arguments.
+If the compiler is not able to infer all type arguments, a user has to specify all type arguments.
 C\# currently doesn't offer a way how to hint just ambigious type arguments.

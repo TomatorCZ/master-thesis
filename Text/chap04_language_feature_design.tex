@@ -1,86 +1,105 @@
-\chapter{Language feature design} \label{sect09:lang}
+\chapter{Language Feature Design} \label{sect09:lang}
 
-The language feature design will be based on existing ideas of the partial type inference mentioned in the previous chapter \ref{sect04:github} and will be validated by the given requirements.
-Besides the language feature design, the last section mentions type inference improvements, whose implementation and proposal is not in the scope of this text, altought their possible implementation is sketched for being inspiration of future improvements.
+The previous chapter determined two improvement directions that would be beneficial to explore. 
+This chapter continues with exploring these directions consisting of the partial method type inference and the constructor type inference. 
+The goal of this exploration is to precisely design the improvements that are used afterward as the content of the mentioned proposal for \ac{LDM} and implemented in Roslyn.
 \par
-The mentioned ideas can be categorized into three groups. 
-The first group consists of \textit{Target-typed inference} \ref{sect06:targetType} and \textit{Type inference based on constraints} \ref{sect11:is6}, which improve method type inference algorithm. 
-The second group consists of \textit{Default type parameters} \ref{sect07:is1}, \textit{Generic aliases} \ref{sect08:is2}, \textit{Named type parameters} \ref{sect09:is3}, \textit{Inferred type argument} \ref{sect10:is4}, and \textit{Relocation} \ref{sect13:is8}, which regards partial type inference. 
-The third group consists of \textit{Constructor type inference} \ref{sect14:is9} and \textit{Inferred method return type} \ref{sect12:is7}, which introduce type inference in new C\# constructs. 
-Inferred method return type is not in the scope of this work, although it is mentioned in the last section as a future improvement that will be difficult to implement. 
-The first group is discussed in relation to constructor type inference, where potentially applied method type inference can be improved without introducing breaking changes. 
-The second group is discussed in relation to partial type inference, which is an main objective of the championed issue.
+We take the language change suggestions, mentioned in the GitHub Issues section \ref{sect04:github}, as an inspiration for the improvements and divide them into three following groups.
+Suggestions in the first group, given below, regard improving the method type inference algorithm and are used in the constructor type inference mentioned later.
+\begin{enumerate}
+  \item \textit{Target-typed inference} mentioned in Section \ref{sect06:targetType}
+  \item \textit{Type inference based on constraints} mentioned in Section \ref{sect11:is6}
+\end{enumerate}
+The following second group consists of suggestions describing general partial type inference which relate to both improvements.
+\begin{enumerate}
+  \item \textit{Default type parameters} mentioned in Section \ref{sect07:is1}
+  \item \textit{Generic aliases} mentioned in Section \ref{sect08:is2}
+  \item \textit{Named type parameters} mentioned in Section \ref{sect09:is3}
+  \item \textit{Inferred type argument} mentioned in Section \ref{sect10:is4}
+  \item \textit{Relocation} mentioned in Section \ref{sect13:is8}
+\end{enumerate}
+The third group contains suggestions introducing type inference in new C\# constructs. 
+The first suggestion describes the second improvement which is explored further and the second suggestion is mentioned in the last section of this chapter as a potential future improvement that will be difficult to implement and which is not in the scope of this work.
+\begin{enumerate}
+  \item \textit{Constructor type inference} mentioned in Section \ref{sect14:is9}
+  \item \textit{Inferred method return type} mentioned in Section \ref{sect12:is7}
+\end{enumerate}
 
-\section{Partial method type inference}
+\section{Partial Method Type Inference}
 
-Discussions regarding partial type inference can be further divided into two groups. 
-The first group provides hints in type parameter declarations, which are done by default type parameters. 
-Since it has to be done in the declaration, partial type inference wouldn’t work with already existing code without adjusting it.
-For this reason, the work excludes the idea.
+The partial method type inference occurs in the second group where various techniques are used to allow specify only some type arguments in the generic method call.
+These techniques are discussed below.
 \par
-The second group provides hints through the usage. 
-Generic aliases don’t work for methods, and also, it doesn’t seem to be useful when the inferred type arguments don’t represent some common specialization of generic type.  
-An example of the specialization is \texttt{StringDictionary<TValue>} mentioned in the previous chapter \ref{sect08:is2}.
+The disadvantage of default type parameters \ref{sect07:is1} is that it requires to provide the defaults in the type parameter declarations.
+It is problematic since the old code has to be changed to allow skipping the type arguments which have defaults.
+For this reason, the work excludes this suggestion.
 \par
-Named type parameters are excluded since providing that would be an uncommon new feature that has no equivalent in other well-known languages like Java, C++, Kotlin, and Rust. 
+Generic aliases \ref{sect08:is2} don't work for methods.
+There could be something like a generic alias for a method using a similar syntax as for the type which would allow to give defaults for some type parameters.
+However, it would still need additional declarations to provide these aliases and we don't think that it is flexible enough since it requires a new declaration for each method call scenario, where is beneficial to omit a type argument.
+\par
+Named type parameters \ref{sect09:is3} are excluded since providing that would be an uncommon new feature that has no equivalent in other well-known languages like Java, C++, Kotlin, and Rust. 
 We believe it would be confusing to introduce it to the users since it is a controversial change.
 \par
-Relocation doesn’t solve the problem of specifying all type arguments. 
-It just compacts type argument lists into one.
-\par
-The last discussion regards using inferred type argument, which will be a core of the proposed design for the following reasons. 
-It is already used in different languages, like a star in Kolin and Java or an underscore in Rust and F\#. 
-So, it is more common and intentional than previously mentioned ideas. 
+The suggestion of representing inferred type arguments \ref{sect10:is4} looks promising.
+It is already used in different languages, like a star symbol in Kolin and Java or an underscore in Rust and F\#. 
+So, it is more common and intentional than other mentioned suggestions. 
 It introduces no or at least minimal syntax changes into the language, which makes the usage simple, and it solves the problem of specifying all type arguments.
+This suggestion is a core of the partial method type inference improvement.
+\par
+Relocation \ref{sect13:is8} doesn’t solve the problem of specifying all type arguments. 
+It just compacts type argument lists into one.
 
 \subsection{Syntax}
 
-The choice of the syntax is based on six use cases where the expression of inferred type argument can be used or could be used in the future. 
-Table \ref{table2:useCasesChar} shows examples of these usages, which identify necessary syntax requirements.
+The syntax has to be chosen to allow a user to represent type arguments that have to be inferred by the compiler.
+The choice of the syntax should be based on the following conditions:
+\begin{enumerate}
+  \item The usage should be intentional for a user
+  \item A future extension of type inference should reuse the syntax
+  \item It shouldn't introduce the breaking change
+\end{enumerate}
+We identified five use cases that use the syntax in different situations to help reasoning about advantages and disadvantages of different syntax alternatives which are presented in the mentioned GitHub issues.
+Table \ref{table2:useCasesChar} shows the use cases and their examples in the current C\# language version.
 \begin{table}[h]
 \begin{center}
 \begin{tabular}{ | l | c | } 
   \hline
-  Generic method call & \texttt{Foo<\{SYNTAX\}>(arg1, arg2,...)}\\
+  Use case & Example\\
   \hline
-  Object creation expression & \texttt{new Bar<\{SYNTAX\}>(arg1, arg2,...)}\\
+  Type argumens of generic method & \texttt{Foo<Type1, ...>(...)}\\
   \hline
-  Variable declaration & \texttt{Bar<\{SYNTAX\}> temp = ...}\\
+  Type arguments of generic type & \texttt{new Bar<Type1, ...>(...)}\\
   \hline
-  Array type & \texttt{\{SYNTAX\}[]}\\
+  Variable declaration & \texttt{int temp = ...}\\
   \hline
-  Inferred type & \texttt{\{SYNTAX\}}\\
+  Array type & \texttt{int[]}\\
   \hline
-  Inferred nullable type & \texttt{\{SYNTAX\}?}\\
+  Nullable type & \texttt{int?}\\
   \hline
 \end{tabular}
 \end{center}
-\caption{Use cases containing syntax for inferred type argument.}
+\caption{Use cases helping to choose the syntax.}
 \label{table2:useCasesChar}
 \end{table}
 \par
-\textbf{Generic method call} use case represents a situation where the syntax is used during a generic method call.
+\textbf{Type argumens of generic method} use case represents a situation where a user wants to skip type arguments which can be inferred by the compiler and wants to specify just the ambiguous type arguments.
 \par
-\textbf{Object creation expression} represents the usage in the construction of generic type.
+\textbf{Type arguments of generic type} use case represents a situation where a user wants to infer either all type arguments of the generic type or to specify ambiguous type arguments and let the compiler infer the rest. 
+The syntax doesn’t have to be bound to the shown object creation expression example, but it can be also used on other potential places like a variable declaration, type casting, or a type argument of a generic method. 
+The description of the syntax behavior in other places than an object creation expression and a generic method call is not in the scope of this work. 
+However, the syntax is considered since it is a natural future continuation to use type inference on new places in the language.
 \par
-\textbf{Variable declaration} represents the potential usage in the variable type declaration, which is not in the scope of this work. 
-However, it is a natural continuation of partial type inference extension where the inferred type arguments are determined by the surrounding context.
+\textbf{Variable declaration} use case represents a situation where a user wants to infer a type of variable that is declared. 
+This use case already has the \text{var} syntax and reminds the secondary ability of the \texttt{var} keyword representing an inferred type of the declared variable. 
+Because of that, the new syntax shouldn’t be allowed to be used in this situation.
 \par
-\textbf{Array type} has a different syntax of type argument list specifying a type of the contained elements. 
-The type of the elements can also be inferred, and the proposed syntax has to offer a convenient way to express an array type with the inferred element type.
+\textbf{Array type} use case represents a situation where a user should be able to use the syntax to represent an array type whose element type should be inferred by the compiler.
 \par
-\textbf{Inferred type} doesn’t have to be contained only in the type argument list.
-The previous chapter presented the \texttt{var} keyword used in the variable declaration, whose type is determined by the type of initializing value. 
-C\# also offers a discard pattern \cite{online:discard} represented by an underscore, which is commonly used as a placeholder for variables that are not intentionally used in the code. 
-Since type argument inference relates to that, the syntax should be at least aligned with already existing related syntax. 
-The alignment will help the syntax to be naturally used without using language documentation.
+\textbf{Nullable type} use case represents a situation where a user should be able to hint to the compiler a nullability of a type that should be inferred.
 \par
-\textbf{Inferred nullable type} can be used to specify nullability of the inferred type which will be useful in scenarious where non-nullable and nullable code is mixed together.
-\par
-There are several syntax variants that can be used for inferred types. 
-The work presents the most relevant variants that appeared in the mentioned ideas and comments on the advantages and disadvantages for each variant.
 
-\subsubsection{Diamond operator} 
+\subsubsection{Diamond Operator} 
 
 Diamond operator syntax consists of a pair of two angle brackets \texttt{<>}.
 It is used as an empty type argument list determining that the type name or method name is generic.
@@ -162,7 +181,7 @@ Similar conclusions are made in the last example in Figure \ref{img44:opDi5} whe
 The \texttt{?} nullable operator can be appended to the diamond operator.
 In general, each syntax introducing a placeholder which is not a whitespace is suitable for appending the \texttt{?} operator.
 
-\subsubsection{Whitespace separated by commas} 
+\subsubsection{Nothing or Whitespaces Separated by Commas} 
 
 The syntax would simly skip inferred type argument by whitespace which would allow to specify just the ambiguous type arguments. 
 It would also determine the arity of type, which is important for the type name look-up phase of the compiler. 
@@ -207,7 +226,7 @@ temp = ...
 \par
 Since there is no placeholder which will be prepended to the nullable operator, the syntax doesn't work well in the last scenario regarding the nullable operator.
 
-\subsubsection{Underscores separated by commas} 
+\subsubsection{Underscores Separated by Commas} 
 
 The syntax is commonly used in other programming languages like F\# or Haskell to represent inferred type arguments, or as a placeholder for discarding variables that are intentionally not used. 
 This is considered as a big advantage. 
@@ -242,7 +261,7 @@ _ temp = ...
 \end{figure}
 
 
-\subsubsection{\texttt{var} keywords separated by commas} 
+\subsubsection{\texttt{var} Keywords Separated by Commas} 
 
 The \texttt{var} keyword representing the placeholder is another natural option of the syntax. 
 The big advantage of the syntax is the already used the \texttt{var} keyword in the variable declaration, whose meaning is coherent with inferred type arguments. 
@@ -256,7 +275,7 @@ Foo<var, string, List<var>, int>(arg1, arg2, arg3);
 \label{img52:opV1}
 \end{figure}
 
-\subsubsection{Something else separated by commas} 
+\subsubsection{Something Else Separated by Commas} 
 
 A different placeholder doesn't make a lot of sense because it needs to assign new meaning to that character in comparison with an underscore, the \texttt{var} keyword, the \texttt{<>} operator, or \texttt{<,,,>} syntax. 
 An asterisk can be considered.
@@ -272,7 +291,7 @@ Problems with the potential future extension where the underscore can represent 
 Although the diamond operator is not very useful in a generic method call, it makes sense in object creation expression. 
 The usage and analysis of that is covered later in this work.
 
-\subsection{Method and typename lookup}
+\subsection{Method and Typename Lookup}
 
 The previous section presented the proposed syntax for skipping inferred type arguments using an underscore as a placeholder. 
 This section continues with determining what the expression containing the syntax means.
@@ -301,7 +320,7 @@ referring to inferred type argument, it simply ignores the binding of this ident
 \par
 The underscores contained in the type arguments are threatened in the changed type inference algorithm mentioned in the following section.
 
-\section{Method type inference algorithm change}
+\section{Method Type Inference Algorithm Change}
 
 The thesis extends method type inference by introducing a new type variable bound, which represents inferred type arguments contained in the type argument list. 
 Firstly, if a generic method call doesn’t contain a type argument list, the method type inference is unchanged. The change is when the generic method is partially inferred. 
@@ -330,7 +349,7 @@ void Foo<T1, T2>(T1 p1, T2 p2)
 \label{img54:partInf}
 \end{figure}
 
-\subsection{New definitions}
+\subsection{New Definitions}
 
 The proposed algorithm uses two new definitions of dependendencies which are given below.
 \begin{defn}[Shape dependence]
@@ -343,7 +362,7 @@ An unfixed type variable \texttt{$X_i$} \emph{type-depends directly on} an unfix
 Thus \emph{type-depends on} is the transitive but not reflexive closure of \emph{type-depends directly on}.
 \end{defn}
 
-\subsection{Algorithm phases}
+\subsection{Algorithm Phases}
 
 The required change of the algorithm is presented as an algorithm divided into three sections, which is based on the former method type inference. 
 Figure \ref{img54:mainTypeInference1} shows the beginning, the first, and second phases. 
@@ -409,7 +428,7 @@ fn SecondPhase():
 
 \newpage
 
-\subsection{Collecting Type bounds}
+\subsection{Collecting Type Bounds}
 
 Figure \ref{img55:mainTypeInference2} shows three adjusted inferences, adding new bounds, and presents a new \texttt{InferShape} inference.
 The change is in propagating nested type bounds between type variable bounds. 
@@ -516,7 +535,7 @@ The last observation is to ensure that the propagation will end.
 Since the algorithm doesn't add the same bound multiple times, the cycle can't occur.
 \end{obs}
 
-\section{Partial constructor type inference}
+\section{Partial Constructor Type Inference}
 
 Constructor type inference, which will be a core part of the second part of the improvement, was mentioned in the discussion \cite{online:CtorTInf}. 
 The design of the partial type inference regarding underscore placeholders will be used again in order to be coherent with method type inference. 
@@ -545,7 +564,7 @@ List<int> t = new List<_>();
 \par
 Similar to the partial method type inferece, the \texttt{?} nullability operator is allowed to determine the type nullability.
 
-\subsection{Class lookup}
+\subsection{Class Lookup}
 
 Class lookup is done in the same way as in partial method type inference. 
 The binding of the underscore identifier is skipped. 
@@ -563,7 +582,7 @@ new GenericWrapper<int>.CreatingClass<_>(arg1,...); // Allowed
 \label{img59:TypeArgList}
 \end{figure}
 
-\subsection{Argument binding}
+\subsection{Argument Binding}
 
 The mentioned target-typed inference complicates the binding of the arguments. 
 When a target is an assigned variable or a return statement, the type of the target is given by the declaration of the variable or method’s return type. 
@@ -625,7 +644,7 @@ new Bar<_>(new Bar<_>(null, null), 1);
 \label{img61:exp}
 \end{figure}
 
-\subsection{Constructor type inference algorithm}
+\subsection{Constructor Type Inference Algorithm}
 
 The previously mentioned algorithm for inferring method type arguments is unchanged except for collecting new bounds in the first phase of the algorithm. 
 If a target type is provided, an upper bound type inference is made from it to the partially inferred type containing the constructor. 
@@ -650,7 +669,7 @@ Then, the type constraint of \texttt{T2} type parameters causes another lower bo
 Shape inferences continue to relate type variables representing underscores with type variables representing type parameters. 
 Then, the fixation is made, and it results in the \texttt{Bar<int, object>} inferred type.
 
-\subsection{Initiliazer extension} \label{sect12:ex1}
+\subsection{Initiliazer Extension} \label{sect12:ex1}
 
 Initializers can be part of the creating expression, which will allow us to use it as another source of type information. 
 As the thesis mentions in the previous chapter, initializers are syntax sugar. 
@@ -688,7 +707,7 @@ The inference is made from the type of the expression to the type of method para
 The last initializer regards indexers.
 Since indexers can be considered as a special case of methods that can be overloaded as well, the same process is made.
 
-\subsection{Diamond operator extension} \label{sect13:ex2}
+\subsection{Diamond Operator Extension} \label{sect13:ex2}
 
 Since constructor type inference is invoked when the creating type contains inferred type arguments in its type argument list, it can feel like a boilerplate when all type arguments are inferable. 
 Figure \ref{img57:diamondExample} shows an example of creating the \texttt{Dictionary} generic type whose all type arguments can be inferred using the target type. 
@@ -713,7 +732,7 @@ IDictionary<int, string> t = new Dictionary<>();
 \label{img58:diamondExample2}
 \end{figure}
 
-\section{Partial time inference during dynamic member invocation} \label{sect11:dynamic}
+\section{Partial Time Inference During Dynamic Member Invocation} \label{sect11:dynamic}
 
 The previous chapter mentioned that despite the dynamic binding, the compiler can still check an expression containing the dynamic value. 
 The compiler checks three relevant expressions containing the dynamic value as an argument. 
@@ -744,19 +763,19 @@ Foo<_, _>(t, 1);
 \label{img63:dinamic}
 \end{figure}
 
-\section{Other type inference improvements}
+\section{Other Type Inference Improvements}
 
 Besides the proposed improvement described above, the work touched on surrounding areas of type inference during the initial problem exploration. 
 The chapter gives a couple of thoughts about touched areas since they were also investigated and can be a future extension of the C\# programming language.
 
-\subsection{Shared type inference context}
+\subsection{Shared Type Inference Context}
 
 C\# currently has a local type inference preventing advanced type inferences. 
 The next big improvement of the type inference would be to provide global type inference using inferring contexts similar to Rust's. 
 However, since it would bring a breaking change, it would require an additional tool that would patch the old code to work in the same way compiled with the new type inference. 
 However, this refactoring can be challenging, so at least it should warn the user about possible behavior changes in each place where it can occur.
 
-\subsection{Inferring return value of methods}
+\subsection{Inferring Return Value of Methods}
 
 The work already mentioned the possibility of inferring the return value type of the method, which can be beneficial for writing a simple method whose name indicates the return value, helping a reader to understand the code. 
 An example of the function can be \texttt{ToString}, which indicates that the return value is the \texttt{string} type.

@@ -730,29 +730,27 @@ IDictionary<int, string> t = new Dictionary<>();
 \label{img58:diamondExample2}
 \end{figure}
 
-\section{Partial Time Inference During Dynamic Member Invocation} \label{sect11:dynamic}
+\section{Partial Type Inference During Dynamic\\ Member Invocation} \label{sect11:dynamic}
 
-The previous chapter mentioned that despite the dynamic binding, the compiler can still check an expression containing the dynamic value. 
-The compiler checks three relevant expressions containing the dynamic value as an argument. 
+Inferred type arguments can appear in an expression containing a dynamic value which is still checked by the compiler in the limitted way mentioned in the C\# Programming Langauge chapter \ref{sect15:dyn}.
+We have to adjust this check to reflect the described improvements.
+The compiler checks three relevant expression types containing the dynamic value as an argument. 
 It is a static method invocation, instance method invocation whose receiver is not a dynamic value, and object creation expression. 
-For each candidate of this kind, a modified parameter list and argument list are created to be checked. 
-If there is no candidate for which the test succeeded, a compile-time error occurs.
+For each candidate of this kind, a modified parameter list and argument list are created to be checked for applicability. 
+If there is no candidate for which the test succeeds, a compile-time error occurs.
 \par
 The modified parameter list is created in the following way. 
 If the candidate is a generic method and type arguments were provided, it substitutes them in the parameter list. 
 Then, all parameters that include a type parameter are elided with corresponding arguments. 
-The resulting set of parameters and arguments are checked.
+The resulting set of parameters and arguments are checked for the applicability.
 \par
-The improvement adjusts the modified parameter list of partially inferred methods by substituting only these type arguments, which don’t contain any inferred type arguments. 
-The same process is made in object creation expression, where the substitution is made on the type containing the constructor candidate.
-\par
-For practical reasons, it also announces a warning about using partial inference in late-binding, which doesn’t support it since it is handled by the runtime. 
-However, there are situations where the runtime is able to infer type arguments even without partially hinting. 
+The thesis removes this check since the type hints are not considered during the binding in runtime and announces a warning about using partial type inference in late-binding, which is not supported since it is handled by the runtime. 
+There are situations where the runtime is able to infer type arguments even with used underscores in the type argument list. 
 Figure \ref{img63:dinamic} shows an example where the \texttt{Foo} method is inferred by runtime because inferred type arguments are inferrable in the runtime. 
 These situations are valid, and hence, the compiler should just warn about them.
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp, mathescape=true]
-void Foo<T>(T arg1, T arg2) {}
+void Foo<T1, T2>(T1 arg1, T2 arg2) {}
 ...
 dynamic t = ...
 Foo<_, _>(t, 1);
@@ -768,10 +766,10 @@ The chapter gives a couple of thoughts about touched areas since they were also 
 
 \subsection{Shared Type Inference Context}
 
-C\# currently has a local type inference preventing advanced type inferences. 
+C\# currently has a local type inference preventing advanced type inference. 
 The next big improvement of the type inference would be to provide global type inference using inferring contexts similar to Rust's. 
 However, since it would bring a breaking change, it would require an additional tool that would patch the old code to work in the same way compiled with the new type inference. 
-However, this refactoring can be challenging, so at least it should warn the user about possible behavior changes in each place where it can occur.
+This refactoring can be challenging, so at least it should warn the user about possible behavior changes in each place where it can occur.
 
 \subsection{Inferring Return Value of Methods}
 
@@ -795,21 +793,21 @@ class MyClass {
 \label{img64:kotlin}
 \end{figure}
 \par
-The main obstacle regarding inferred return type in the method's signatures is an order of compilation and possible multithreaded compilation.
+The main obstacle regarding the inferred return type in methods' signatures is an order of compilation and possible multithreaded compilation.
 The Roslyn compiler first finds all definitions in the program, which allows it to compile methods separately in different threads.
 This advantage is because the method's content consists of only types and methods defined in the program, whose signatures are already known thanks to the previous phase.
 So, the compiler knows the exact return types of the used functions, which allows it to do a type check.
 \par
 Kotlin divides the method compilation into two groups, as it is described in the video \cite{online:kotlinCompiler}. 
 The first group contains methods without a return type, which is compiled first in a single thread. 
-This will allow us to obtain all signatures for the methods in the program. 
+This will allow to obtain all signatures for these methods in the program. 
 Obviously, if these methods are recursions, the compiler can’t infer the return type, and an error occurs.
 The second group contains methods with a return type, which can be compiled in multiple threads since all method signatures are already known.
 \par
 Although this implementation would be possible in Roslyn as well, it would require a large number of changes. 
 Instead of that, C\# could allow inferring return in a local function, which is a function defined inside a method body and can be used only inside the method. 
-There are two benefits of this. 
+There are two benefits of it. 
 The main architecture of the Roslyn compiler doesn’t have to be changed since the method is compiled by one thread, and the local functions can’t be used outside. 
-Local functions are usually tied with the method implementation, and the return type is not contained in public API, so a reader shouldn’t need to know the return type till the time when he/she wants to explore the inner implementation, which gives him/her a context to deduce the return type.
+Local functions are usually tied with the method implementation, and the return type is not contained in the public API, so a reader shouldn’t need to know the return type till the time when he/she wants to explore the inner implementation, which gives him/her a context to deduce the return type by himself.
 
 

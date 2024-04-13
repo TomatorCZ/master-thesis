@@ -744,7 +744,9 @@ If the candidate is a generic method and type arguments were provided, it substi
 Then, all parameters that include a type parameter are elided with corresponding arguments. 
 The resulting set of parameters and arguments are checked for the applicability.
 \par
-The thesis removes this check since the type hints are not considered during the binding in runtime and announces a warning about using partial type inference in late-binding, which is not supported since it is handled by the runtime. 
+The improvement adjusts the modified parameter list of partially inferred methods by substituting only these type arguments, which don’t contain any inferred type arguments. 
+The same process is made in object creation expression, where the substitution is made on the type containing the constructor candidate.
+It also announces a warning about using partial type inference in late-binding, which is not supported since it is handled by the runtime.
 There are situations where the runtime is able to infer type arguments even with used underscores in the type argument list. 
 Figure \ref{img63:dinamic} shows an example where the \texttt{Foo} method is inferred by runtime because inferred type arguments are inferrable in the runtime. 
 These situations are valid, and hence, the compiler should just warn about them.

@@ -55,7 +55,7 @@ It just compacts type argument lists into one.
 The syntax has to be chosen to allow a user to represent type arguments that have to be inferred by the compiler.
 The choice of the syntax should be based on the following conditions:
 \begin{enumerate}
-  \item The usage should be intentional for a user
+  \item The usage should be intuitive for a user
   \item A future extension of type inference should reuse the syntax
   \item It shouldn't introduce the breaking change
 \end{enumerate}
@@ -91,7 +91,7 @@ The description of the syntax behavior in other places than an object creation e
 However, the syntax is considered since it is a natural future continuation to use type inference on new places in the language.
 \par
 \textbf{Variable declaration} use case represents a situation where a user wants to infer a type of variable that is declared. 
-This use case already has the \text{var} syntax and reminds the secondary ability of the \texttt{var} keyword representing an inferred type of the declared variable. 
+This use case already has the \texttt{var} syntax and reminds the secondary ability of the \texttt{var} keyword representing an inferred type of the declared variable. 
 Because of that, the new syntax shouldn’t be allowed to be used in this situation.
 \par
 \textbf{Array type} use case represents a situation where a user should be able to use the syntax to represent an array type whose element type should be inferred by the compiler.
@@ -101,31 +101,25 @@ Because of that, the new syntax shouldn’t be allowed to be used in this situat
 
 \subsubsection{Diamond Operator} 
 
-Diamond operator syntax consists of a pair of two angle brackets \texttt{<>}.
-It is used as an empty type argument list determining that the type name or method name is generic.
+The diamond operator syntax consists of a pair of two angle brackets \texttt{<>}.
 \par
-Figure \ref{img40:opDi1} demonstrates the usage in generic method calls of \texttt{Foo1} and \texttt{Foo2}. 
-The declarations of these methods are not important for the purpose of showing the pros and cons. 
-Calling the \texttt{Foo1} method with an empty argument list doesn’t make much sense since method type inference is enabled by default without using angle brackets. 
-Calling the \texttt{Foo2} method with nested usage of the diamond operator allows limited partial type inference when the diamond operator is used inside the type argument list. 
-The \texttt{Bar<>} type partially hints to the compiler the generic type name without specifying the type arguments. 
-However, the usage is problematic when there are multiple generic types with the same name since it can cause ambiguity between them. 
-This problem is described in the next example.
+In the context of the first use case, the syntax is used after the generic method name instead of the type argument list.
+The semantics of the operator is to determine that the method name is generic so the compiler will consider only generic methods during overload resolution.
+Figure \ref{img40:opDi1} shows an example of the syntax used in the \texttt{Foo} method call.
+Since it doesn't allow to skip inferable type arguments, we don't see it as a good candidate for the feature.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
-Foo1<>(arg1, arg2, arg3);
-Foo2<Bar<>, int>(arg1, arg2, arg3);
+Foo<>(arg1, ...);
 \end{lstlisting}
-\caption{Diamond operator - generic method call.}
+\caption{Type argumens of generic method use case.}
 \label{img40:opDi1}
 \end{figure}
 \par
-Figure \ref{img41a:opDi2} shows the usage in object creation expression. 
-The first statement containing the \texttt{Bar<>} name has the advantage of expressing the will to infer the type’s type arguments, which is necessary in comparison to the previous example since the object creation doesn’t offer type inference. 
-If the type inference were potentially turned on by default, it would introduce a breaking change. 
-However, there is also a disadvantage of the usage since it doesn’t specify the arity of the generic type. If there were multiple generic types differing in arity, it would complicate the already mentioned overload resolution phase since all constructors from these generic types would have to be considered. The process would be computationally demanding. 
-A possible solution would be the following restriction. 
-Usually, there is not more than one generic type with the same name. 
+In the context of the second use case, the syntax is used after the generic type name instead of the type argument list.
+The semantics of the operator is to determine that the type is generic so the compiler will look up only generic types.
+Figure \ref{img41a:opDi2} shows the usage in the object creation expression where the type arguments of the \texttt{Bar} type should be inferred by the compiler.
+As we can notice, it is not clear, where the compiler should find constructors for overload resolution since the \texttt{Bar<>} syntax can represent multiple types differing in type parameter's arity.
+Probing all options for the constructors seems complicated because it requires a significant change in the Roslyn implementation and it will influence the compile time because of the increased overloading resolution complexity. 
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp]
 class Bar { ... }
@@ -134,162 +128,156 @@ class Bar<T1, T2> { ... }
 ...
 new Bar<>(...);
 \end{lstlisting}
-\caption{Diamond operator - object creation expression ambiguity.}
+\caption{Type arguments of generic type -- ambiguity.}
 \label{img41a:opDi2}
 \end{figure}
-So when there is just one type of that name, the diamond operator would be allowed to use it since the name determined one specific generic type. 
-In Example \ref{img41b:opDi2}, \texttt{Baz<>} would refer to the \texttt{Baz<T1, T2>} generic type since there is no other generic type with the same name, causing the ambiguity.
+On the other hand, it is common to have just one type without multiple variations of type parameter's arity.
+Figure \ref{img41b:opDi2} shows an example where an object representing a directory is created.
+The compiler can check if there is just one generic type with this name.
+If it is, the problem with ambiguity disappears and the compiler can try to infer the type arguments.
+We think that it is a beneficial usage since it allows to turn on type inference of object creation expression.
+Extending the current overload resolution during object creation expression binding to consider generic types when the type doesn't contain the type argument list can't be used instead of it since it would cause a breaking change.
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp]
-class Baz<T1,T2> { ... }
-...
-new Baz<>(...);
+new Directory<>(...);
 \end{lstlisting}
-\caption{Diamond operator - object creation expression.}
+\caption{Diamond operator -- object creation expression.}
 \label{img41b:opDi2}
 \end{figure}
+The syntax can be used in other places too, however, we don't see any practical usage for that.
 \par
-The third example is shown in Figure \ref{img42:opDi3}, where the generic \texttt{Wrapper} class is used to specify the wrapping generic type. 
-However, it doesn’t offer to specify any type arguments, which is limiting when the compiler can’t infer all of them.
-\begin{figure}[h]
-\begin{lstlisting}[style=csharp]
-Wrapper<> temp = ...
-\end{lstlisting}
-\caption{Diamond operator - variable declaration.}
-\label{img42:opDi3}
-\end{figure}
+The third use case is not considered since there is already the \texttt{var} keyword.
 \par
-Figure \ref{img43:opDi4} shows the operator as an indicator of the inferred element of the array type. 
-Since there isn’t a known popular language similar to C\#, which would contain a similar construct, the usage is considered to be unintentional for most of the users.
+In the context of the fourth use case, the syntax determines that a user wants to infer an element of an array.
+Figure \ref{img43:opDi4} shows an example, where there is the \texttt{temp} variable declaration of the array type whose element should be inferred.
+We think, that the meaning of this syntax is not clear to a user in comparison to the previous use case where it reminds the type argument list.
 \begin{figure}[h]
 \begin{lstlisting}[style=csharp]
 <>[] temp = ...
 \end{lstlisting}
-\caption{Diamond operator - array type.}
+\caption{Diamond operator -- array type.}
 \label{img43:opDi4}
 \end{figure}
 \par
-Similar conclusions are made in the last example in Figure \ref{img44:opDi5} where the \texttt{<>} operator has the same functionality as the already existing \texttt{var} keyword.
+In the context of the fifth use case, the syntax should represent a nullable type which is inferred by the compiler.
+Figure \ref{img44:opDi5} shows an example, where a user wants to infer the type of the declared \texttt{temp} variable and hints to the compiler the nullability of that type.
+We don't think that the usage is intuitive for that and we exclude it.
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp]
-<> temp = ...
+<>? temp = ...
 \end{lstlisting}
-\caption{Diamond operator - inferred type.}
+\caption{Diamond operator -- inferred nullable type.}
 \label{img44:opDi5}
 \end{figure}
 \par
-The \texttt{?} nullable operator can be appended to the diamond operator.
-In general, each syntax introducing a placeholder which is not a whitespace is suitable for appending the \texttt{?} operator.
+We think that the diamond operator would be beneficial only in the second use case where it turns on the type inference of object creation expression.
+The symbol already means a generic type with one type argument in the \texttt{typeof(Bar<>)} expression which has a conflict with the new semantics in the context of object creation expression.
+However, we think that the context of reflection and object creation expression are distinct enough to use the symbol for a different meaning as we can see in other language constructs.
+We think that the advantage of the syntax in this use case is that it still reminds the type argument list and it is not verbose.
 
-\subsubsection{Nothing or Whitespaces Separated by Commas} 
+\subsubsection{Nothing Separated by Commas} 
 
-The syntax would simly skip inferred type argument by whitespace which would allow to specify just the ambiguous type arguments. 
-It would also determine the arity of type, which is important for the type name look-up phase of the compiler. 
-A natural choice for the separator is commas since it is widely used. 
-Another advantage is that this syntax is already used when working with C\# reflaction. 
-An example is the following expression \texttt{typeof(Dictionary<,>)}, which returns a class describing the \texttt{Dictionary} type from the standard library.
-\par
-Figure \ref{img45:opW1} shows the usage when the \texttt{Foo1} generic method is called by
-skipping the first and the last type argument, which is inferred by the compiler. 
-However, the syntax seems to be messy when it is used in generic methods with many generic type parameters, as can be seen in the \texttt{Foo2} method call. 
-Similar thoughts regard the second and third use case.
+In the context of the first use case, the syntax omits type arguments that should be inferred by the compiler and specifies just ambiguous type arguments using commas as a separator. 
+Figure \ref{img45:opW1} shows an example where the syntax is used to call the \texttt{Foo} method with three type arguments. 
+The first and third type argument are inferred by the compiler and the second type argument is specified by a user as the \texttt{int} type.
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp]
-Foo1<, string, List<>, >(arg1, arg2, arg3);
-Foo2<,,,int,,>(arg1, arg2, arg3);
+Foo<, int,>(arg1, ...);
 \end{lstlisting}
-\caption{Whitespace - generic method call.}
+\caption{Whitespace -- generic method call.}
 \label{img45:opW1}
 \end{figure}
+There are the following advantages of this syntax. 
+It determines the arity of the called generic method. 
+The syntax is already used in the \texttt{typeof()} operator where commas are used to determine the arity of the reflected type. 
+It allows specifying just ambiguous types. 
+Although the syntax is a good candidate, we think that skipping the type arguments by nothing makes the code comprehension of the code worse since it makes it difficult to determine the position of the type arguments at first sight.
 \par
-The usage with array type seems to be unintentional and would cause changes in the compiler parser. 
-Figure \ref{img46:opW4} shows the syntax to express the inferred type of array's element.
+The syntax has the same use and meaning in the second use case.
+\par
+In the context of the fourth use case, the syntax omits the type of a array. 
+Figure \ref{img46:opW4} shows the syntax where the first statement means a declaration of the \texttt{temp} variable which has a type of array whose element is inferred by the compiler. 
+The second statement uses the syntax to hint to the compiler that the second type argument should be an array type.
+We think that the usage in this use case is unintuitive.
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp]
 [] temp = ...
-Foo<, [], >(arg1, arg2)
+Foo<,[],>(arg1, ...);
 \end{lstlisting}
-\caption{Whitespace - array type.}
+\caption{Whitespace -- array type.}
 \label{img46:opW4}
 \end{figure}
 \par
-The last use case regarding using the whitespace as an inferred type would probably cause problems with determining declarations of variables. 
-Figure \ref{img47:opW5} shows a situation where the compiler can’t determine if it is a variable declaration or a variable assignment. 
-Although it could be solved by investigating the surrounding context, we consider that the code comprehension would get worse.
-\begin{figure}[h]
-\begin{lstlisting}[style=csharp]
-temp = ...
-\end{lstlisting}
-\caption{Whitespace - inferred type.}
-\label{img47:opW5}
-\end{figure}
+In the fifth use case, the syntax makes it difficult to append the \texttt{?} mark since it doesn't have any placeholder.
+There is the same problem as mentioned above.
 \par
-Since there is no placeholder which will be prepended to the nullable operator, the syntax doesn't work well in the last scenario regarding the nullable operator.
+Although the syntax is a good candidate in the first and second use cases, it is not suitable for the array types and nullable types.
+We consider this disadvantage important and exclude the syntax.
 
 \subsubsection{Underscores Separated by Commas} 
 
-The syntax is commonly used in other programming languages like F\# or Haskell to represent inferred type arguments, or as a placeholder for discarding variables that are intentionally not used. 
-This is considered as a big advantage. 
-A disadvantage is the introduction of breaking change because C\# allows the underscore as a type identifier. 
-However, that seems to be rather uncommon in the code. 
-It seems to be less messy than the previous syntax when a generic type contains many type parameters, as shown in Figure \ref{img50:opU1}.
+The syntax uses an underscore to represent a type that has to be inferred by the compiler. 
+The syntax is commonly used in other programming languages like F\# or Haskell to represent inferred type arguments which is considered as an advantage. 
+Although it has different semantics in C\# where it can also mean a discarded variable.
+We don’t think it makes the usage of that unintuitive or confusing in the following use cases.
+\par
+The usage of the syntax in the first use case is similar to the previous syntax where omitting the type arguments is done by using the underscore.
+Figure \ref{img50:opU0} shows the same \texttt{Foo} method using underscores to represent the first and third type argument as an inferred argument.
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp]
-new Bar<_, _, List<_>, _,_>(arg1, arg2, arg3);
+Foo<_, int, _>(arg1, ...);
 \end{lstlisting}
-\caption{Underscore - object creation expression.}
-\label{img50:opU1}
+\caption{Underscore -- generic method.}
+\label{img50:opU0}
 \end{figure}
+We think that the underscore placeholder helps to identify type argument positions in comparison with the previous syntax variant.
 \par
-The usage with array type also seems to work even if it can still be considered uncommon. 
-Figure \ref{img51:opU4} shows the usage where we think that the syntax intentionally expresses the inferred type of array’s elements.
+The syntax has the same use and meaning in the second use case.
+\par
+In the context of the fourth use case, the syntax seems to be more intuitive than in the previous syntax variant.
+Figure \ref{img51:opU4} shows the declaration of the \texttt{temp} variable whose type is an array with the inferred element's type.
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp]
 _[] temp = ...
 \end{lstlisting}
-\caption{Underscore - array type.}
+\caption{Underscore -- array type.}
 \label{img51:opU4}
 \end{figure}
 \par
-The last use case is shown in Figure \ref{img52:opU5} where it clashes with the already existing \texttt{var} keyword.
+The fifth use case is shown in Figure \ref{img52:opU5} where it uses the \texttt{\_?} syntax to express that the inferred type of the temp variable has to be nullable.
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp]
-_ temp = ...
+_? temp = ...
 \end{lstlisting}
-\caption{Underscore - variable declaration.}
+\caption{Underscore -- nullable.}
 \label{img52:opU5}
 \end{figure}
-
+\par
+A disadvantage is the introduction of breaking change because C\# allows the underscore as a type identifier. 
+However, we don't think that it is a blocker since a similar change was done with the discards and the potential change behavior is
+easily discoverable.
 
 \subsubsection{\texttt{var} Keywords Separated by Commas} 
 
-The \texttt{var} keyword representing the placeholder is another natural option of the syntax. 
-The big advantage of the syntax is the already used the \texttt{var} keyword in the variable declaration, whose meaning is coherent with inferred type arguments. 
-However, it starts to raise the question if it brings the advantage of saving keystrokes. 
-Figure \ref{img52:opV1} shows a usage of the syntax, which is considered to be unnecessarily long.
-\begin{figure}[h!]
-\begin{lstlisting}[style=csharp]
-Foo<var, string, List<var>, int>(arg1, arg2, arg3);
-\end{lstlisting}
-\caption{\texttt{var} - generic method call.}
-\label{img52:opV1}
-\end{figure}
+The \texttt{var} keyword representing the placeholder is another natural option of the syntax.
+The usage and meaning of the syntax is similar to the previous syntax variant except for replacing the underscore with the \texttt{var} keyword.
+An advantage is the already used \texttt{var} keyword in a variable declaration where the secondary meaning of it is that it represents an inferred type.
+On the other hand, it also means that a variable declaration which can be confusing.
+Another disadvantage is the syntax size which seems to be too long for this purpose.
+We exclude this variant based on these several issues. 
 
 \subsubsection{Something Else Separated by Commas} 
 
-A different placeholder doesn't make a lot of sense because it needs to assign new meaning to that character in comparison with an underscore, the \texttt{var} keyword, the \texttt{<>} operator, or \texttt{<,,,>} syntax. 
-An asterisk can be considered.
-However, it can remind a pointer in the context of unmanaged C\# code.
+A different placeholder for the inferred type arguments doesn't make a lot of sense because we think that it would be less intuitive than already mentioned syntax variants.
 
-\subsubsection{Conslusion} 
+\subsubsection{Conlusion} 
 
-The thesis chooses the underscore as a placeholder for inferred
-type argument since the meaning of this character is related to the intention. 
+The thesis chooses the underscore as a placeholder for the inferred type argument since the meaning of this character is related to the intention. 
 It also seems to be the shortest and synoptical way to skip inferred type arguments. 
 The possible breaking change is not an obstacle in this situation since a similar decision was made for the \texttt{var} keyword, and the situation where it can occur seems to be rare. 
 Problems with the potential future extension where the underscore can represent inferred type in the variable declaration would be prohibited to not mix it with the \texttt{var} keyword. 
-Although the diamond operator is not very useful in a generic method call, it makes sense in object creation expression. 
-The usage and analysis of that is covered later in this work.
+Although the diamond operator is not very useful in a generic method call, it makes sense in an object creation expression. 
+The potential usage and analysis of that is covered later in this work.
 
 \subsection{Method and Typename Lookup}
 

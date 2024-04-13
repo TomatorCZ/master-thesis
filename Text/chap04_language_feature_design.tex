@@ -282,17 +282,17 @@ The potential usage and analysis of that is covered later in this work.
 \subsection{Method and Typename Lookup}
 
 The previous section presented the proposed syntax for skipping inferred type arguments using an underscore as a placeholder. 
-This section continues with determining what the expression containing the syntax means.
+This section continues with determining what the expression containing the syntax means for the compiler.
 \par
 Since an underscore character is a valid type identifier in C\# and there is
 1:1 mapping of inferred type arguments to these placeholders, determining the referred generic method containing the proposed syntax is almost unchanged. 
-The change is in overload resolution where if the generic method is \textit{partially inferred}, meaning it contains the syntax, the type inference has to be done to determine the type arguments of that method.
+A change is in the overload resolution where if the generic method is \textit{partially inferred}, meaning it contains the syntax, the type inference has to be done to determine the type arguments of that method.
 \par
-An underscore itself can be a nullable or non-nullable type. 
+An underscore can be represent a nullable or non-nullable type. 
 If the inferred type argument has to be a nullable type, the metioned \texttt{?} operator can be appended to the underscore. 
 Figure \ref{img53:null} shows an example of using the nullable operator. 
-The call of \texttt{Foo} generic method has three type arguments where the first one is inferred by the compiler and which has to be nullable. 
-The second type argument is the \texttt{List} type, containing an inferred nullable type argument as well. 
+The call of the \texttt{Foo} generic method has three type arguments where the first is inferred by the compiler and which has to be nullable. 
+The second type argument is the \texttt{List<\_>} type, containing an inferred nullable type argument as well. 
 The third type argument doesn’t require the nullable type, so the inferred type can be either nullable or non-nullable.
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp]
@@ -302,15 +302,14 @@ Foo<_?, List<_?>, _>(arg1, arg2, arg3);
 \label{img53:null}
 \end{figure}
 \par
-The type name lookup is also almost unchanged. 
-If there is an underscore
-referring to inferred type argument, it simply ignores the binding of this identifier.
+The typename lookup is almost unchanged. 
+If there is an underscore referring to an inferred type argument, it simply ignores the binding of this identifier.
 \par
-The underscores contained in the type arguments are threatened in the changed type inference algorithm mentioned in the following section.
+The underscores contained in the type arguments are handled in the changed method type inference algorithm mentioned in the following section.
 
 \section{Method Type Inference Algorithm Change}
 
-The thesis extends method type inference by introducing a new type variable bound, which represents inferred type arguments contained in the type argument list. 
+The thesis extends the method type inference by introducing new type variables, which represents inferred type arguments contained in the type argument list. 
 Firstly, if a generic method call doesn’t contain a type argument list, the method type inference is unchanged. The change is when the generic method is partially inferred. 
 Figure \ref{img54:partInf} shows an example of a partially inferred method \texttt{Foo} containing two type parameters. 
 The former algorithm identifies the type arguments as type variables for which it tries to find a unique type. 
@@ -318,15 +317,15 @@ The algorithm can be extended to represent placeholders for inferred type argume
 Using the example, all three underscores would be represented as three unique type variables besides those representing \texttt{T1} and \texttt{T2} type parameters. 
 However, this extension also has to be respected by the order of type variables fixing and inferring. 
 A reason can be seen in the \texttt{T2} type variable. 
-The \texttt{Dictionary<\_, \_>} can be considered as a bound for the type variable, which has to be respected. 
-However, this bound contains other type variables which are not yet known. 
-So, the algorithm has to first infer the type variables contained in that bound and then infer the \texttt{T2} type variable. 
-The second observation for this extension is a way of inferring the bounds. 
+The \texttt{Dictionary<\_, \_>} is considered as a bound for the type variable, which has to be respected. 
+However, this bound contains other type variables which doesn't have to be known yet. 
+So, the algorithm has to first fix the type variables contained in that bound and then infer the \texttt{T2} type variable. 
+The second observation for this extension is a way of collecting the bounds. 
 Since type variable bounds can contain other type variables, it is necessary to propagate the relation between the bounds at the time of adding new bounds. 
 An example of this can be demonstrated using the given Figure \ref{img54:partInf}. 
 The \texttt{Dictionary<\_, \_>} is a bound of the \texttt{T2} type variable. 
-The second bound is a type of the \texttt{p2} argument. 
-This type gives us bounds for type variables contained in the former bound, which has to be propagated.
+It's second bound is a type of the \texttt{p2} argument. 
+This type gives us bounds for type variables contained in the \texttt{Dictionary<\_, \_>} bound, which have to be propagated.
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp]
 Foo<_, Dictionary<_, _>>(arg1, new Dictionary<int, int>());
@@ -339,14 +338,17 @@ void Foo<T1, T2>(T1 p1, T2 p2)
 
 \subsection{New Definitions}
 
-The proposed algorithm uses two new definitions of dependendencies which are given below.
+The proposed algorithm uses three new definitions which are given below.
+\begin{defn}[Inferred type argument]
+Inferred type argument is a type argument which is inferred by the compiler and is represented as the \texttt{\_} symbol in a type argument list.
+\end{defn}
 \begin{defn}[Shape dependence]
-An unfixed type variable \texttt{$X_i$} \emph{shape-depends directly on} an unfixed type variable \texttt{$X_e$} if \texttt{$X_e$} represents \textit{inferred\_type\_argument} and it is contained in shape bound of the type variable \texttt{$X_i$}.
-\texttt{$X_e$} \emph{shape-depends on} \texttt{$X_i$} if \texttt{$X_e$} \emph{shape-depends directly on} \texttt{$X_i$} or if \texttt{$X_i$} \emph{shape-depends directly on} \texttt{$X_v$} and \texttt{$X_v$} \emph{shape-depends on} \texttt{$X_e$}. Thus \emph{shape-depends on} is the transitive but not reflexive closure of \emph{shape-depends directly on}.
+An unfixed type variable \texttt{$X_i$} \emph{shape-depends directly on} an unfixed type variable \texttt{$X_e$} if \texttt{$X_e$} represents \textit{inferred\_type\_argument} and \texttt{$X_e$} is contained in shape bound of the type variable \texttt{$X_i$}.
+\texttt{$X_i$} \emph{shape-depends on} \texttt{$X_e$} if \texttt{$X_i$} \emph{shape-depends directly on} \texttt{$X_e$} or if \texttt{$X_i$} \emph{shape-depends directly on} \texttt{$X_v$} and \texttt{$X_v$} \emph{shape-depends on} \texttt{$X_e$}. Thus \emph{shape-depends on} is the transitive but not reflexive closure of \emph{shape-depends directly on}.
 \end{defn}
 \begin{defn}[Type dependence]
 An unfixed type variable \texttt{$X_i$} \emph{type-depends directly on} an unfixed type variable \texttt{$X_e$} if \texttt{$X_e$} occurs in any bound of type variable \texttt{$X_i$}.
-\texttt{$X_e$} \emph{type-depends on} \texttt{$X_i$} if \texttt{$X_e$} \emph{type-depends directly on} \texttt{$X_i$} or if \texttt{$X_i$} \emph{type-depends directly on} \texttt{$X_v$} and \texttt{$X_v$} \emph{type-depends on} \texttt{$X_e$}. 
+\texttt{$X_i$} \emph{type-depends on} \texttt{$X_e$} if \texttt{$X_i$} \emph{type-depends directly on} \texttt{$X_e$} or if \texttt{$X_i$} \emph{type-depends directly on} \texttt{$X_v$} and \texttt{$X_v$} \emph{type-depends on} \texttt{$X_e$}. 
 Thus \emph{type-depends on} is the transitive but not reflexive closure of \emph{type-depends directly on}.
 \end{defn}
 
@@ -370,14 +372,14 @@ The current implementation will infer the \texttt{string} type although it shoul
 The behavior of the exact bound can’t be changed because of breaking changes, so we have to add a new bound to reflect this need.
 \par
 \texttt{FirstPhase} collects shape bounds from the provided type argument list before the initial  collection of bounds from the argument list.
-The referring \texttt{InferShapeBound} is described later with the rest of inferring methods.
+The referring\\ \texttt{InferShapeBound} is described later with the rest of inferring methods.
 \par
 \texttt{SecondPhase} now respects newly added dependencies, which forces to infer type variables in the correct order. 
 If there are no type variables that are independent, the algorithm relaxes the condition for type variable fixation to break the possible circular dependency, which still has a chance to be resolved. 
 In comparison to the former algorithm, the relaxation still has to respect \textit{shape-depends on} relation. 
 The reason for that is to prohibit inferred type from being different from the provided ``shape'' in the type argument list. 
-The next condition is that at least one bound can’t contain an unfixed type variable. 
-This requirement ensures at least one candidate, which could be the inferred type argument.
+Additionally to allow type variable fixing, at least one bound mustn't not contain an unfixed type variable. 
+This requirement ensures at least one type candidate, which can be the inferred type argument.
 \begin{figure}[h!]
 \begin{lstlisting}[style=myAlgo, mathescape=true]
 Input: method call M<$S_1$,...$S_n$>($E_1$,...$E_x$) and 
@@ -422,8 +424,8 @@ Figure \ref{img55:mainTypeInference2} shows three adjusted inferences, adding ne
 The change is in propagating nested type bounds between type variable bounds. 
 This is done by the \texttt{Propagate} function, which is invoked after a new bound is added. 
 It iterates over all bounds of the type variable and makes additional type inferences for each bound containing an unfixed type variable checked by the \texttt{containsUnfixedTypeVariable} property. 
-This step will ensure that the unfixed type variable will receive a bound which is associated with it. 
-Using mentioned example \ref{img54:partInf}, this phase propagates the  \texttt{int} type bounds contained in the \texttt{Dictionary<int, int>} type of provided argument to the underscores representing type variables in the \texttt{Dictionary<\_ ,\_>} type argument.
+This step will ensure that the unfixed type variable will receive all bounds which are associated with it. 
+Using mentioned example \ref{img54:partInf}, this phase propagates the  \texttt{int} type bounds contained in the \texttt{Dictionary<int, int>} type of the provided argument to the underscores representing type variables in the \texttt{Dictionary<\_ ,\_>} type argument.
 Since the design of the algorithm always adds type bounds received from the left argument of algorithm's functions to the type variable obtained from the right argument of algorithm's functions, the inference has to be done for each transposition of the pair of the added bound and an already collected type variable bound.
 \begin{figure}[h!]
 \begin{lstlisting}[style=myAlgo, mathescape=true]
@@ -469,9 +471,9 @@ fn InferShape(Type U, Type V):
 \label{img55:mainTypeInference2}
 \end{figure}
 \par
-Table \ref{table3:InferHelper} shows which inference is called based on the inputs. 
+Table \ref{table3:InferHelper} shows which inference is called based on the \texttt{InferHelper}'s inputs. 
 For example, if the \texttt{U} represents the added lower bound and \texttt{b} is an exact bound, the algorithm calls the \texttt{InferUpper} function. 
-The intuition behind the table is to respect the relation between the bounds of a type variable.
+The intuition behind the table is to respect the relation between the bounds of the type variable.
 So, for example, all bounds of lower bounds are lower bounds for exact, upper, and shape bounds of that type variable and are exact bounds for each other.
 \begin{table}[h!]
 \begin{center}
@@ -495,7 +497,7 @@ So, for example, all bounds of lower bounds are lower bounds for exact, upper, a
 
 \subsection{Fixation}
 
-Figure \ref{img55::mainTypeInference3} shows the last part of the changed algorithm, type variable fixation. 
+Figure \ref{img55::mainTypeInference3} shows the last part of the changed algorithm, the type variable fixation. 
 The set of candidates is changed to respect the shape-bound ability to express the exact form of the inferred type argument. 
 So, if the type variable contains a shape bound, the candidate list contains only this type, and other bounds are used to check if the candidate doesn’t contradict the collected bounds. 
 There are two notes regarding this step. 
@@ -519,7 +521,7 @@ fn Fix(TypeVariable x):
 \end{figure}
 \par
 \begin{obs}
-The last observation is to ensure that the propagation will end.
+We want to make sure that the propagation will end.
 Since the algorithm doesn't add the same bound multiple times, the cycle can't occur.
 \end{obs}
 

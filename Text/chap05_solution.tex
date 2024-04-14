@@ -6,7 +6,7 @@ The solution consists of a proposal describing the language feature given in the
 
 The final version of the proposal can be found in the attachment as the\\ \texttt{Attachment/Proposal/partial-type-inference.md} file.
 
-\subsection{Creation process}
+\subsection{Creation Process}
 
 The proposal had three stages of development. 
 The first version of the document was created in a personal repository \cite{online:personalRepo}, where it was reviewed by a member of Roslyn's development team. 
@@ -54,11 +54,11 @@ The last part suggests other potential improvements.
 
 The already mentioned proposal is tested by the implementation described in this section. 
 The goal of the implementation is to observe the consequences of the proposed feature in a practical way, which can be tried by the C\# community. 
-The goal will be achieved by contributing to the forked Roslyn project on GitHub \cite{online:roslynFork}, which is public.
-The copy of the fork containing the changes can be also found in the attachment in the \texttt{Attachment/Source/roslyn} folder. 
+The goal will be achieved by contributing to the the \texttt{final/PartialTypeInference} branch \cite{online:roslynFork} of the forked Roslyn project on GitHub, which is public.
+The copy of the branch containing the changes can be also found in the attachment in the \texttt{Attachment/Source/roslyn} folder. 
 Since the proposal is in the state of probing the benefits, the implementation is rather a proof of concept than a ready-to-production code.
 
-\subsection{Development environment}
+\subsection{Development Environment}
 
 Since the compiler is a complicated program consisting of many parts, the creators provide a guide \cite{online:roslynGuide} describing a common workflow, including building the compiler, writing tests, and deployment.
 \par
@@ -148,7 +148,6 @@ using System;
 
 #error version
 
-class Program {
 ...
 \end{lstlisting}
 \caption{Begining of \texttt{Program.cs}.}
@@ -185,7 +184,7 @@ Time Elapsed 00:00:09.19
 \label{img67:output}
 \end{figure}
 
-\subsection{Repository overview}
+\subsection{Repository Overview}
 
 Roslyn’s repository contains several projects besides the C\# compiler, like the Visual Basic compiler or Visual Studio extension. 
 Figure \ref{img68:roslynFolder} shows relevant files and folders of the \texttt{roslyn} directory, which have been adjusted or are used by the implementation. 
@@ -244,7 +243,7 @@ The \texttt{Generated} folder contains generated nodes of \textit{bound tree}, a
 \label{img68:roslynFolder}
 \end{figure}
 
-\subsection{Test suite}
+\subsection{Test Suite}
 
 Roslyn tests use the xUnit framework \cite{online:xUnit}, providing wide API for testing application functionalities in various scenarios. 
 We used this framework for our own tests in the \texttt{PartialTypeInferenceTests.cs} file. 
@@ -286,7 +285,7 @@ class _ {}
 \label{img69:test}
 \end{figure}
 
-\subsection{Parsing inferred type arguments}
+\subsection{Parsing Inferred Type Arguments}
 
 We didn’t change the Roslyn parser. 
 Instead of that, we created the\\ \texttt{SourceInferredTypeSymbol} symbol representing the inferred type argument and postponed the \texttt{\_} type argument recognition to the binding phase. 
@@ -304,14 +303,14 @@ This helped us to not change the other interacting parts of the codebase too muc
 There is the \texttt{InferMethod} static method, which has a signature similar to the previous one and is an entry point for the partial method type inference. 
 We also added the \texttt{InferConstructor} static method as an entry point for the partial constructor type inference.
 
-\subsection{Binding partial-inferred method}
+\subsection{Binding Partial-inferred Method}
 
 The partial-inferred method binding is contained in the \texttt{Binder\_Invocation.cs} and the \texttt{OverloadResolution.cs} files. 
 The changes in the binder were mostly about an error recovery and raising potential warnings. 
 An example of that is a warning raised during dynamic method invocation binding where if the inferred type argument is used, we notify the user about a potential error in runtime since runtime doesn’t support the partial type inference. 
 The change in the overload resolution was to analyze the method group with used inferred type arguments and to use the mentioned API of the type inferrer.
 
-\subsection{Binding partial-inferred object construction}
+\subsection{Binding Partial-inferred Object Construction}
 
 Binding partial-inferred object construction was the most tricky in the implementation since there was no preparation for the type inference as in the previous case. 
 Moreover getting type information from the target is complicated since the binding order is reversed to the binding direction.
@@ -406,7 +405,7 @@ class M<T>
 \par
 As we can see, binding an expression with the target type has complicated implementation in Roslyn.
 
-\subsection{Nullable walker}
+\subsection{Nullable Walker}
 
 The last part of the code changes is in the \texttt{NullableWalker.cs} file, which provides a nullability analysis pass. 
 The basic principle of the analysis is traversing the control-flow graph and rebinding the nodes of \textit{bound tree}, if necessary, according to the nullability. 

@@ -3,9 +3,19 @@ using System;
 
 //#error version
 
-F<_>(1);
+Console.WriteLine("PartialMethodTypeInference");
+Console.WriteLine("--------------------------");
+PartialMethodTypeInference.RunExample1();
+Console.WriteLine("\n");
+PartialMethodTypeInference.RunExample2();
+Console.WriteLine("\n");
 
-
-void F<T>(T p1) {
-    Console.WriteLine(typeof(T).Name);
-}
+Console.WriteLine("PartialConstructorTypeInference");
+Console.WriteLine("-------------------------------");
+PartialConstructorTypeInference.RunExample1();
+Console.WriteLine("\n");
+PartialConstructorTypeInference.RunExample2();
+Console.WriteLine("\n");
+PartialConstructorTypeInference.RunExample3();
+Console.WriteLine("\n");
+PartialConstructorTypeInference.RunExample4();

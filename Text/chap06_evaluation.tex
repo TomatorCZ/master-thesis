@@ -6,9 +6,13 @@ The implementation and proposal are evaluated using the following metrics.
 
 We run the same suite case before and after our changes. 
 The results can be found in the \texttt{/Attachment/TestResults} folder containing the \texttt{Test-Master} folder and the \texttt{Test-Feature} folder corresponding to test results before and after the change. 
-These folders contain the results of the \texttt{-testCompilerOnly} suite case. 
-Except for unimportant small changes in the compiler tests regarding adding new error messages caused by our changes, all tests that passed before the improvement also passed after the improvement. 
-This result ensures that the improvement doesn’t break the compiler functionality significantly.
+These folders contain the results from the \texttt{-testCompilerOnly} suite case run.
+We can notice that two of our tests from the \texttt{WorkItem\_4\_x64\_test\_results.html} test result failed.
+However, when we run these tests separately, they pass.
+The failure doesn't seem to be caused by our high-level solution and it seems like a bug in the implementation.
+Since the implementation is just a proof of concept and it will be reimplemented for production, we ignore this failure.
+Except for this failure and unimportant small changes in the compiler tests regarding adding new error messages caused by our changes, all tests that passed before the improvement also passed after the improvement.
+This result ensures that the improvement doesn’t introduce any significant regression in the compiler tests.
 
 \section{Demo examples}
 
@@ -151,6 +155,8 @@ F1(
 \end{figure}
 \par
 Based on the previous examples, the solution can be considered robust enough to solve complicated examples.
+
+\newpage
 
 \section{LDM meeting summary}
 

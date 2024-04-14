@@ -1,0 +1,26 @@
+%%% A template for a simple PDF/A file like a stand-alone abstract of the thesis.
+
+\documentclass[12pt]{report}
+
+\usepackage[a4paper, hmargin=1in, vmargin=1in]{geometry}
+\usepackage[a-2u]{pdfx}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{textcomp}
+
+\begin{document}
+
+%% Do not forget to edit abstract.xmpdata.
+
+C\# je silně typovaný jazyk využívající typovou inferenci k ušetření typových anotací napsaných programátorem.
+Tato typová inference však není tak silná jako v jiných programovacích jazycích jako Rust nebo Haskell.
+Tato práce si klade za cíl navrhnout vylepšení jazyka C\#, které by zlepšilo současnou typovou inferenci a které by pravděpodobně bylo přijato týmem návrhářů jazyka C\#.
+Pro tento cíl jsme analyzovali typovou inferenci v jazyce Rust a určili nezbytné požadavky jazyka a omezení typové inference na základě Hindley-Millnerovy formalizace typové inference. 
+Tato analýza byla použita k návrhu vylepšení jazyka sestávajícího ze dvou částí.
+První částí je změna specifikace C\# popisující vylepšení úpravou formální specifikace C\#.
+Tato část byla představena týmu pro návrh jazyka C\#, kterému se návrh líbil, a rozhodl pokračovat v ladění zmíněného vylepšení které by se objevilo v budoucí verzi C\#.
+Druhá část je implementace vylepšení v oficiální kompilátoru jazyka C\#, Roslyn. 
+Implementace je testována pomocí originálních testů kompilátoru a nových testů ověřující funkčnost vylepšení.
+
+\end{document}

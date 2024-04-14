@@ -12,10 +12,10 @@ Console.WriteLine("\n");
 
 Console.WriteLine("PartialConstructorTypeInference");
 Console.WriteLine("-------------------------------");
-PartialConstructorTypeInference.RunExample1();
-Console.WriteLine("\n");
-PartialConstructorTypeInference.RunExample2();
-Console.WriteLine("\n");
 PartialConstructorTypeInference.RunExample3();
 Console.WriteLine("\n");
 PartialConstructorTypeInference.RunExample4();
+Console.WriteLine("\n");
+PartialConstructorTypeInference.RunExample5();
+Console.WriteLine("\n");
+PartialConstructorTypeInference.RunExample6();

@@ -17,12 +17,14 @@ This result ensures that the improvement doesn’t introduce any significant reg
 \section{Demo Examples}
 
 The basic capabilities of the improvement are demonstrated in the demo application contained in the \texttt{Attachment/Demo} attachment folder. 
-We also show advanced features of the improvement which can be found in the tests and which were presented to \texttt{LDT}. 
+We also show advanced features of the improvement which can be found in the tests and which were presented to \ac{LDT}. 
 
 
 \subsection{Basics}
 
-\begin{figure}[h]
+Figure \ref{img100:example1} shows an example of the partial method type inference where the underscore is used to skip the first type argument of the \texttt{M1} method call because it can be inferred from the first argument.
+In this case, the inferred type argument is \texttt{int}.
+\begin{figure}[!h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
 void M1<T1, T2>(T1 p1) { ... }
 ...
@@ -31,8 +33,11 @@ M1<_, string>(1);
 \caption{RunExample1 -- Top level inferred type argument}
 \label{img100:example1}
 \end{figure}
-
-\begin{figure}[h]
+\par
+Figure \ref{img101:example2} shows the usage of the underscore in the first type argument of the \texttt{M2} method call where it is an inferred type argument of the \texttt{IList<T>} type.
+The usage allows to influence the original method type inference algorithm which would infer the type of the first argument.
+The nested inferred type argument is \texttt{int}.
+\begin{figure}[!h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
 void M2<T1>(T1 p1) { ... }
 ...
@@ -42,7 +47,13 @@ M2<IList<_>>(new List<int>());
 \label{img101:example2}
 \end{figure}
 
-\begin{figure}[h]
+\newpage
+
+\par
+Figure \ref{img102:example3} shows an example of the partial constructor type inference where the first type argument of the \texttt{C1<T1>} object creation expression is inferred based on the first argument.
+The process of the type inference is the same as in the first example.
+The inferred type argument is \texttt{int}.
+\begin{figure}[!h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
 class C1<T1> {
   public C1(T1 p1) { ... }
@@ -53,8 +64,11 @@ new C1<_>(1);
 \caption{RunExample3 -- Top level inferred type argument}
 \label{img102:example3}
 \end{figure}
-
-\begin{figure}[h]
+\par
+Figure \ref{img103:example4} shows the usage of the nested inferred type in the \texttt{C2<T1>} object creation expression.
+The process of type inference is the same as in the second example.
+The nested inferred type argument is \texttt{int}.
+\begin{figure}[!h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
 class C2<T1> {
   public C2(T1 p1) { ... }
@@ -65,8 +79,11 @@ new C2<IList<_>>(new List<int>());
 \caption{RunExample4 -- Nested inferred type argument}
 \label{img103:example4}
 \end{figure}
-
-\begin{figure}[h]
+\par
+Figure \ref{img104:example5} shows an example where type inference of the \texttt{C3<T1>} object creation expression uses the target type to infer the type argument of the \texttt{C3<T1>} type.
+The target type is the \texttt{C3<int>} type obtained from the \texttt{a} variable declaration.
+The inferred type argument is the \texttt{int} type.
+\begin{figure}[!h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
 class C3<T1> {
   public C3() { ... }
@@ -77,8 +94,11 @@ C3<int> a = new C3<_>();
 \caption{RunExample5 -- Target-typed inference}
 \label{img104:example5}
 \end{figure}
-
-\begin{figure}[h]
+\par
+Figure \ref{img105:example6} shows an example of type inference based on the type constraints where the first type argument of the \texttt{C4<T1, T2>} object creation expression is inferred based on the second type argument.
+Since the first type argument has to inherit the \texttt{List<T2>} type, it gives us a default for this type argument.
+So the first type argument is inferred to the \texttt{List<int>} type. 
+\begin{figure}[!h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
 class C4<T1, T2> where T1 : List<T2> {
     public C4() { ... }
@@ -90,12 +110,14 @@ new C4<_, int>();
 \label{img105:example6}
 \end{figure}
 
+\newpage
+
 \subsection{Advanced Examples}
 
 Figure \ref{img73:example1} shows the \texttt{F4} generic method containing three function parameters. 
 The parameters and arguments are assembled in the way that is required to infer \texttt{T1} to infer \texttt{T2}, which is required to infer \texttt{T3}, which is required to infer \texttt{T1}. 
 The call site uses the partial method type inference to hint to the compiler one of the type arguments, which will break this circular dependency and enable the inference of the rest of the type parameters.
-\begin{figure}[h]
+\begin{figure}[!h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
 void F4<T1, T2, T3>(
   Func<T1, T2> p12, 
@@ -113,7 +135,7 @@ Figure \ref{img74:example2} shows an advanced scenario containing a nested infer
 There is the \texttt{F6} generic method call containing one type parameter.
 The \texttt{temp} variable and the type argument’s hint (\texttt{I2<\_, A>}) are used to determine the inferred nested type argument, which is \texttt{int}.
 During the process, multiple rules for inference, such as inheritance and variance, are applied.
-\begin{figure}[h]
+\begin{figure}[!h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
 class A {}
 class B : A {}
@@ -131,7 +153,7 @@ Figure \ref{img75:example3} shows an example where the nullability inference is 
 The \texttt{F10} call site has an inferred type argument with an appended question mark determining the nullability of the inferred type argument. 
 The inferred type argument would be \texttt{string} if there wouldn't be the appended question mark. 
 However, the question mark is used to hint to infer \texttt{string?}.
-\begin{figure}[h]
+\begin{figure}[!h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
 void F10<T>(T p1) {}
 ...
@@ -143,7 +165,7 @@ F10<_?>("");
 \par
 Figure \ref{img76:example4} shows an example of constructor type inference, which uses a target type to infer type arguments of the new \texttt{new C2<\_>()} expression. 
 The target type is a type of the \texttt{C4} constructor parameter resulting in the inferred \texttt{int} type argument.
-\begin{figure}[h]
+\begin{figure}[!h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
 class C1<T> {}
 class C2<T> : C1<T> {}
@@ -161,7 +183,7 @@ new C4(new C2<_>());
 Figure \ref{img77:example5} shows an example of an advanced binding order of arguments. 
 The top-level object creation needs the type of the constructor’s argument to determine its type parameter. 
 For this purpose, the nested object creation expression is bound without the target to provide this type of information.
-\begin{figure}[h]
+\begin{figure}[!h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
 class C1<T> {}
 class C5<T> : C1<T>
@@ -180,7 +202,7 @@ The failure is caused by a lack of type information.
 However, the second argument provides enough type information to infer a type parameter of the \texttt{C3} class. 
 After the bound, the new \texttt{new C2<\_>()} expression is tried to bound again with the inferred target type.
 After that, both inferred type arguments are resolved to the \texttt{int} type.
-\begin{figure}[h]
+\begin{figure}[!h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
 class C1<T> {}
 class C2<T> : C1<T> {}
@@ -194,6 +216,9 @@ new C3<_>(new C2<_>(), 1);
 \caption{Advanced arguments binding -- With target type}
 \label{img78:example6}
 \end{figure}
+
+\newpage
+
 \par
 Figure \ref{img79:example7} shows the most advanced scenario where type the binding order and type inference uses several things to infer the \texttt{new C9<\_,\_,int,\_>(1)} expression. 
 We will focus on how the type parameters of the \texttt{C9} class are gradually inferred. 
@@ -204,7 +229,7 @@ The type parameter is resolved to \texttt{int}.
 The \texttt{T2} type parameter is resolved by using the target type given by the \texttt{F1} method parameter \texttt{p1}. 
 This type information is received in the second try of binding the argument using the target type. 
 The \texttt{T1} type parameter of the \texttt{F1} method is determined based on its second parameter type, which is the \texttt{int} type.
-\begin{figure}[h]
+\begin{figure}[!h]
 \begin{lstlisting}[style=csharp, showstringspaces=false]
 class C1<T> {}
 void F1<T>(C1<T> p1, T p2) {}

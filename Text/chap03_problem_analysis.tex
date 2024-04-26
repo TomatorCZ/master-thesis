@@ -15,7 +15,7 @@ This consequence is different from the intention of this
 work. 
 However, some more extensive changes in the type inference will also be mentioned to outline possible obstacles to introducing them in the C\#.
 \par
-The thesis will focus on the already-mentioned \textit{partial type inference} proposal \ref{sect04:github}, which was recommended by a member of \ac{LDT} and has a chance to be discussed in \ac{LDM} and potentially accepted. 
+The thesis will focus on the already-mentioned \textit{partial type inference} proposal \ref{sect04:github}, which was recommended by a member of LDT and has a chance to be discussed in LDM and potentially accepted. 
 Analysis of this improvement will contain a consideration of existing ideas, their consequences on C\#, and their difficulties in implementing them in Roslyn.
 
 \section{Motivation} \label{sect10:mot}
@@ -240,7 +240,7 @@ From now on, thesis calls \textit{constructor type inference} for introducing su
 
 \section{Requirements}
 
-The following requirements should be fulfilled by the solution to make it more likely to be discussed by \ac{LDT}.
+The following requirements should be fulfilled by the solution to make it more likely to be discussed by LDT.
 \par
 \textbf{Backward compatibility} is one of the most important requirements for new language features. 
 The improvement shouldn’t introduce a breaking change. However, this requirement is sometimes too strict for improvements, which would be very beneficial, and its breaking change would appear in cases that seem to be rare in the code. 
@@ -276,6 +276,6 @@ The time complexity added by the thesis’s improvement shouldn’t be too big i
 \section{Summary}
 
 Three possible improvements of type inference were introduced based on the mentioned motivation, where was identified main weaknesses of the current type inference. 
-Then, several requirements were created to achieve the fourth goal of the thesis, which is to make the proposal likely to be discussed by \ac{LDT}. 
+Then, several requirements were created to achieve the fourth goal of the thesis, which is to make the proposal likely to be discussed by LDT. 
 Based on the requirements, the first improvement introducing breaking change was excluded. 
 The remaining two improvements seem to fulfill the requirements, and they will be further proceeded in the following section with focusing on not breaking any mentioned requirements.

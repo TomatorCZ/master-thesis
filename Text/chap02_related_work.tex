@@ -2,7 +2,7 @@
 
 This chapter follows by mentioning related work regarding the current implementation of the C\# compiler and formalizing C\# type inference using Hindley-Milner type inference, which is explored in more detail with references to its modification in Rust and C\# programming languages.
 This knowledge will be utilized as a primary source of inspiration for the improvement.
-In the end, it mentions relevant C\# language issues presented on the GitHub repository, which will be used later to prioritize the improvement features to make it more likely to be discussed at \ac{LDM} held by \ac{LDT}. 
+In the end, it mentions relevant C\# language issues presented on the GitHub repository, which will be used later to prioritize the improvement features to make it more likely to be discussed at Language Design Meetings (LDM) held by Language Design Team (LDT). 
 
 \section{Roslyn} \label{sect04:roslyn}
 
@@ -19,13 +19,13 @@ Figure \ref{img15:roslynPip} is used to explain the compilation pipeline \cite{o
 \subsection{Parsing C\# Sources Phase}
 
 The pipeline starts with loading the \texttt{.csproj} file with related C\# sources (\texttt{.cs}) and referenced libraries (\texttt{.dll}).
-C\# sources are passed to the lexer, creating tokens used by the parser forming \ac{AST}.
-\ac{AST} construction is the first phase (green boxes in Figure \ref{img15:roslynPip}) of the compiler checking the syntax of C\# sources.
+C\# sources are passed to the lexer, creating tokens used by the parser forming Abstract Syntax Tree (AST).
+AST construction is the first phase (green boxes in Figure \ref{img15:roslynPip}) of the compiler checking the syntax of C\# sources.
 
 \subsection{Loading Named Symbols}
 
 The second phase, marked by orange, forms \emph{named symbols} exposed by public API representing defined namespaces, classes, methods, etc., in the C\# project. 
-The declarations are received from C\# sources by traversing \ac{AST} and seeking for the particular syntax. 
+The declarations are received from C\# sources by traversing AST and seeking for the particular syntax. 
 Libraries, stored in the \texttt{.dll} format are parsed by \texttt{MetadataLoader}, creating the same named symbols as those received from C\# sources.
 
 \subsection{Binding Phase}
@@ -61,7 +61,7 @@ The required changes are stored during the analysis, and the Bound tree is rewri
 
 \subsection{Emiting Code Phase}
 
-The last phase, marked by purple, emits \ac{CIL} code targeting the .NET virtual machine.
+The last phase, marked by purple, emits Common Intermediate Language (CIL) code targeting the .NET virtual machine.
 The code is later loaded and executed by .NET runtime.
 
 \section{Hindley-Millner Type Inference} \label{sect03:HM}
@@ -205,26 +205,28 @@ Although Rust type inference is more advanced in comparison with C\#, it has to 
 As an example, the mentioned overloading can cause exponetial time of type inference. 
 Since Rust doesn't have overloading, the type inference can be more powerful without significant slowdown, which is not the case of C\# as will be shown in the following chapters.
 
-\section{GitHub Issues} \label{sect04:github}
+\section{Language Design GitHub Issues} \label{sect04:github}
 
-Some ideas for type inference improvements have already been introduced in discussions in the C\# language repository, which will be used as inspiration for the thesis’s proposed improvement.
+Some ideas for type inference improvements have already been introduced in discussions in the C\# language repository \cite{online:langRepo}, which will be used as inspiration for the thesis’s proposed improvement.
 However, before describing the related ideas, a process of proposing new C\# language features is mentioned to better understand how the ideas and final language changes are proceeded.
-\par
+
+\subsection{Design Process and Championed Issue} \label{sect:champion}
+
 The process of designing a new language feature starts with publishing an idea into discussions \cite{online:discussions}, where the C\# community can comment on it. 
 The idea contains a brief description of the feature, motivation, and design. 
-Besides the idea, a new language feature requires a proposal, initially published as an GitHub issue, describing the feature in a way that can be later reviewed by the \ac{LDM} committee.
-If the proposal sufficiently merits the discussions, it can be marked as a \textit{champion} by a member of \ac{LDT} for being discussed further in \ac{LDM}. 
+Besides the idea, a new language feature requires a proposal, initially published as an GitHub issue, describing the feature in a way that can be later reviewed by the LDM committee.
+If the proposal sufficiently merits the discussions, it can be marked as a \textit{champion} by a member of LDT for being discussed further in LDM. 
 The state of a proposal is described by several milestones. 
 The most important for the thesis is the \textit{AnyTime} milestone, meaning that the proposal is not actively worked on and is open to the community to collaborate on it. 
-At the time of writing, a member of \ac{LDT} recommended championed issue \cite{online:champion} regarding \textit{partial type inference} to be investigated since it contains many related discussions with proposed changes but still doesn’t have a required proposal specification which would allow to be discussed by the team. 
-When a proposal has sufficient quality to be discussed by \ac{LDT}, a member invites the proposer to make a \textit{pull request} where further collaboration continues. 
-If \ac{LDT} accepts the proposal, it is added to the \textit{proposals} folder in the repository for being added into the C\# specification, and its future implementation (in Roslyn) will be shipped with the next C\# version. 
+At the time of writing, a member of LDT recommended a championed issue \cite{online:champion} regarding \textit{partial type inference} to be investigated since it contains many related discussions with proposed changes but still doesn’t have a required proposal specification which would allow to be discussed by the team. 
+When a proposal has sufficient quality to be discussed by LDT, a member invites the proposer to make a \textit{pull request} where further collaboration continues. 
+If LDT accepts the proposal, it is added to the \textit{proposals} folder in the repository for being added into the C\# specification, and its future implementation (in Roslyn) will be shipped with the next C\# version. 
 \par
 The recommended issue doesn't contain a specific idea of the improvemenet rather the scope of the improvement.
 The improvement suggests \textit{partial type inference} which would allow to hint ambigious type arguments which can't be inferred by a compiler instead of currently specifying the whole type argument list.
-Since it doesn't have any concerete way how to achive it, there are presented related discussions directly or indirectly mentioned in the issue which partially suggest a possible solution.
+Since it doesn't have any concerete way how to achive it, there are presented related discussion topics directly or indirectly mentioned in the issue which partially suggest a possible solution.
 
-\subsection{Default Type Parameters} \label{sect07:is1}
+\subsection{Topic: Default Type Parameters} \label{sect07:is1}
 
 One of the discussion \cite{online:DefTypeParam} mentions \textit{default type parameters} introducing default type arguments, which are used when explicit type arguments are not used. 
 Figure \ref{img19:defTypeParam} shows a potential design of this feature where construing generic type \texttt{A} doesn’t need a type argument since it uses the \texttt{int} type as a default value. 
@@ -238,7 +240,7 @@ var temp = new A();
 \label{img19:defTypeParam}
 \end{figure}
 
-\subsection{Generic Aliases} \label{sect08:is2}
+\subsection{Topic: Generic Aliases} \label{sect08:is2}
 
 Another discussion \cite{online:GenAlias} mentions \textit{generic aliases} allowing to specify default values similar to the goal of the previous discussion by defining an alias to that type with option generic parameters. 
 Figure \ref{img20:genAlias} shows an example where there is the \texttt{StringDictionary} generic alias specifying the first type argument of the \texttt{Dictionary} class to be the \texttt{string} type, which simplifies the usage of the \texttt{Dictionary} type in scenarios where there are often used dictionaries with keys of the \texttt{string} type.
@@ -252,7 +254,7 @@ var temp = new StringDictionary<int>();
 \label{img20:genAlias}
 \end{figure}
 
-\subsection{Named Type Parameters} \label{sect09:is3}
+\subsection{Topic: Named Type Parameters} \label{sect09:is3}
 
 The discussion \cite{online:NamedTypeParam} mentions \textit{named type parameters}, which are similar to named parameters of methods. 
 The basic thought of this idea is being able to specify a type parameter for which a user provides a type argument by the name. 
@@ -269,7 +271,7 @@ var x = F<U:short>(1);
 \label{img21:NamedTParam}
 \end{figure}
 
-\subsection{Representing Inferred Type Argument} \label{sect10:is4}
+\subsection{Topic: Representing Inferred Type Argument} \label{sect10:is4}
 
 Comments of the mentioned championed issue \cite{online:champion} propose several keywords that can be used in a type argument list for skipping type arguments, which can be inferred by the compiler and just providing the remaining ones.
 Figure \ref{img22:CharITArg} shows the \texttt{var} keyword for skipping the first type argument since it can be inferred from the argument list, and a user just specifies the second type argument, which can’t be inferred by the compiler. 
@@ -284,7 +286,7 @@ Foo<var, int>("string");
 \label{img22:CharITArg}
 \end{figure}
 
-\subsection{Target-typed Inference} \label{sect06:targetType}
+\subsection{Topic: Target-typed Inference} \label{sect06:targetType}
 
 The discussion \cite{online:RetTInference} proposes \textit{Target-typed inference}, where type inference uses type information of the target assigned by the return value. 
 We can see the usage in Figure \ref{img62:RetTInf}, where type inference determines that the return type has to be the \texttt{int} type and uses that to deduce the type argument \texttt{T}.
@@ -299,10 +301,10 @@ int id = Field(row, "id")
 \label{img62:RetTInf}
 \end{figure}
 
-\subsection{Type Inference Based on Constrains} \label{sect11:is6}
+\subsection{Topic: Type Inference Based on Constrains} \label{sect11:is6}
 
 The next idea of improving type inference is given by the discussion \cite{online:TInfConst}, where type inference utilizes type information obtained from type constraints.
-\begin{figure}[b!]
+\begin{figure}[h]
 \begin{lstlisting}[style=csharp]
 T1 Foo<T1,T2>(T2 item) where T1 : List<T2> {}
 ...
@@ -315,7 +317,7 @@ A simple example of that can be seen in Figure \ref{img23:TInfConst}, where \tex
 
 \newpage
 
-\subsection{Inferred Method Return Type} \label{sect12:is7}
+\subsection{Topic: Inferred Method Return Type} \label{sect12:is7}
 
 The discussion \cite{online:TMRetInf} mentions type inference of the method return type known from the Kotlin programming language.
 There is the usage in the following Figure \ref{img24:TMRetInf}, where the return type of the \texttt{Add} method is inferred to be \texttt{int} based on the type of the return expression.
@@ -327,7 +329,7 @@ public static Add(int x, int y ) => x + y;
 \label{img24:TMRetInf}
 \end{figure}
 
-\subsection{Realocation} \label{sect13:is8}
+\subsection{Topic: Realocation} \label{sect13:is8}
 
 The issue \cite{online:Realloc} proposes a way to compact type argument lists of identifiers containing inner identifiers with argument lists. 
 The idea is demonstrated in the example \ref{img25:Realloc}, where the argument list of the \texttt{A<T1>} type and the \texttt{Foo<T2>} method are merged, and the type arguments are split by a semicolon.
@@ -343,7 +345,7 @@ A.Foo<int;string>();
 \label{img25:Realloc}
 \end{figure}
 
-\subsection{Constructor Type Inference} \label{sect14:is9}
+\subsection{Topic: Constructor Type Inference} \label{sect14:is9}
 
 The discussion \cite{online:CtorTInf}, regards \textit{constructor type inference} enabling type inference for object creation expressions. 
 The type inference can be seen in Figure \ref{img26:CtorTInf}, where the \texttt{T} type parameter of the \texttt{C<T>} generic type can be deduced by using type information from its constructor.

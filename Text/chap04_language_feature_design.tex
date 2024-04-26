@@ -2,7 +2,7 @@
 
 The previous chapter determined two improvement directions that would be beneficial to explore. 
 This chapter continues with exploring these directions consisting of the partial method type inference and the constructor type inference. 
-The goal of this exploration is to precisely design the improvements that are used afterward as the content of the mentioned proposal for \ac{LDM} and implemented in Roslyn.
+The goal of this exploration is to precisely design the improvements that are used afterward as the content of the mentioned proposal for LDM and implemented in Roslyn.
 \par
 We take the language change suggestions, mentioned in the GitHub Issues section \ref{sect04:github}, as an inspiration for the improvements and divide them into three following groups.
 Suggestions in the first group, given below, regard improving the method type inference algorithm and are used in the constructor type inference mentioned later.
@@ -539,7 +539,7 @@ Target-typed inference is useful because an object creation is usually associate
 Type inference based on type constraints provides a wider context for type inference allowing to infer the type arguments based on \texttt{where} clauses in the type declaration of the created object. 
 \par
 Besides this functionality, the text mentions two additional features that extends the context of type inference and makes the syntax less boilerplate.
-After a discussion with a member of \ac{LDT}, the additional features are considered to be controversial. 
+After a discussion with a member of LDT, the additional features are considered to be controversial. 
 For this reason, the features is presented as a voluntary extension that can be removed from the core design. 
 The first feature regards using type information from initializers, which is valuable when creating collections or objects with the object initializer syntax. 
 The second feature uses the diamond operator to turn on the constructor type inference in cases when the compiler can surely determine the referring generic type without knowledge about the arity.

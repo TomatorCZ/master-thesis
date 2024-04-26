@@ -1,0 +1,289 @@
+{
+  "version": 3,
+  "targets": {
+    "net8.0": {
+      "Microsoft.Net.Compilers.Toolset/4.9.0-dev": {
+        "type": "package",
+        "build": {
+          "build/Microsoft.Net.Compilers.Toolset.props": {}
+        },
+        "buildMultiTargeting": {
+          "buildMultiTargeting/Microsoft.Net.Compilers.Toolset.props": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Microsoft.Net.Compilers.Toolset/4.9.0-dev": {
+      "sha512": "81y57Okv7OQDQOJKKdaYWR5RmGMfc0Pxfq38BRcIrMfDsdGKg1+oc4jl2GIw095bF4HgjFLeTYoHuHaSxpGr6Q==",
+      "type": "package",
+      "path": "microsoft.net.compilers.toolset/4.9.0-dev",
+      "files": [
+        ".nupkg.metadata",
+        "Icon.png",
+        "ThirdPartyNotices.rtf",
+        "build/Microsoft.Net.Compilers.Toolset.props",
+        "buildMultiTargeting/Microsoft.Net.Compilers.Toolset.props",
+        "microsoft.net.compilers.toolset.4.9.0-dev.nupkg.sha512",
+        "microsoft.net.compilers.toolset.nuspec",
+        "tasks/net472/Microsoft.Build.Tasks.CodeAnalysis.dll",
+        "tasks/net472/Microsoft.CSharp.Core.targets",
+        "tasks/net472/Microsoft.CodeAnalysis.CSharp.Scripting.dll",
+        "tasks/net472/Microsoft.CodeAnalysis.CSharp.dll",
+        "tasks/net472/Microsoft.CodeAnalysis.ExternalAccess.RazorCompiler.dll",
+        "tasks/net472/Microsoft.CodeAnalysis.Scripting.dll",
+        "tasks/net472/Microsoft.CodeAnalysis.VisualBasic.dll",
+        "tasks/net472/Microsoft.CodeAnalysis.dll",
+        "tasks/net472/Microsoft.DiaSymReader.Native.amd64.dll",
+        "tasks/net472/Microsoft.DiaSymReader.Native.arm64.dll",
+        "tasks/net472/Microsoft.DiaSymReader.Native.x86.dll",
+        "tasks/net472/Microsoft.Managed.Core.CurrentVersions.targets",
+        "tasks/net472/Microsoft.Managed.Core.targets",
+        "tasks/net472/Microsoft.VisualBasic.Core.targets",
+        "tasks/net472/System.Buffers.dll",
+        "tasks/net472/System.Collections.Immutable.dll",
+        "tasks/net472/System.Memory.dll",
+        "tasks/net472/System.Numerics.Vectors.dll",
+        "tasks/net472/System.Reflection.Metadata.dll",
+        "tasks/net472/System.Runtime.CompilerServices.Unsafe.dll",
+        "tasks/net472/System.Text.Encoding.CodePages.dll",
+        "tasks/net472/System.Threading.Tasks.Extensions.dll",
+        "tasks/net472/VBCSCompiler.exe",
+        "tasks/net472/VBCSCompiler.exe.config",
+        "tasks/net472/cs/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/net472/cs/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll",
+        "tasks/net472/cs/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/net472/cs/Microsoft.CodeAnalysis.Scripting.resources.dll",
+        "tasks/net472/cs/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/net472/cs/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/net472/csc.exe",
+        "tasks/net472/csc.exe.config",
+        "tasks/net472/csc.rsp",
+        "tasks/net472/csi.exe",
+        "tasks/net472/csi.exe.config",
+        "tasks/net472/csi.rsp",
+        "tasks/net472/de/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/net472/de/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll",
+        "tasks/net472/de/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/net472/de/Microsoft.CodeAnalysis.Scripting.resources.dll",
+        "tasks/net472/de/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/net472/de/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/net472/es/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/net472/es/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll",
+        "tasks/net472/es/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/net472/es/Microsoft.CodeAnalysis.Scripting.resources.dll",
+        "tasks/net472/es/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/net472/es/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/net472/fr/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/net472/fr/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll",
+        "tasks/net472/fr/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/net472/fr/Microsoft.CodeAnalysis.Scripting.resources.dll",
+        "tasks/net472/fr/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/net472/fr/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/net472/it/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/net472/it/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll",
+        "tasks/net472/it/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/net472/it/Microsoft.CodeAnalysis.Scripting.resources.dll",
+        "tasks/net472/it/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/net472/it/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/net472/ja/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/net472/ja/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll",
+        "tasks/net472/ja/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/net472/ja/Microsoft.CodeAnalysis.Scripting.resources.dll",
+        "tasks/net472/ja/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/net472/ja/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/net472/ko/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/net472/ko/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll",
+        "tasks/net472/ko/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/net472/ko/Microsoft.CodeAnalysis.Scripting.resources.dll",
+        "tasks/net472/ko/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/net472/ko/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/net472/pl/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/net472/pl/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll",
+        "tasks/net472/pl/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/net472/pl/Microsoft.CodeAnalysis.Scripting.resources.dll",
+        "tasks/net472/pl/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/net472/pl/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/net472/pt-BR/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/net472/pt-BR/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll",
+        "tasks/net472/pt-BR/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/net472/pt-BR/Microsoft.CodeAnalysis.Scripting.resources.dll",
+        "tasks/net472/pt-BR/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/net472/pt-BR/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/net472/ru/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/net472/ru/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll",
+        "tasks/net472/ru/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/net472/ru/Microsoft.CodeAnalysis.Scripting.resources.dll",
+        "tasks/net472/ru/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/net472/ru/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/net472/tr/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/net472/tr/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll",
+        "tasks/net472/tr/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/net472/tr/Microsoft.CodeAnalysis.Scripting.resources.dll",
+        "tasks/net472/tr/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/net472/tr/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/net472/vbc.exe",
+        "tasks/net472/vbc.exe.config",
+        "tasks/net472/vbc.rsp",
+        "tasks/net472/zh-Hans/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/net472/zh-Hans/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll",
+        "tasks/net472/zh-Hans/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/net472/zh-Hans/Microsoft.CodeAnalysis.Scripting.resources.dll",
+        "tasks/net472/zh-Hans/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/net472/zh-Hans/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/net472/zh-Hant/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/net472/zh-Hant/Microsoft.CodeAnalysis.CSharp.Scripting.resources.dll",
+        "tasks/net472/zh-Hant/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/net472/zh-Hant/Microsoft.CodeAnalysis.Scripting.resources.dll",
+        "tasks/net472/zh-Hant/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/net472/zh-Hant/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/netcore/Microsoft.Build.Tasks.CodeAnalysis.deps.json",
+        "tasks/netcore/Microsoft.Build.Tasks.CodeAnalysis.dll",
+        "tasks/netcore/Microsoft.CSharp.Core.targets",
+        "tasks/netcore/Microsoft.Managed.Core.CurrentVersions.targets",
+        "tasks/netcore/Microsoft.Managed.Core.targets",
+        "tasks/netcore/Microsoft.VisualBasic.Core.targets",
+        "tasks/netcore/bincore/Microsoft.CodeAnalysis.CSharp.dll",
+        "tasks/netcore/bincore/Microsoft.CodeAnalysis.ExternalAccess.RazorCompiler.dll",
+        "tasks/netcore/bincore/Microsoft.CodeAnalysis.VisualBasic.dll",
+        "tasks/netcore/bincore/Microsoft.CodeAnalysis.dll",
+        "tasks/netcore/bincore/System.Collections.Immutable.dll",
+        "tasks/netcore/bincore/System.Reflection.Metadata.dll",
+        "tasks/netcore/bincore/VBCSCompiler.deps.json",
+        "tasks/netcore/bincore/VBCSCompiler.dll",
+        "tasks/netcore/bincore/VBCSCompiler.runtimeconfig.json",
+        "tasks/netcore/bincore/cs/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/netcore/bincore/cs/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/netcore/bincore/cs/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/netcore/bincore/csc.deps.json",
+        "tasks/netcore/bincore/csc.dll",
+        "tasks/netcore/bincore/csc.runtimeconfig.json",
+        "tasks/netcore/bincore/de/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/netcore/bincore/de/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/netcore/bincore/de/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/netcore/bincore/es/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/netcore/bincore/es/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/netcore/bincore/es/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/netcore/bincore/fr/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/netcore/bincore/fr/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/netcore/bincore/fr/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/netcore/bincore/it/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/netcore/bincore/it/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/netcore/bincore/it/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/netcore/bincore/ja/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/netcore/bincore/ja/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/netcore/bincore/ja/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/netcore/bincore/ko/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/netcore/bincore/ko/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/netcore/bincore/ko/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/netcore/bincore/pl/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/netcore/bincore/pl/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/netcore/bincore/pl/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/netcore/bincore/pt-BR/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/netcore/bincore/pt-BR/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/netcore/bincore/pt-BR/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/netcore/bincore/ru/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/netcore/bincore/ru/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/netcore/bincore/ru/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/netcore/bincore/tr/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/netcore/bincore/tr/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/netcore/bincore/tr/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/netcore/bincore/vbc.deps.json",
+        "tasks/netcore/bincore/vbc.dll",
+        "tasks/netcore/bincore/vbc.runtimeconfig.json",
+        "tasks/netcore/bincore/zh-Hans/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/netcore/bincore/zh-Hans/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/netcore/bincore/zh-Hans/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/netcore/bincore/zh-Hant/Microsoft.CodeAnalysis.CSharp.resources.dll",
+        "tasks/netcore/bincore/zh-Hant/Microsoft.CodeAnalysis.VisualBasic.resources.dll",
+        "tasks/netcore/bincore/zh-Hant/Microsoft.CodeAnalysis.resources.dll",
+        "tasks/netcore/cs/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/netcore/de/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/netcore/es/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/netcore/fr/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/netcore/it/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/netcore/ja/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/netcore/ko/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/netcore/pl/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/netcore/pt-BR/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/netcore/ru/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/netcore/tr/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/netcore/zh-Hans/Microsoft.Build.Tasks.CodeAnalysis.resources.dll",
+        "tasks/netcore/zh-Hant/Microsoft.Build.Tasks.CodeAnalysis.resources.dll"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net8.0": [
+      "Microsoft.Net.Compilers.Toolset >= 4.9.0-dev"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\husak\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\husak\\GitHubProjects\\master-thesis\\Attachment\\Demo\\Demo.csproj",
+      "projectName": "Demo",
+      "projectPath": "C:\\Users\\husak\\GitHubProjects\\master-thesis\\Attachment\\Demo\\Demo.csproj",
+      "packagesPath": "C:\\Users\\husak\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\husak\\GitHubProjects\\master-thesis\\Attachment\\Demo\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\husak\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net8.0"
+      ],
+      "sources": {
+        "C:\\Users\\husak\\GitHubProjects\\master-thesis\\Attachment\\Bin": {}
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "projectReferences": {}
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      }
+    },
+    "frameworks": {
+      "net8.0": {
+        "targetAlias": "net8.0",
+        "dependencies": {
+          "Microsoft.Net.Compilers.Toolset": {
+            "target": "Package",
+            "version": "[4.9.0-dev, )"
+          }
+        },
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

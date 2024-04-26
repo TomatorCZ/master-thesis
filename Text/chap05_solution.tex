@@ -24,7 +24,7 @@ This step was done after the recommendation from the team member.
 The pull request was continued by another round of clarifications, recommendations, and revisions from three members of Roslyn's team.
 \par
 The current stage of the proposal at the time of writing is that the pull
-request is still open, waiting for the next requirements from the \ac{LDT}.
+request is still open, waiting for the next requirements from the LDT.
 
 \subsection{Content}
 
@@ -203,12 +203,12 @@ The \texttt{CSharp/Portable} folder contains the C\# compiler sources, modified 
 Describing all parts of C\# compiler sources is out of the scope of this work since it is an extensive program, and most of the parts are not influenced by the implementation. 
 So, the work mentions only a small part of the compiler, which is necessary to understand implementation internals. 
 The compiler’s source code is divided into multiple folders where most of the changes are in the \texttt{Binder} folder. 
-The folder contains logic for binding \ac{AST} to \textit{bound tree} mentioned in the Roslyn section \ref{sect04:roslyn}. 
+The folder contains logic for binding AST to \textit{bound tree} mentioned in the Roslyn section \ref{sect04:roslyn}. 
 The implementation of the type inference algorithm can be found in the \texttt{Semantics/OverloadResolution} folder, together with the whole mechanism for overload resolution of methods and constructors. 
 The \texttt{BoundTree} folder contains an XML description of automatically generated nodes representing \textit{bound tree}. 
 The \texttt{Errors} folder contains definitions of all C\# errors and a list of features that can be disabled and which contain an item for enabling partial type inference. 
 The \texttt{FlowAnalysis} contains several control flow analyzers, such as a nullability analyzer that checks the nullability state of variables. 
-The \texttt{Generated} folder contains generated nodes of \textit{bound tree}, and the \texttt{Symbols} folder contains nodes of the \ac{AST} tree.
+The \texttt{Generated} folder contains generated nodes of \textit{bound tree}, and the \texttt{Symbols} folder contains nodes of the AST tree.
 \begin{figure}[h]
 \begin{lstlisting}
 +roslyn

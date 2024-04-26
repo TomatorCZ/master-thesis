@@ -19,7 +19,7 @@ The following second group consists of suggestions describing general partial ty
   \item \textit{Relocation} mentioned in Section \ref{sect13:is8}
 \end{enumerate}
 The third group contains suggestions introducing type inference in new C\# constructs. 
-The first suggestion describes the second improvement which is explored further and the second suggestion is mentioned in the last section of this chapter as a potential future improvement that will be difficult to implement and which is not in the scope of this work.
+The first suggestion describes the second improvement which is explored further and the second suggestion is mentioned in the last section of this chapter as a potential future improvement that will be difficult to implement and which is not in the scope of this thesis.
 \begin{enumerate}
   \item \textit{Constructor type inference} mentioned in Section \ref{sect14:is9}
   \item \textit{Inferred method return type} mentioned in Section \ref{sect12:is7}
@@ -32,7 +32,7 @@ These techniques are discussed below.
 \par
 The disadvantage of \textit{default type parameters} \ref{sect07:is1} is that it requires to provide the defaults in the type parameter declarations.
 It is problematic since the old code has to be changed to allow skipping the type arguments which have defaults.
-For this reason, the work excludes this suggestion.
+For this reason, the thesis excludes this suggestion.
 \par
 \textit{Generic aliases} \ref{sect08:is2} don't work for methods.
 There could be something like a generic alias for a method using a similar syntax as for the type which would allow to give defaults for some type parameters.
@@ -55,17 +55,17 @@ It just compacts type argument lists into one.
 The syntax has to be chosen to allow a user to represent type arguments that have to be inferred by the compiler.
 The choice of the syntax should be based on the following conditions:
 \begin{enumerate}
-  \item The usage should be intuitive for a user
-  \item A future extension of type inference should reuse the syntax
-  \item It shouldn't introduce the breaking change
+  \item the usage should be intuitive for a user,
+  \item a future extension of type inference should reuse the syntax, and
+  \item it shouldn't introduce the breaking change.
 \end{enumerate}
-We identified five use cases that use the syntax in different situations to help reasoning about advantages and disadvantages of different syntax alternatives which are presented in the mentioned GitHub discussions.
+We identified five use cases that use the syntax in different situations to help reasoning about advantages and disadvantages of different syntax alternatives which are presented in the mentioned GitHub issues and discussions.
 Table \ref{table2:useCasesChar} shows the use cases and their examples in the current C\# language version.
 \begin{table}[h]
 \begin{center}
 \begin{tabular}{ | l | c | } 
   \hline
-  Use case & Example\\
+  \textbf{Use case} & \textbf{Example}\\
   \hline
   Type argumens of generic method & \texttt{Foo<Type1, ...>(...)}\\
   \hline
@@ -87,7 +87,7 @@ Table \ref{table2:useCasesChar} shows the use cases and their examples in the cu
 \par
 \textbf{Type arguments of generic type} use case represents a situation where a user wants to infer either all type arguments of the generic type or to specify ambiguous type arguments and let the compiler infer the rest. 
 The syntax doesn’t have to be bound to the shown object creation expression example, but it can be also used on other potential places like a variable declaration, type casting, or a type argument of a generic method. 
-The description of the syntax behavior in other places than an object creation expression and a generic method call is not in the scope of this work. 
+The description of the syntax behavior in other places than an object creation expression and a generic method call is not in the scope of this thesis. 
 However, the syntax is considered since it is a natural future continuation to use type inference on new places in the language.
 \par
 \textbf{Variable declaration} use case represents a situation where a user wants to infer a type of variable that is declared. 
@@ -98,6 +98,7 @@ Because of that, the new syntax shouldn’t be allowed to be used in this situat
 \par
 \textbf{Nullable type} use case represents a situation where a user should be able to hint to the compiler a nullability of a type that should be inferred.
 \par
+We continue with presenting syntax alternatives found in the mentioned\\ GitHub discussions and comparing their advantages and disadvantages in the use cases mentioned above.
 
 \subsubsection{Diamond Operator} 
 
@@ -133,14 +134,14 @@ As we can notice, it is not clear, where the compiler should find constructors f
 Probing all options for the constructors seems complicated because it requires a significant change in the Roslyn implementation and it will influence the compile time because of the increased overloading resolution complexity. 
 \par
 On the other hand, it is common to have just one type without multiple variations of type parameter's arity in the current name scope.
-Figure \ref{img41b:opDi2} shows an example where an object representing a directory is created.
+Figure \ref{img41b:opDi2} shows an example where an object representing a dictionary is created.
 The compiler can check if there is just one generic type with this name in the current scope.
 If it is, the problem with ambiguity disappears and the compiler can try to infer the type arguments.
 We think that it is a beneficial usage since it allows to turn on type inference of object creation expression.
 Extending the current overload resolution during object creation expression binding to consider generic types when the type doesn't contain the type argument list can't be used instead of it since it would cause a breaking change.
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp]
-new Directory<>(...);
+new Dictionary<>(...);
 \end{lstlisting}
 \caption{Diamond operator -- object creation expression.}
 \label{img41b:opDi2}
@@ -176,7 +177,7 @@ The symbol already means a generic type with one type argument in the \texttt{ty
 However, we think that the context of reflection and object creation expression are distinct enough to use the symbol for a different meaning as we can see in other language constructs.
 We think that the advantage of the syntax in this use case is that it still reminds the type argument list and it is not verbose.
 
-\subsubsection{Nothing Separated by Commas} 
+\subsubsection{Commas Separating Nothing} 
 
 In the context of the first use case, the syntax omits type arguments that should be inferred by the compiler and specifies just ambiguous type arguments using commas as a separator. 
 Figure \ref{img45:opW1} shows an example where the syntax is used to call the \texttt{Foo} method with three type arguments. 
@@ -215,7 +216,7 @@ There is the same problem as mentioned above.
 Although the syntax is a good candidate in the first and second use cases, it is not suitable for the array types and nullable types.
 We consider this disadvantage important and exclude the syntax.
 
-\subsubsection{Underscores Separated by Commas} 
+\subsubsection{Commas Separating Underscores} 
 
 The syntax uses an underscore to represent a type that has to be inferred by the compiler. 
 The syntax is commonly used in other programming languages like F\# or Haskell to represent inferred type arguments which is considered as an advantage. 
@@ -258,27 +259,61 @@ A disadvantage is the introduction of breaking change because C\# allows the und
 However, we don't think that it is a blocker since a similar change was done with the discards and the potential change behavior is
 easily discoverable.
 
-\subsubsection{\texttt{var} Keywords Separated by Commas} 
+\subsubsection{Commas Separating \texttt{var} Keywords} 
 
 The \texttt{var} keyword representing the placeholder is another natural option of the syntax.
 The usage and meaning of the syntax is similar to the previous syntax variant except for replacing the underscore with the \texttt{var} keyword.
+Figure \ref{img520:opU5} shows the usage of \texttt{var} in the generic method call where the first and third type argument has to be inferred by the compiler.
+\begin{figure}[h!]
+\begin{lstlisting}[style=csharp]
+Foo<var, int, var>(arg1, ...);
+\end{lstlisting}
+\caption{\texttt{var} -- generic method.}
+\label{img520:opU5}
+\end{figure}
 An advantage is the already used \texttt{var} keyword in a variable declaration where the secondary meaning of it is that it represents an inferred type.
 On the other hand, it also means that a variable declaration which can be confusing.
 Another disadvantage is the syntax size which seems to be too long for this purpose.
 We exclude this variant based on these several issues. 
 
-\subsubsection{Something Else Separated by Commas} 
+\subsubsection{Commas Separating ``Something Else''} 
 
 A different placeholder for the inferred type arguments doesn't make a lot of sense because we think that it would be less intuitive than already mentioned syntax variants.
 
 \subsubsection{Conlusion} 
 
-The thesis chooses the underscore as a placeholder for the inferred type argument since the meaning of this character is related to the intention. 
-It also seems to be the shortest and synoptical way to skip inferred type arguments. 
+The thesis chooses the underscore as a placeholder for the inferred type argument since the meaning of this character is related to the intention.
+Table \ref{table:undescore} reuses Table \ref{table2:useCasesChar} to show the usage of the underscore placeholder.
+The first two examples use the underscore placeholder in the type argument list.
+We can notice that the underscore placeholder can be nested and it can be used as an inferred type of array's element.
+The question mark can be also used with the underscore to represent a nullable type which has to be inferred by the compiler.
+We prohibit to use the underscore placeholder in the variable declaration since the \texttt{var} keyword should be used for this purpose.
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{ | l | c | } 
+  \hline
+  \textbf{Use case} & \textbf{Example}\\
+  \hline
+  Type argumens of generic method & \texttt{Foo<\_, Baz<\_, \_[]>, \_?>(...)}\\
+  \hline
+  Type arguments of generic type & \texttt{new Bar<\_, Baz<\_,  \_[]>, \_?>(...)}\\
+  \hline
+  Variable declaration & Not applicable\\
+  \hline
+  Array type & \texttt{\_[]}\\
+  \hline
+  Nullable type & \texttt{\_?}\\
+  \hline
+\end{tabular}
+\end{center}
+\caption{Use cases utilizing the underscore placeholder.}
+\label{table:undescore}
+\end{table}
+\par
+We think that the underscore is the shortest and synoptical way to skip inferred type arguments based on the exploration of syntax alternatives given above.
 The possible breaking change is not an obstacle in this situation since a similar decision was made for the \texttt{var} keyword, and the situation where it can occur seems to be rare. 
-Problems with the potential future extension where the underscore can represent inferred type in the variable declaration would be prohibited to not mix it with the \texttt{var} keyword. 
 Although the diamond operator is not very useful in a generic method call, it makes sense in an object creation expression. 
-The potential usage and analysis of that is covered later in this work.
+The potential usage and analysis of that is covered later in this thesis.
 
 \subsection{Method and Typename Lookup}
 
@@ -308,9 +343,9 @@ If there is an underscore referring to an inferred type argument, it simply igno
 \par
 The underscores contained in the type arguments are handled in the changed method type inference algorithm mentioned in the following section.
 
-\section{Method Type Inference Algorithm Change}
+\section{Method Type Inference Algorithm Change} \label{sect:algChange}
 
-The thesis extends the method type inference by introducing new type variables, which represents inferred type arguments contained in the type argument list. 
+The thesis extends the method type inference \ref{sect02:MTIA} by introducing new type variables, which represents inferred type arguments contained in the type argument list. 
 Firstly, if a generic method call doesn’t contain a type argument list, the method type inference is unchanged. The change is when the generic method is partially inferred. 
 Figure \ref{img54:partInf} shows an example of a partially inferred method \texttt{Foo} containing two type parameters. 
 The former algorithm identifies the type arguments as type variables for which it tries to find a unique type. 
@@ -390,9 +425,11 @@ $B_{lower}$ = $B_{upper}$ = $B_{exact}$ = $B_{shape} = $F = []
 $TV$ = getAllTypeVariables(X, S)
 FirstPhase()
 SecondPhase()
+
 fn FirstPhase():
   S.foreach(s -> InferShapeBound(s, T[s.idx]))
-  /*Continuation as the former method type inference*/
+  ...here continue as the former method type inference
+  
 fn SecondPhase():
   while (true):
     $TV_{indep}$ = $TV$.filter(x $\rightarrow$ 
@@ -411,7 +448,7 @@ fn SecondPhase():
         )
       )
     )
-    /*Continuation as the former method type inference*/
+    ...here continue as the former method type inference
 \end{lstlisting}
 \caption{Phases of new Method Type Inference}
 \label{img54:mainTypeInference1}
@@ -447,21 +484,24 @@ fn InferExact(Type U, Type V):
     $B_{exact}$[t.idx].add(U)
     Propagate(U, t.idx)
   }
-  /*Continuation as the former method type inference*/
+  ...here continue as the former method type inference
+  
 fn InferLower(Type U, Type V):
   if (TypeVariable t = TV.find(x $\rightarrow$ V == x && F[x.idx] == null) &&
     !$B_{lower}$[t.idx].contains(U)) {
     $B_{lower}$[t.idx].add(U)
     Propagate(U, t.idx)
   }
-  /*Continuation as the former method type inference*/
+  ...here continue as the former method type inference
+  
 fn InferUpper(Type U, Type V):
   if (TypeVariable t = TV.find(x $\rightarrow$ V == x && F[x.idx] == null) &&
     !$B_{upper}$[t.idx].contains(U)) {
     $B_{upper}$[t.idx].add(U)
     Propagate(U, t.idx)
   }
-  /*Continuation as the former method type inference*/
+  ...here continue as the former method type inference
+  
 fn InferShape(Type U, Type V):
   if (TypeVariable t = TV.find(x $\rightarrow$ V == x && F[x.idx] == null)) {
     $B_{shape}$[t.idx] = U
@@ -471,6 +511,7 @@ fn InferShape(Type U, Type V):
 \caption{\textit{Exact inference}, \textit{Upper-bound inference}, \textit{Lower-bound inference}, \textit{Shape-bound inference}}
 \label{img55:mainTypeInference2}
 \end{figure}
+\newpage
 \par
 Table \ref{table3:InferHelper} shows which inference is called based on the \texttt{InferHelper}'s inputs. 
 For example, if the \texttt{U} represents the added lower bound and \texttt{b} is an exact bound, the algorithm calls the \texttt{InferUpper} function. 
@@ -480,15 +521,15 @@ So, for example, all bounds of lower bounds are lower bounds for exact, upper, a
 \begin{center}
 \begin{tabular}{ | c | c | c | c | c | } 
   \hline
-   & Lower & Upper & Exact & Shape\\
+   & \textbf{Lower} & \textbf{Upper} & \textbf{Exact} & \textbf{Shape}\\
   \hline
-  Lower & InferExact  &  InferUpper & InferUpper & InferLower \\
+  \textbf{Lower} & InferExact  &  InferUpper & InferUpper & InferLower \\
   \hline
-  Upper & InferLower  &  InferExact & InferLower & InferLower \\
+  \textbf{Upper} & InferLower  &  InferExact & InferLower & InferLower \\
   \hline
-  Exact & InferLower  &  InferUpper & InferExact & InferExact \\
+  \textbf{Exact} & InferLower  &  InferUpper & InferExact & InferExact \\
   \hline
-  Shape & InferLower  &  InferUpper & InferExact & InfeExact \\
+  \textbf{Shape} & InferLower  &  InferUpper & InferExact & InfeExact \\
   \hline
 \end{tabular}
 \end{center}
@@ -515,7 +556,7 @@ fn Fix(TypeVariable x):
     ($B_{lower}$[x.idx] + $B_{upper}$[x.idx] + $B_{exact}$[x.idx]).filter(b $\rightarrow$
         !b.containsUnfixedTypeVariable
     )
-  /*Continuation as the former method type inference*/
+  ...here continue as the former method type inference
 \end{lstlisting}
 \caption{Fixing of type variables}
 \label{img55::mainTypeInference3}
@@ -579,7 +620,7 @@ However, the second statement is valid because inferred type arguments are only 
 
 \subsection{Argument Binding}
 
-The mentioned target-typed inference complicates the binding of the arguments. 
+The target-typed inference mentioned in Section \ref{sect06:targetType} complicates the binding of the arguments. 
 When a target is an assigned variable or a return statement, the type of the target is given by the declaration of the variable or method’s return type. 
 However, when the target is an argument of the other method, the type doesn’t have to be known during the argument's binding yet if the method is generic. 
 Figure \ref{img60:target} shows a scenario when, at the time of binding the \texttt{Foo} creation expression, the target type is unknown because the binding order is from the constructor’s arguments to the constructor call. 
@@ -598,14 +639,14 @@ new Bar<_>(new Foo<_>(), 1);
 \label{img60:target}
 \end{figure}
 \par
-This process was mentioned regarding the target-typed \texttt{new()} operator.\\ 
+The need to postpone the argument binding relates to Section \ref{sect:new} regarding the target-typed \texttt{new()} operator.
 Roslyn binds the operator in the following way. The operator is bound as an unconverted bound element which needs to be converted in the future. 
 When the right overload of the method is chosen, Roslyn has to generate the necessary conversions of these arguments, which don't have an identical type as the corresponding parameter. 
 At that time, the operator is converted by using the already-known target type. 
 The result of the conversion is the binding of the object creation expression, which type is the target type.
 Its arguments are contained in the type operator’s argument list.
-\par
 The improvement is inspired by that. 
+\par
 When there is an object creation expression as an argument, and the argument is not needed for the inference success(the corresponding parameter doesn't contain a type parameter), a similar unconverted bound element is created.
 Otherwise the argument is bound without the target type.
 After the overload resolution, when the types of parameters are known, and the necessary conversion is started to be created, the unconverted object creation expression is tried to be bound with the already known target type. 
@@ -613,6 +654,18 @@ The compiler has to be careful here.
 It has to bind the object creation expression with and without a target type no more than once to prevent exponential time of binding.
 \par
 Figure \ref{img61:exp} shows a scenario where if the compiler does not do that, it will cause an exponential time of binding the expression. 
+\begin{figure}[h!]
+\begin{lstlisting}[style=csharp, mathescape=true]
+class Bar<T>{
+    public Bar(Foo<T> arg1, T arg2){}
+    public Bar(Foo<T> arg1, List<T> arg2){}
+}
+...
+new Bar<_>(new Bar<_>(null, null), 1);
+\end{lstlisting}
+\caption{Potential exponential time of binding.}
+\label{img61:exp}
+\end{figure}
 Since the constructor of the \texttt{Bar} type is overloaded, the overload resolution has to check these two overloads. 
 Each of these checks includes binding of arguments, type inference, and checking of the applicability of bound arguments on the inferred constructor. 
 Since the binding of arguments contains binding of the similar object creation expression, it will make the same overload resolution containing all overloads of the constructor. 
@@ -627,22 +680,10 @@ The following observation offers a way to avoid it.
 The arguments can be bound before the overload resolution without target types.
 The arguments' bindings, which will fail due to missing target type information will be bound after the overload resolution when a final used overload will be choose.
 This strategy binds each expression no more than twice. 
-\begin{figure}[h!]
-\begin{lstlisting}[style=csharp, mathescape=true]
-class Bar<T>{
-    public Bar(Foo<T> arg1, T arg2){}
-    public Bar(Foo<T> arg1, List<T> arg2){}
-}
-...
-new Bar<_>(new Bar<_>(null, null), 1);
-\end{lstlisting}
-\caption{Potential exponential time of binding.}
-\label{img61:exp}
-\end{figure}
 
 \subsection{Type Inference Algorithm}
 
-The previously mentioned partial method type algorithm is unchanged except for collecting new bounds in the first phase of the algorithm. 
+The previously mentioned partial method type algorithm \ref{sect:algChange} is unchanged except for collecting new bounds in the first phase of the algorithm. 
 If a target type is provided, the upper bound type inference is made from it to the partially inferred type containing the constructor. 
 If the inferring type contains the \texttt{where} clause containing type parameter constraints, for each of the type constraints which represent either inheritance constraints or interface implementation constraints is performed the lower bound type inference from it to the corresponding type parameter.
 \par
@@ -705,7 +746,7 @@ Since indexers can be considered as a special case of methods that can be overlo
 
 \subsection{Diamond Operator Extension} \label{sect13:ex2}
 
-Since the partial constructor type inference is invoked when the creating type contains inferred type arguments in its type argument list, it can feel like a boilerplate when all type arguments are inferable. 
+Since the partial constructor type inference is invoked when the creating type contains inferred type arguments in its type argument list, it can feel like a\\ boilerplate when all type arguments are inferable. 
 Figure \ref{img57:diamondExample} shows an example of creating the \texttt{Dictionary} generic type whose all type arguments can be inferred using the target type. 
 Although C\# allows the definition of generic types with the same name and different arity, there are a lot of situations where the typename represents only one type in the current scope.
 In the given example, the current scope contains only one generic definition for the \texttt{Directory} typename, so specifying the arity in the example is redundant in this case.
@@ -763,19 +804,19 @@ Foo<_, _>(t, 1);
 
 \section{Other Type Inference Improvements}
 
-Besides the proposed improvement described above, the work touched on surrounding areas of type inference during the initial problem exploration. 
+Besides the proposed improvement described above, we touched on surrounding areas of type inference during the initial problem exploration. 
 The chapter gives a couple of thoughts about touched areas since they were also investigated and can be a future extension of the C\# programming language.
 
 \subsection{Shared Type Inference Context}
 
 C\# currently has a local type inference preventing advanced type inference. 
-The next big improvement of the type inference would be to provide global type inference using inferring contexts similar to Rust's. 
+The next big improvement of the type inference would be to provide global type inference using inferring contexts similar to Rust. 
 However, since it would bring a breaking change, it would require an additional tool that would patch the old code to work in the same way compiled with the new type inference. 
 This refactoring can be challenging, so at least it should warn the user about possible behavior changes in each place where it can occur.
 
 \subsection{Inferring Return Value of Methods}
 
-The work already mentioned the possibility of inferring the return value type of the method, which can be beneficial for writing a simple method whose name indicates the return value, helping a reader to understand the code. 
+The thesis already mentioned the possibility of inferring the return value type of the method, which can be beneficial for writing a simple method whose name indicates the return value, helping a reader to understand the code.
 An example of the function can be \texttt{ToString}, which indicates that the return value is the \texttt{string} type.
 \par
 This language feature can be seen in the Kotlin programming language, which allows the definition of a method without a return type if the method is exactly one expression. 
@@ -795,10 +836,17 @@ class MyClass {
 \label{img64:kotlin}
 \end{figure}
 \par
-The main obstacle regarding the inferred return type in methods' signatures is an order of compilation and possible multithreaded compilation.
-The Roslyn compiler first finds all definitions in the program, which allows it to compile methods separately in different threads.
-This advantage is because the method's content consists of only types and methods defined in the program, whose signatures are already known thanks to the previous phase.
+Although C\# can infer the return type of an anonymous function, it can’t infer the return type of a method definition. 
+The main obstacle is an order of compilation and possible multithreaded compilation. 
+The Roslyn compiler first finds all definitions in the program, which allows it to compile methods separately in different threads. 
+This architecture has two consequences.
+\par
+The first consequence is that the compiler can start the methods' bodies compilation in parallel since a method’s content consists of only types and methods defined in the program, whose signatures are already known thanks to the previous phase. 
 So, the compiler knows the exact return types of the used functions, which allows it to do a type check.
+\par
+The second consequence is that it can't infer the method's return type because it requires the compiled method body.
+This is the difference between methods and anonymous functions which are expressions.
+So, the compiler can infer the return type of the anonymous function by compiling its body in the same phase, which is not the case in the method definition.
 \par
 Kotlin divides the method compilation into two groups, as it is described in the video \cite{online:kotlinCompiler}. 
 The first group contains methods without a return type, which is compiled first in a single thread. 
@@ -810,6 +858,6 @@ Although this implementation would be possible in Roslyn as well, it would requi
 Instead of that, C\# could allow inferring return in a local function, which is a function defined inside a method body and can be used only inside the method. 
 There are two benefits of it. 
 The main architecture of the Roslyn compiler doesn’t have to be changed since the method is compiled by one thread, and the local functions can’t be used outside. 
-Local functions are usually tied with the method implementation, and the return type is not contained in the public API, so a reader shouldn’t need to know the return type till the time when he/she wants to explore the inner implementation, which gives him/her a context to deduce the return type by himself.
+Local functions are usually tied with the method implementation, and the return type is not contained in the public API, so a reader shouldn’t need to know the return type till the time when he/she wants to explore the inner implementation, which gives him/her a context to deduce the return type by himself/herself.
 
 

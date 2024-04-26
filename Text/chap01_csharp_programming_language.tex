@@ -149,7 +149,7 @@ var a = "str";
 \label{img07:var}
 \end{figure}
 
-\subsection{Operator \texttt{new()}}
+\subsection{Operator \texttt{new()}} \label{sect:new}
 
 There is also an opposite way of deducting types from a target to a source.
 An example is the \texttt{new()} operator, which can be called with arbitrary arguments and represents an object creation of a type that is determined by a type of the target. 
@@ -349,6 +349,7 @@ fn InferExplicitParameterType(Argument E, Type T):
     && E.paramTypes.size == T.paramTypes.size)
       E.paramTypes.zip(T.paramTypes)
                   .foreach((e, t) $\rightarrow$ InferExact(e, t))
+
 fn InferOutputType(Argument E, Type T):
   switch(E) {
 	E.isAnonymousFunc && $T$.isDelegateOrExprTreeType $\rightarrow$

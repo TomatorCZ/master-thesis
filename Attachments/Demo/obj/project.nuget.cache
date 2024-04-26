@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "+DvPJo5ETLpuG73TYwTO3zxrPiWIOJxswaiLU31h98iWsnoAhoKtwlDvDQRXD0DKfnpj7e3TnOCGRxkP1BNCvg==",
+  "dgSpecHash": "0/21Uolh7siePeB3jEbcj21sp/NjaXNa8qjR3ucgmBsNU/xFTwIFUm/+YMer7LY9g80dww4Jmo3qEQh72M7YQA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\husak\\GitHubProjects\\master-thesis\\Attachment\\Demo\\Demo.csproj",
+  "projectFilePath": "C:\\Users\\husak\\GitHubProjects\\master-thesis\\Attachments\\Demo\\Demo.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\husak\\.nuget\\packages\\microsoft.net.compilers.toolset\\4.9.0-dev\\microsoft.net.compilers.toolset.4.9.0-dev.nupkg.sha512"
   ],

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\husak\\GitHubProjects\\master-thesis\\Attachment\\Demo\\Demo.csproj": {}
+    "C:\\Users\\husak\\GitHubProjects\\master-thesis\\Attachments\\Demo\\Demo.csproj": {}
   },
   "projects": {
-    "C:\\Users\\husak\\GitHubProjects\\master-thesis\\Attachment\\Demo\\Demo.csproj": {
+    "C:\\Users\\husak\\GitHubProjects\\master-thesis\\Attachments\\Demo\\Demo.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\husak\\GitHubProjects\\master-thesis\\Attachment\\Demo\\Demo.csproj",
+        "projectUniqueName": "C:\\Users\\husak\\GitHubProjects\\master-thesis\\Attachments\\Demo\\Demo.csproj",
         "projectName": "Demo",
-        "projectPath": "C:\\Users\\husak\\GitHubProjects\\master-thesis\\Attachment\\Demo\\Demo.csproj",
+        "projectPath": "C:\\Users\\husak\\GitHubProjects\\master-thesis\\Attachments\\Demo\\Demo.csproj",
         "packagesPath": "C:\\Users\\husak\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\husak\\GitHubProjects\\master-thesis\\Attachment\\Demo\\obj\\",
+        "outputPath": "C:\\Users\\husak\\GitHubProjects\\master-thesis\\Attachments\\Demo\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\husak\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -21,7 +21,7 @@
           "net8.0"
         ],
         "sources": {
-          "C:\\Users\\husak\\GitHubProjects\\master-thesis\\Attachment\\Bin": {}
+          "C:\\Users\\husak\\GitHubProjects\\master-thesis\\Attachments\\Bin": {}
         },
         "frameworks": {
           "net8.0": {

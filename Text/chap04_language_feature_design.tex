@@ -4,7 +4,7 @@ The previous chapter determined two improvement directions that would be benefic
 This chapter continues with exploring these directions consisting of the partial method type inference and the constructor type inference. 
 The goal of this exploration is to precisely design the improvements that are used afterward as the content of the mentioned proposal for LDM and implemented in Roslyn.
 \par
-We take the language change suggestions, mentioned in the GitHub Issues section \ref{sect04:github}, as an inspiration for the improvements and divide them into three following groups.
+We take the language change suggestions, mentioned in the Langauge Design GitHub Issues section \ref{sect04:github}, as an inspiration for the improvements and divide them into three following groups.
 Suggestions in the first group, given below, regard improving the method type inference algorithm and are used in the constructor type inference mentioned later.
 \begin{enumerate}
   \item \textit{Target-typed inference} mentioned in Section \ref{sect06:targetType}
@@ -59,7 +59,7 @@ The choice of the syntax should be based on the following conditions:
   \item A future extension of type inference should reuse the syntax
   \item It shouldn't introduce the breaking change
 \end{enumerate}
-We identified five use cases that use the syntax in different situations to help reasoning about advantages and disadvantages of different syntax alternatives which are presented in the mentioned GitHub issues.
+We identified five use cases that use the syntax in different situations to help reasoning about advantages and disadvantages of different syntax alternatives which are presented in the mentioned GitHub discussions.
 Table \ref{table2:useCasesChar} shows the use cases and their examples in the current C\# language version.
 \begin{table}[h]
 \begin{center}
@@ -531,10 +531,10 @@ Since the algorithm doesn't add the same bound multiple times, the cycle can't o
 The second improvement explored by the thesis is the \textit{constructor type inference} mentioned in the discussion \cite{online:CtorTInf}. 
 In addition to the constructor type inference, we present partial constructor type inference using underscore placeholders to represent inferred type arguments in the same way as in the partial method type inference.
 \par
-Since the potential suggestions from GitHub issues can be applied to the partial constructor type inference, we discuss them again in relation to this improvement.
+Since the potential suggestions from GitHub discussions can be applied to the partial constructor type inference, we discuss them again in relation to this improvement.
 Problems regarding using \textit{default type parameters}, \textit{generic aliases}, \textit{named type parameters}, or \textit{relocation} mentioned in the partial method type inference persist, so either the partial constructor type inference is not based on them.
 However, since the inference is not limited by introducing breaking changes because there is no type inference at all, the type inference can be stronger. 
-The stronger type inference can be done by using \textit{target-typed inference} and \textit{type inference based on constraint} contained in the first group of divided issues presented in the introduction of this chapter.
+The stronger type inference can be done by using \textit{target-typed inference} and \textit{type inference based on constraint} contained in the first group of divided suggestions presented in the introduction of this chapter.
 Target-typed inference is useful because an object creation is usually associated with assigning it to a target. 
 Type inference based on type constraints provides a wider context for type inference allowing to infer the type arguments based on \texttt{where} clauses in the type declaration of the created object. 
 \par

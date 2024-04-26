@@ -5,18 +5,18 @@ The implementation and proposal are evaluated using the following metrics.
 \section{Tests}
 
 We run the same suite case before and after our changes. 
-The results can be found in the \texttt{/Attachment/TestResults} folder containing the \texttt{Test-Master} folder and the \texttt{Test-Feature} folder corresponding to test results before and after the change. 
-These folders contain the results from the \texttt{-testCompilerOnly} suite case run.
-We can notice that two of our tests from the \texttt{WorkItem\_4\_x64\_test\_results.html} test result failed.
-However, when we run these tests separately, they pass.
-The failure doesn't seem to be caused by our high-level solution and it seems like a bug in the implementation.
-Since the implementation is just a proof of concept and it will be reimplemented for production, we ignore this failure.
+The results can be found in the \texttt{/Attachments/TestResults} folder containing the \texttt{Test-Master} folder and the \texttt{Test-Feature} folder corresponding to test results before and after the change. 
+These folders contain the results from the \texttt{-testCompilerOnly} suite case run whose tests can be found the the \texttt{Test} folder mentioned in Section \ref{roslynRepo:overview}.
+All tests pass when they are run separately.
+However, we noticed that when we use the testing framework to run \texttt{-testCompilerOnly} suite case, two of our tests don't pass as can be seen in the \texttt{WorkItem\_4\_x64\_test\_results.html} test results summary.
+We didn't manage to identify the reason for that, but we think that it is related to the test framework complexity of how it runs the tests.
+This failure needs further investigation in the context of how the test framework executes the tests.
 Except for this failure and unimportant small changes in the compiler tests regarding adding new error messages caused by our changes, all tests that passed before the improvement also passed after the improvement.
 This result ensures that the improvement doesn’t introduce any significant regression in the compiler tests.
 
 \section{Demo Examples}
 
-The basic capabilities of the improvement are demonstrated in the demo application contained in the \texttt{Attachment/Demo} attachment folder. 
+The basic capabilities of the improvement are demonstrated in the demo application contained in the \texttt{Attachments/Demo} attachments folder. 
 We also show advanced features of the improvement which can be found in the tests and which were presented to LDT. 
 
 
@@ -46,9 +46,6 @@ M2<IList<_>>(new List<int>());
 \caption{RunExample2 -- Nested inferred type argument}
 \label{img101:example2}
 \end{figure}
-
-\newpage
-
 \par
 Figure \ref{img102:example3} shows an example of the partial constructor type inference where the first type argument of the \texttt{C1<T1>} object creation expression is inferred based on the first argument.
 The process of the type inference is the same as in the first example.
@@ -106,7 +103,7 @@ class C4<T1, T2> where T1 : List<T2> {
     
 new C4<_, int>();
 \end{lstlisting}
-\caption{RunExample6 -- TYpe inference based on constraints}
+\caption{RunExample6 -- Type inference based on constraints}
 \label{img105:example6}
 \end{figure}
 
@@ -254,4 +251,4 @@ Based on the previous examples, the solution can be considered robust enough to 
 LDM discussed the proposal on 7th February 2024. 
 Besides the overall summary of the proposal with additional questions, the LDT agreed to continue with moving the proposal forward. 
 Although it is not going to present the change in the upcoming C\# 13, it is planned to ship this feature with some modifications in the following releases. 
-The summary \cite{online:mettingSummary} and discussion \cite{online:mettingSummaryDisc} are published on the C\# GitHub repository.
+The summary \cite{online:mettingSummary} of the meeting and the following discussion \cite{online:mettingSummaryDisc} are published on the C\# GitHub repository.

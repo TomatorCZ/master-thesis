@@ -4,12 +4,12 @@ The solution consists of a proposal describing the language feature given in the
 
 \section{Proposal}
 
-The final version of the proposal can be found in the attachment as the\\ \texttt{Attachment/Proposal/partial-type-inference.md} file.
+The final version of the proposal can be found in the attachments as the\\ \texttt{Attachments/Proposal/partial-type-inference.md} file.
 
 \subsection{Creation Process}
 
-The proposal had three stages of development. 
-The first version of the document was created in a personal repository \cite{online:personalRepo}, where it was reviewed by a member of Roslyn's development team. 
+The proposal had three stages of development.
+The first version of the document was created in author's personal repository \cite{online:personalRepo}, where it was reviewed by a member of Roslyn's development team. 
 The review was in the form of a pull request \cite{online:personalPull} where the member suggested several changes on how to structure the proposal and how to refer to the original C\# standard documentation and pointed out possible improvements that would be beneficial to investigate.
 \par
 After the revisions were made, the member recommended to post it as a discussion \cite{online:discussion1}, which was the first time when a wider community could comment on the proposal. 
@@ -23,8 +23,9 @@ After this step, the third stage was made by publishing the proposal as a pull r
 This step was done after the recommendation from the team member. 
 The pull request was continued by another round of clarifications, recommendations, and revisions from three members of Roslyn's team.
 \par
-The current stage of the proposal at the time of writing is that the pull
-request is still open, waiting for the next requirements from the LDT.
+The current stage of the proposal at the time of writing is that the pull request is still open, waiting for the next requirements from the LDT.
+Meanwhile, there was the LDM meeting regarding our proposal, whose result we present later in this thesis.
+We continue with the description of the proposal's content.
 
 \subsection{Content}
 
@@ -32,30 +33,29 @@ The whole document has two styles of describing the feature.
 The first style explains the intention of the improvement and necessary relations, which helps to understand it. 
 The second style used in the detailed design section is rather a patch of C\# standard documentation, which enables improvement. 
 So, the text doesn’t contain fluent sentences but fragments of the documentation that need to be changed.
-\par
-The proposal consists of five parts. 
-The first part gives a quick overview of the proposed change, summarizing it in a few sentences.
-\par
-The second part describes the motivation why it should be done. The text
-and the used examples are similar to those in section \ref{sect10:mot}.
-\par
-The third and largest part contains a detailed design of the improvement. 
+The proposal consists of five parts:
+
+\begin{enumerate}
+  \item The first part gives a quick overview of the proposed change, summarizing it in a few sentences.
+  \item The second part describes the motivation why it should be done. 
+The text and the used examples are similar to those in section \ref{sect10:mot}.
+  \item The third and largest part contains a detailed design of the improvement. 
 There is a description of grammar change, where it explains a new underscore contextual keyword in the type argument list. 
 It is followed by the change of binding method invocation and object creation expressions. 
 This part describes the mentioned core design of the improvement with the changed method type inference algorithm. 
 The design ends with extending compile-time checking dynamic member invocation, which is explained in section \ref{sect11:dynamic}.
-\par
-The fourth part comments on the reason for not doing other alternatives contained in the discussions. 
+  \item The fourth part comments on the reason for not doing other alternatives contained in the discussions. 
 It also mentions two possible extensions of the improvement using the diamond operator \ref{sect13:ex2} and initializers \ref{sect12:ex1} in the type inference context.
-\par
-The last part suggests other potential improvements.
+ \item The last part suggests other potential improvements.
+\end{enumerate}
 
 \section{Implementation}
 
 The already mentioned proposal is tested by the implementation described in this section. 
 The goal of the implementation is to observe the consequences of the proposed feature in a practical way, which can be tried by the C\# community. 
 The goal will be achieved by contributing to the the \texttt{final/PartialTypeInference} branch \cite{online:roslynFork} of the forked Roslyn project on GitHub, which is public.
-The copy of the branch containing the changes can be also found in the attachment in the \texttt{Attachment/Source/roslyn} folder. 
+The branch contains one commit, with the\\ \texttt{[PartialTypeInference] Add partial type inference} name, containing all our changes.
+The copy of the branch can be also found in the attachments in the \texttt{Attachments/Source/roslyn} folder. 
 Since the proposal is in the state of probing the benefits, the implementation is rather a proof of concept than a ready-to-production code.
 
 \subsection{Development Environment}
@@ -97,7 +97,7 @@ Test.cmd -testCompilerOnly
 \label{img65:runTests}
 \end{figure}
 \par
-The results of the tests, when we started the implementation, can be seen in the attachment in the \texttt{Attachment/TestResults/Tests-Master} folder, where two tests regarding Visual Basic were not passed. 
+The results of the tests, when we started the implementation, can be seen in the attachments in the \texttt{Attachments/TestResults/Tests-Master} folder, where two tests regarding Visual Basic were not passed. 
 Since our contribution is the C\# compiler, we ignore it.
 
 \subsubsection{Deployment}
@@ -112,7 +112,7 @@ The Nuget cache is usually placed in the\\ \texttt{C://Users/\%user\%/.nuget} fo
 The command generates the \texttt{roslyn/artifacts/publish/Shipping} folder containing the\\ \texttt{Microsoft.CSharp.Net.Compiler.ToolSet} package, which needs to be referenced. 
 Additionally, the project file has to define a folder containing the package that will be used to restore the packages in the Nuget cache. 
 The last required action is specifying a language version, which has to be set to \texttt{preview}, enabling the partial method type inference and the partial constructor type inference. 
-Figure \ref{img68:csproj} shows a modified project file of the demo application, which can be found in the \texttt{Attachment/Demo} folder. 
+Figure \ref{img68:csproj} shows a modified project file of the demo application, which can be found in the \texttt{Attachments/Demo} folder. 
 The \texttt{PropertyGroup} element contains a definition of the language version and a folder for package restoration. 
 The \texttt{ItemGroup} element contains a definition of the package reference injecting the locally built compiler.
 \begin{figure}[h]
@@ -184,7 +184,7 @@ Time Elapsed 00:00:09.19
 \label{img67:output}
 \end{figure}
 
-\subsection{Repository Overview}
+\subsection{Repository Overview} \label{roslynRepo:overview}
 
 Roslyn’s repository contains several projects besides the C\# compiler, like the Visual Basic compiler or Visual Studio extension. 
 Figure \ref{img68:roslynFolder} shows relevant files and folders of the \texttt{roslyn} directory, which have been adjusted or are used by the implementation. 

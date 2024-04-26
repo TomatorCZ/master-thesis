@@ -1,21 +1,25 @@
 \chapter{Attachments}
 
-Table \ref{img80:attachment} describes the content of the attachment. 
-Although the attachment contains most of the thesis outcomes, part of the outcome is placed on a public GitHub repository where further discussions regarding the change, made by C\# community members and LDT, continue.
+Table \ref{img80:attachment} describes the content of the attachments. 
+Although the attachments contain most of the thesis outcomes, part of the outcome is placed on a public GitHub repository where further discussions regarding the change, made by C\# community members and LDT, continue.
 \begin{table}[h]
 \centering
 \begin{tabular}{ | m{11em} | m{22em}| } 
 \hline
-Folder & Description \\
+\textbf{Folder} & \textbf{Description} \\
 \hline
 \texttt{Bin/} & Nuget packages of compiler with proposed changes \\
+\hline
 \texttt{Demo/} & Ready-to-run demo using the packages \\
-\texttt{Proposal/} & Laguage change proposal with LDM summary \\
-\texttt{Source/roslyn/} & Source code of compiler with proposed changes \\
+\hline
+\texttt{Proposal/} & Laguage change proposal and LDM summary \\
+\hline
+\texttt{Source/roslyn/} & Source code of forked compiler with proposed changes in the \texttt{[PartialTypeInference] Add partial type inference} commit \\
+\hline
 \texttt{TestResults/} & Test results before and after changes \\
 \hline
 \end{tabular}
-\caption{Attachment's content }
+\caption{Attachments content}
 \label{img80:attachment}
 \end{table}
 
@@ -25,7 +29,7 @@ The thesis contains a demo that can be used as a playground for testing the chan
 The .NET SDK is needed to be able to compile and run the demo. We used version 8.0.100, which can be downloaded from Microsoft's offical websites
 \par
 After the download, make sure that you don't have the\\ \texttt{Microsoft.Net.Compilers.Toolset.4.9.0-dev} package in your nuget packages cache.
-The cache is usually placed in the \texttt{C://Users/\%user\%/.nuget} folder.
+The cache is usually placed in the \texttt{C:/Users/\%user\%/.nuget} folder.
 Then, navigate to the \texttt{Demo} folder and run \texttt{dotnet build} which builds the demo example.
 
 \section{Build your applications}
@@ -37,7 +41,7 @@ Then, you can again use a common \texttt{dotnet build} to build your application
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RestoreSources>
-      path/to/Attachment/Bin/folder
+      path/to/Attachments/Bin/folder
     </RestoreSources>
   </PropertyGroup>
 

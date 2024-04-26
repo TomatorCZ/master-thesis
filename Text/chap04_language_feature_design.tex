@@ -606,6 +606,9 @@ The typename lookup is done in the same way as in the partial method type infere
 The binding of the underscore identifier is skipped. 
 The underscore represents an inferred type, which has to be resolved during type inference. 
 The inferred arguments are allowed only in the argument list of the type containing the called constructor.
+So, if there is a generic type containing a nested class that is being created, the type arguments of the generic class have to be provided. 
+This limitation is shown in Figure \ref{img59:TypeArgList}, where the first statement is invalid since it contains inferred type arguments in the \texttt{GenericWrapper} identifier, which doesn’t contain the called constructor. 
+However, the second statement is valid because inferred type arguments are only in the \texttt{CreatingClass} identifier, which contains the called constructor.
 \begin{figure}[h!]
 \begin{lstlisting}[style=csharp, mathescape=true]
 new GenericWrapper<_>.CreatingClass<_>(arg1,...); // Not allowed
@@ -614,9 +617,6 @@ new GenericWrapper<int>.CreatingClass<_>(arg1,...); // Allowed
 \caption{Allowed inferred type arguments.}
 \label{img59:TypeArgList}
 \end{figure}
-So, if there is a generic type containing a nested class that is being created, the type arguments of the generic class have to be provided. 
-This limitation is shown in Figure \ref{img59:TypeArgList}, where the first statement is invalid since it contains inferred type arguments in the \texttt{GenericWrapper} identifier, which doesn’t contain the called constructor. 
-However, the second statement is valid because inferred type arguments are only in the \texttt{CreatingClass} identifier, which contains the called constructor.
 
 \subsection{Argument Binding}
 

@@ -372,7 +372,7 @@ void Foo<T1, T2>(T1 p1, T2 p2)
 \label{img54:partInf}
 \end{figure}
 
-\subsection{New Definitions}
+\subsection{New Definitions} \label{sect:dependencies}
 
 The proposed algorithm uses three new definitions which are given below.
 \begin{defn}[Inferred type argument]
@@ -388,7 +388,7 @@ An unfixed type variable \texttt{$X_i$} \emph{type-depends directly on} an unfix
 Thus \emph{type-depends on} is the transitive but not reflexive closure of \emph{type-depends directly on}.
 \end{defn}
 
-\subsection{Algorithm Phases}
+\subsection{Algorithm Phases} \label{sect:phasesAlg}
 
 The required change of the algorithm is presented as an algorithm divided into three sections, which is based on the former method type inference. 
 Figure \ref{img54:mainTypeInference1} shows the beginning, the first, and second phases. 
@@ -456,7 +456,7 @@ fn SecondPhase():
 
 \newpage
 
-\subsection{Collecting Type Bounds}
+\subsection{Collecting Type Bounds} \label{sect:Collection}
 
 Figure \ref{img55:mainTypeInference2} shows three adjusted inferences, adding new bounds, and presents a new \texttt{InferShape} inference.
 The change is in propagating nested type bounds between type variable bounds. 
@@ -537,7 +537,7 @@ So, for example, all bounds of lower bounds are lower bounds for exact, upper, a
 \label{table3:InferHelper}
 \end{table}
 
-\subsection{Fixation}
+\subsection{Fixation} \label{final:fixation}
 
 Figure \ref{img55::mainTypeInference3} shows the last part of the changed algorithm, the type variable fixation. 
 The set of candidates is changed to respect the shape-bound ability to express the exact form of the inferred type argument. 

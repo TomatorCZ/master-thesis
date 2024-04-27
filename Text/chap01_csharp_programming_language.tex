@@ -329,7 +329,7 @@ This goal represents dealing with implicit anonymous functions mentioned in Figu
 The algorithm first infers the \texttt{T2} input type of the anonymous function, then infers the function's output type, which is then used to match the output type of \texttt{Func<T2, T3>} parameter type with the output type of the inferred anonymous function's type.
 The match yields the \texttt{int} upper bound of the \texttt{T3} type parameter.
 
-\subsection{Function Type Inference}
+\subsection{Function Type Inference} \label{sect:FuncTI}
 
 Figure \ref{img11:methodTypeInference2} contains definitions of two helper functions used in the first and second phases. 
 The \texttt{ExplicitParameterType()} function is used to match an argument type, which is an explicit typed anonymous function. 

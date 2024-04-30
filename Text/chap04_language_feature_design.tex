@@ -848,7 +848,7 @@ The second consequence is that it can't infer the method's return type because i
 This is the difference between methods and anonymous functions which are expressions.
 So, the compiler can infer the return type of the anonymous function by compiling its body in the same phase, which is not the case in the method definition.
 \par
-Kotlin divides the method compilation into two groups, as it is described in the video \cite{online:kotlinCompiler}. 
+Kotlin divides the method compilation into two groups, as it is described in the video \cite{online:kotlinCompiler} regarding Kotlin compiler architecture. 
 The first group contains methods without a return type, which is compiled first in a single thread. 
 This will allow to obtain all signatures for these methods in the program. 
 Obviously, if these methods are recursions, the compiler can’t infer the return type, and an error occurs.

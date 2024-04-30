@@ -9,7 +9,7 @@ The results can be found in the \texttt{/Attachments/TestResults} folder contain
 These folders contain the results from the \texttt{-testCompilerOnly} suite case run whose tests can be found the the \texttt{Test} folder mentioned in Section \ref{roslynRepo:overview}.
 All tests pass when they are run separately.
 However, we noticed that when we use the testing framework to run \texttt{-testCompilerOnly} suite case, two of our tests don't pass as can be seen in the \texttt{WorkItem\_4\_x64\_test\_results.html} test results summary.
-We didn't manage to identify the reason for that, but we think that it is related to the test framework complexity of how it runs the tests.
+We didn't manage to identify the reason for that, but we believe that it is related to the test framework complexity of how it runs the tests.
 This failure needs further investigation in the context of how the test framework executes the tests.
 Except for this failure and unimportant small changes in the compiler tests regarding adding new error messages caused by our changes, all tests that passed before the improvement also passed after the improvement.
 This result ensures that the improvement doesn’t introduce any significant regression in the compiler tests.
